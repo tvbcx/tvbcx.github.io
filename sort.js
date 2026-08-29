@@ -1,24 +1,10 @@
-// Shared "sort" dropdown for any page that lists shows as a grid of
-// `.card` elements. Reads per-card data attributes (set by the page that
-// renders the cards) so this file has zero knowledge of where the shows
-// actually came from:
-//
-//   data-title="Show Name"       (required for Name sort)
-//   data-imdb="tt1234567"        (required for Average Rating / Popularity)
-//   data-my-rating="4.5"         (optional — omitted entirely if unrated)
-//
-// "Date" has no real watched-date stored anywhere on the site, so it's
-// approximated using each card's original position in the grid when
-// TVSort.init() runs — last card = most recently watched. If real
-// watched-date values ever get added, swap the date_desc/date_asc cases
-// in compareBy() below to compare those instead of dataset.order.
 (function (global) {
   'use strict';
 
   var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
   var TMDB_BASE = 'https://api.themoviedb.org/3';
   var CACHE_PREFIX = 'tvbox:tmdb:';
-  var CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days — TMDB rating/popularity barely move day to day
+  var CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
   var SORT_GROUPS = [
     {
@@ -70,12 +56,6 @@
     '<path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.42-.48-.42h-3.84c-.24 0-.44.18-.47.42l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.86c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94L2.85 14.5c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.03.24.24.42.48.42h3.84c.24 0 .44-.18.47-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.56ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/>' +
     '</svg>';
 
-  // ---------------------------------------------------------------------
-  // TMDB lookup, with a localStorage cache so repeat visits (and the
-  // watched/star pages, which share shows) don't keep re-fetching the
-  // same ~80 shows every time.
-  // ---------------------------------------------------------------------
-
   function readCache(imdbId) {
     try {
       var raw = localStorage.getItem(CACHE_PREFIX + imdbId);
@@ -96,7 +76,6 @@
         ts: Date.now()
       }));
     } catch (e) {
-      // storage full or unavailable (e.g. private browsing) — fine, just skip caching
     }
   }
 
@@ -123,8 +102,6 @@
       });
   }
 
-  // Fetch every id in the list with a small concurrency cap, so we don't
-  // fire 80+ simultaneous requests at once.
   function fetchAllTmdbInfo(imdbIds) {
     var CONCURRENCY = 6;
     var results = {};
@@ -147,10 +124,6 @@
     return Promise.all(workers).then(function () { return results; });
   }
 
-  // ---------------------------------------------------------------------
-  // Sort menu component
-  // ---------------------------------------------------------------------
-
   function numOrNull(v) {
     if (v === '' || v === undefined || v === null) return null;
     var n = parseFloat(v);
@@ -163,9 +136,6 @@
     var storageKey = config.storageKey || 'tvbox:sort';
     if (!grid || !mount) return;
 
-    // Snapshot the grid's current order as the "date added" stand-in —
-    // see the file header comment for why. Re-running init() (e.g. after
-    // star.html re-renders for a new ?stars= value) re-snapshots too.
     var cards = Array.prototype.slice.call(grid.children).filter(function (el) {
       return el.classList && el.classList.contains('card');
     });
@@ -229,7 +199,7 @@
     wrapper.appendChild(menu);
     mount.appendChild(wrapper);
 
-    var tmdbCache = {};   // imdbId -> { avg, popularity }
+    var tmdbCache = {};
     var tmdbLoaded = false;
 
     function setActive(key) {
@@ -285,7 +255,7 @@
             av = numOrNull(a.dataset.myRating);
             bv = numOrNull(b.dataset.myRating);
             if (av === null && bv === null) return 0;
-            if (av === null) return 1;   // unrated always sinks to the bottom
+            if (av === null) return 1;
             if (bv === null) return -1;
             return key === 'mine_desc' ? (bv - av) : (av - bv);
 
@@ -349,8 +319,6 @@
       }
     });
 
-    // Remember the last sort the person picked (shared across watched.html
-    // and star.html when storageKey matches, per-page when it doesn't).
     var saved = null;
     try { saved = localStorage.getItem(storageKey); } catch (e) {}
 
