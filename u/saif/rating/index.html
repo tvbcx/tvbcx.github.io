@@ -10,9 +10,11 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Stack+Sans+Headline:wght@200..700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://www.themoviedb.org">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link rel="preload" as="script" href="/sort.js?v=1">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* 4 posters per line, matching /u/saif/journal/ */
     #rating-grid { grid-template-columns: repeat(4, 1fr); }
   </style>
 </head>
@@ -80,9 +82,8 @@
       <div class="poster-grid" id="rating-grid"></div>
     </section>
 
-  </div><!-- /.page-content -->
+  </div>
 
-    <!-- Bottom Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -106,9 +107,6 @@
   <script src="/shows.js?v=1"></script>
   <script src="/sort.js?v=1"></script>
   <script>
-    // Renders the subset of shows from /shows.js that match the ?stars= param.
-    // Shows loaded from /shows.js
-
     function starGlyph(v) {
       var full = Math.floor(v);
       var half = (v - full) >= 0.5;
@@ -138,10 +136,13 @@
         return;
       }
 
+      var EAGER_ROW_SIZE = 4;
+
       var fragment = document.createDocumentFragment();
-      matches.forEach(function (s) {
+      matches.forEach(function (s, i) {
         var imdbId = s.imdb || '';
         var titleAttr = s.title.replace(/"/g, '&quot;');
+        var loadingAttr = i < EAGER_ROW_SIZE ? 'eager' : 'lazy';
 
         var card = document.createElement('div');
         card.className = 'card';
@@ -150,7 +151,7 @@
         card.dataset.myRating = s.rating;
         card.innerHTML =
           '<a href="/show/?imdb=' + imdbId + '">' +
-            '<img src="' + s.src + '" alt="' + titleAttr + '" width="150" height="225" loading="lazy" decoding="async">' +
+            '<img src="' + s.src + '" alt="' + titleAttr + '" width="150" height="225" loading="' + loadingAttr + '" decoding="async">' +
           '</a>' +
           '<p class="rating"><a href="/u/saif/rating/?stars=' + s.rating + '" class="rating-link">' + starGlyph(s.rating) + '</a></p>';
         fragment.appendChild(card);
@@ -194,13 +195,6 @@
         }
       });
 
-      // The overlay gets turned on right before we navigate to /search/,
-      // and this page is never given a chance to turn it back off — so if
-      // the browser later restores this exact page from its back/forward
-      // cache (e.g. tapping Back from the search results), it's repainted
-      // exactly as frozen: overlay still up, spinner still spinning,
-      // hiding all the real content underneath. Clear it every time this
-      // page is (re)shown so that can't happen.
       window.addEventListener('pageshow', function () {
         overlay.classList.remove('-visible');
       });
