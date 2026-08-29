@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>...</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
+  <link rel="preconnect" href="https://image.tmdb.org">
+  <link rel="preload" as="script" href="/auth.js?v=1">
+  <link rel="preload" as="script" href="/showmarking.js?v=1">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400&display=swap" rel="stylesheet">
+  <style>
+    #show-poster-img {
+      background-color: #32425b;
+      display: block;
+    }
+    #watchlist-btn {
+      background-color: #4d8eff;
+      border-color: #4d8eff;
+      color: #0b121e;
+    }
+    #markas-btn-label {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 37px;
+      color: #b3c2db;
+      border-color: #30405a;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      #watchlist-btn:hover {
+        background-color: #80aeff;
+        border-color: #80aeff;
+      }
+      #markas-btn-label:hover {
+        color: #4d8eff;
+        border-color: #4d8eff;
+      }
+    }
+    @media (min-width: 641px) {
+      #markas-btn-label {
+        height: 45px;
+      }
+    }
+    @media (min-width: 641px) {
+      .show-hero {
+        align-items: flex-start;
+      }
+    }
+    @media (min-width: 641px) {
+      #show-meta {
+        gap: 10px;
+      }
+      #show-meta .show-meta-dot {
+        display: none;
+      }
+      #show-meta > span:not(.show-meta-dot) {
+        padding: 6px 14px;
+        background-color: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+        color: #eaeef5;
+        font-weight: 600;
+      }
+      #show-genres {
+        gap: 10px;
+      }
+      #show-genres .genre-tag {
+        background-color: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+        color: #dde2eb;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="backdrop-container show-banner-container">
+    <div id="show-backdrop" class="backdrop-wrapper">
+      <div class="backdropimage js-show-backdrop-image"></div>
+      <div class="backdropmask"></div>
+    </div>
+    <a href="/about/" class="floating-tvbox" aria-label="TV Box">
+      <svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+        <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+      </svg>
+    </a>
+
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+  </div>
+
+  <div class="page-content">
+
+    <div id="show-status" class="search-status"></div>
+
+    <section id="show-hero" class="show-hero" hidden>
+      <div class="show-poster">
+        <img id="show-poster-img" alt="">
+      </div>
+
+      <div class="show-hero-info">
+        <h1 id="show-title" class="show-title"></h1>
+
+        <div id="show-meta" class="show-meta"></div>
+
+        <div id="show-genres" class="show-genres"></div>
+
+        <div class="show-actions">
+          <input type="checkbox" id="markas-toggle" class="auth-checkbox">
+
+          <button type="button" id="watchlist-btn" class="watchlist-btn">Add to Watchlist</button>
+
+          <label for="markas-toggle" id="markas-btn-label" class="markas-btn">Mark As</label>
+
+          <label for="markas-toggle" class="markas-backdrop" aria-hidden="true"></label>
+
+          <div class="markas-popover">
+            <div id="markas-options" class="markas-options"></div>
+
+            <div class="markas-divider"></div>
+
+            <div class="markas-stars">
+              <div class="stars-track" id="markas-stars-track">
+                <div class="stars-bg">★★★★★</div>
+                <div class="stars-fg" id="markas-stars-fg">★★★★★</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="show-stats">
+          <div class="show-stat">
+            <span class="value numbers" id="show-rating-value">–</span>
+            <span class="definition title-all-caps -small">Rating</span>
+          </div>
+          <div class="show-stat">
+            <span class="value numbers" id="show-seasons-value">–</span>
+            <span class="definition title-all-caps -small">Seasons</span>
+          </div>
+          <div class="show-stat">
+            <span class="value numbers" id="show-episodes-value">–</span>
+            <span class="definition title-all-caps -small">Episodes</span>
+          </div>
+        </div>
+
+        <p id="show-overview" class="show-overview"></p>
+      </div>
+    </section>
+
+  </div>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+  <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+</svg><a href="/about/"><strong>tvbox.</strong></a> Data from <a href="https://www.themoviedb.org/">TMDB</a> | 
+      <a href="https://x.com/csaif_" class="footer-social" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center;">
+        <svg class="footer-social-icon" style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="spinner">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
+      var TMDB_BASE = 'https://api.themoviedb.org/3';
+      var POSTER_BASE = 'https://image.tmdb.org/t/p/w500';
+      var BACKDROP_BASE = 'https://image.tmdb.org/t/p/original';
+
+      var statusEl = document.getElementById('show-status');
+      var hero = document.getElementById('show-hero');
+      var backdropImage = document.querySelector('.js-show-backdrop-image');
+
+      var SPINNER_HTML =
+        '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+
+      function setStatus(html, isError) {
+        if (!html) {
+          statusEl.hidden = true;
+          statusEl.innerHTML = '';
+          statusEl.classList.remove('-error');
+          return;
+        }
+        statusEl.hidden = false;
+        statusEl.innerHTML = html;
+        statusEl.classList.toggle('-error', !!isError);
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function yearFromDate(dateStr) {
+        return dateStr ? dateStr.slice(0, 4) : null;
+      }
+
+      function statusLabel(status) {
+        return status || null;
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      var showId = params.get('id');
+      var imdbId = params.get('imdb');
+
+      function loadShow(id) {
+        setStatus(SPINNER_HTML);
+
+        fetch(TMDB_BASE + '/tv/' + encodeURIComponent(id) + '?api_key=' + TMDB_API_KEY + '&append_to_response=external_ids')
+          .then(function (res) {
+            if (!res.ok) throw new Error('TMDB request failed (' + res.status + ')');
+            return res.json();
+          })
+          .then(renderShow)
+          .catch(function (err) {
+            setStatus('Something went wrong: ' + err.message, true);
+          });
+      }
+
+      if (showId) {
+        loadShow(showId);
+      } else if (imdbId) {
+        setStatus(SPINNER_HTML);
+        fetch(TMDB_BASE + '/find/' + encodeURIComponent(imdbId) + '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id')
+          .then(function (res) {
+            if (!res.ok) throw new Error('TMDB request failed (' + res.status + ')');
+            return res.json();
+          })
+          .then(function (found) {
+            var match = found.tv_results && found.tv_results[0];
+            if (!match) throw new Error('No matching show found on TMDB');
+            loadShow(match.id);
+          })
+          .catch(function (err) {
+            setStatus('Something went wrong: ' + err.message, true);
+          });
+      } else {
+        setStatus('No show selected. Head back to <a href="/search/">search</a> and pick one.', true);
+      }
+
+      function renderShow(show) {
+            setStatus('');
+
+            var backdropUrl = show.backdrop_path
+              ? BACKDROP_BASE + show.backdrop_path
+              : (show.poster_path ? BACKDROP_BASE + show.poster_path : null);
+            if (backdropUrl) {
+              var preload = new Image();
+              preload.onload = function () {
+                backdropImage.style.backgroundImage = 'url("' + backdropUrl + '")';
+                backdropImage.classList.add('is-loaded');
+              };
+              preload.src = backdropUrl;
+            }
+
+            var posterImg = document.getElementById('show-poster-img');
+            posterImg.src = show.poster_path ? POSTER_BASE + show.poster_path : 'poster-placeholder.jpg';
+            posterImg.alt = show.name || '';
+
+            document.getElementById('show-title').textContent = show.name || 'Untitled';
+            document.title = (show.name || 'Untitled') + ' — TVbox';
+
+            var year = yearFromDate(show.first_air_date);
+            var metaParts = [];
+            if (year) metaParts.push('<span class="numbers">' + year + '</span>');
+            var status = statusLabel(show.status);
+            if (status) metaParts.push('<span>' + escapeHtml(status) + '</span>');
+            if (show.number_of_seasons) {
+              metaParts.push('<span>' + show.number_of_seasons + ' season' + (show.number_of_seasons === 1 ? '' : 's') + '</span>');
+            }
+            document.getElementById('show-meta').innerHTML = metaParts.join('<span class="show-meta-dot">·</span>');
+
+            var genresEl = document.getElementById('show-genres');
+            var genres = show.genres || [];
+            if (genres.length) {
+              genresEl.innerHTML = genres.map(function (g) {
+                return '<span class="genre-tag">' + escapeHtml(g.name) + '</span>';
+              }).join('');
+            }
+
+            document.getElementById('show-rating-value').textContent =
+              show.vote_average ? show.vote_average.toFixed(1) : '–';
+            document.getElementById('show-seasons-value').textContent =
+              show.number_of_seasons != null ? show.number_of_seasons : '–';
+            document.getElementById('show-episodes-value').textContent =
+              show.number_of_episodes != null ? show.number_of_episodes : '–';
+
+            document.getElementById('show-overview').textContent =
+              show.overview || 'No description available.';
+
+            hero.hidden = false;
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var form = document.getElementById('home-search-form');
+      var input = document.getElementById('home-search-input');
+      var overlay = document.getElementById('page-loading-overlay');
+
+      function goToResults() {
+        var value = input.value.trim();
+        if (!value) return;
+        overlay.classList.add('-visible');
+        window.location.href = '/search/?q=' + encodeURIComponent(value);
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        goToResults();
+      });
+
+      input.addEventListener('search', function () {
+        goToResults();
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          goToResults();
+        }
+      });
+
+      window.addEventListener('pageshow', function () {
+        overlay.classList.remove('-visible');
+      });
+    })();
+  </script>
+  <script>
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted && document.activeElement) {
+        document.activeElement.blur();
+      }
+    });
+  </script>
+<script src="/auth.js?v=1"></script>
+<script src="/showmarking.js?v=1"></script>
+</body>
+</html>

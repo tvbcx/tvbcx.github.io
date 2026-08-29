@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saif's profile</title>
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://www.themoviedb.org">
+  <link rel="preconnect" href="https://media.themoviedb.org" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Figtree:wght@300..700&family=Stack+Sans+Headline:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/9999999999999profilepicture.webp">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link rel="preload" as="script" href="/stats.js?v=1">
+  <style>
+    /* Divider between the 2026 and 2025 journal sections */
+    .journal-year-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 16px;
+    }
+    /*MOBILE*/
+    /* Breathing room between the stacked sections on mobile: Ratings ->
+       Journal (dash-cards inside the same section), then Journal -> Did
+       Not Finish -> Watchlist (separate sections). Scoped below the
+       1024px breakpoint so it never touches the desktop float layout,
+       which already sets its own spacing further down this stylesheet. */
+    @media (max-width: 1023px) {
+      .dashboard-row .dash-card:first-child {
+        margin-bottom: 24px;
+      }
+      .profile-ratings-journal,
+      .profile-dnf {
+        margin-bottom: 24px;
+      }
+    }
+    /*DESKTOP*/
+    .profile-stats-embed {
+      display: none;
+    }
+    .last-watched-poster .rating {
+      display: block;
+      margin: 6px 2px 0;
+      font-size: 13px;
+      letter-spacing: -1px;
+      color: #4d8eff;
+      text-align: center;
+    }
+    @media (min-width: 1024px) {
+      .profile-header .sgraph-link,
+      .profile-header .sgraph-link:hover {
+        font-size: 16px;
+      }
+      .profile-grid {
+        display: block;
+      }
+      .profile-grid::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-watchlist {
+        float: left;
+        clear: left;
+        width: calc(100% - 380px);
+      }
+      .profile-stats-embed,
+      .profile-ratings-journal {
+        float: right;
+        clear: right;
+        width: 340px;
+        display: block;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-stats-embed {
+        margin-bottom: 24px;
+      }
+      .profile-favorites .stats-box {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+      .profile-favorites,
+      .profile-dnf {
+        margin-top: 0 !important;
+        margin-bottom: 24px !important;
+      }
+      .profile-watchlist {
+        margin-top: 0 !important;
+        margin-bottom: 24px !important;
+      }
+      .profile-ratings-journal .dashboard-row {
+        display: block;
+      }
+      .profile-ratings-journal .dash-card:first-child {
+        margin-bottom: 24px;
+      }
+
+      .profile-stats-embed .stats-hero-card {
+        padding: 18px 6px 16px;
+      }
+      .profile-stats-embed .stats-hero-card .value {
+        font-size: 1.5rem;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .profile-stats-embed .stats-donut-panel {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+      }
+      .profile-stats-embed .stats-donut {
+        width: 108px;
+        height: 108px;
+      }
+      .profile-stats-embed .stats-legend {
+        width: auto;
+      }
+      .profile-stats-embed .stats-legend-item {
+        font-size: 11.5px;
+        gap: 6px;
+      }
+      .profile-stats-embed .stats-legend-name {
+        max-width: 110px;
+      }
+
+      .profile-favorites {
+        margin-bottom: 12px !important;
+      }
+      .profile-stats-embed {
+        margin-bottom: 12px !important;
+      }
+    }
+  </style>
+</head>
+<body class="profile-page">
+
+  <div class="backdrop-container">
+    <div id="backdrop" class="backdrop-wrapper backdrop-fade-in"
+         data-backdrop="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/Train%20Dreams%20-%20(2025)%20-%20Frame%20327.webp"
+         data-backdrop2x="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/Train%20Dreams%20-%20(2025)%20-%20Frame%20327.webp"
+         data-backdrop-mobile="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/Train%20Dreams%20-%20(2025)%20-%20Frame%20327.webp"
+         data-offset="21">
+      <div class="backdropimage js-backdrop-image"></div>
+      <div class="backdropmask js-backdrop-fade"></div>
+    </div>
+
+    <a href="/about/" class="floating-tvbox" aria-label="TV Box">
+      <svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+        <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+      </svg>
+    </a>
+
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+  </div>
+
+  <div class="page-content">
+  <header class="profile-header">
+<div class="profile-left">
+      <div class="profile-summary js-profile-summary">
+        <div class="profile-avatar">
+          <img id="avatar-trigger" src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/9999999999999profilepicture.webp" alt="Saif" class="avatar-img" role="button" tabindex="0" aria-label="View full profile picture" fetchpriority="high" decoding="async">
+        </div>
+        <div id="badge-morph" class="badge-morph" aria-hidden="true">
+          <img id="badge-morph-avatar" class="badge-morph-img -visible" src="" alt="">
+          <img id="badge-morph-badge" class="badge-morph-img" src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/badge.webp" alt="">
+        </div>
+        <div class="profile-name-and-actions">
+          <h1 id="name-trigger" class="person-display-name js-display-name">Saif<button type="button" id="badge-circle-trigger" class="badge-circle-trigger" aria-label="Saif — tap to reveal badge">
+              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="m 8 0 c -3.3125 0 -6 2.6875 -6 6 c 0.007812 0.710938 0.136719 1.414062 0.386719 2.078125 l -0.015625 -0.003906 c 0.636718 1.988281 3.78125 5.082031 5.625 6.929687 h 0.003906 v -0.003906 c 1.507812 -1.507812 3.878906 -3.925781 5.046875 -5.753906 c 0.261719 -0.414063 0.46875 -0.808594 0.585937 -1.171875 l -0.019531 0.003906 c 0.25 -0.664063 0.382813 -1.367187 0.386719 -2.078125 c 0 -3.3125 -2.683594 -6 -6 -6 z m 0 3.691406 c 1.273438 0 2.308594 1.035156 2.308594 2.308594 s -1.035156 2.308594 -2.308594 2.308594 c -1.273438 -0.003906 -2.304688 -1.035156 -2.304688 -2.308594 c -0.003906 -1.273438 1.03125 -2.304688 2.304688 -2.308594 z m 0 0" fill="#9fa9ba"/>
+              </svg>
+            </button></h1>
+          
+<div class="bio js-bio" style="margin: 0; text-align: left;">
+  <div class="js-collapsible-text body-text -small -reset js-bio-content" data-full-text-url="/s/full-text/person:32104717/">
+    <p style="margin: 0;">
+      <a href="https://app.thestorygraph.com/profile/caif" rel="nofollow" class="sgraph-link" style="display: inline-flex; align-items: center; gap: 4px;">
+<svg 
+  viewBox="0 0 24 24" 
+  width="12.4" 
+  height="12.4" 
+  style="flex-shrink: 0; transform: translateY(1.5px);" 
+  xmlns="http://www.w3.org/2000/svg" 
+  fill="#000000"
+>
+  <g transform="translate(0 -1028.4)">
+    <path d="m3 1035.4v2 1 3 1 5 1c0 1.1 0.8954 2 2 2h14c1.105 0 2-0.9 2-2v-1-5-4-3h-18z" fill="#16a085"></path>
+    <path d="m3 1034.4v2 1 3 1 5 1c0 1.1 0.8954 2 2 2h14c1.105 0 2-0.9 2-2v-1-5-4-3h-18z" fill="#ecf0f1"></path>
+    <path d="m3 1033.4v2 1 3 1 5 1c0 1.1 0.8954 2 2 2h14c1.105 0 2-0.9 2-2v-1-5-4-3h-18z" fill="#bdc3c7"></path>
+    <path d="m3 1032.4v2 1 3 1 5 1c0 1.1 0.8954 2 2 2h14c1.105 0 2-0.9 2-2v-1-5-4-3h-18z" fill="#ecf0f1"></path>
+    <path d="m5 1028.4c-1.1046 0-2 0.9-2 2v1 4 2 1 3 1 5 1c0 1.1 0.8954 2 2 2h2v-1h-1.5c-0.8284 0-1.5-0.7-1.5-1.5 0-0.9 0.6716-1.5 1.5-1.5h12.5 1c1.105 0 2-0.9 2-2v-1-5-4-3-1c0-1.1-0.895-2-2-2h-4-10z" fill="#16a085"></path>
+    <path d="m8 1028.4v18h1 9 1c1.105 0 2-0.9 2-2v-1-5-4-3-1c0-1.1-0.895-2-2-2h-4-6-1z" fill="#1abc9c"></path>
+    <path d="m7 1048.4v2 2l2.5-2 2.5 2v-2-2h-5z" fill="#e74c3c"></path>
+    <rect height="1" width="5" y="1047.4" x="7" fill="#c0392b"></rect>
+  </g>
+</svg>
+     <strong>sgraph.com</strong>
+      </a>
+    </p>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+
+    <div class="profile-stats js-profile-stats">
+      <h4 class="profile-statistic statistic">
+        <a href="/u/saif/watched/">
+          <span class="value numbers" id="shows-count">85</span>
+          <span class="definition title-all-caps -small">Shows</span>
+        </a>
+      </h4>
+      <span class="profile-stats-divider" aria-hidden="true">|</span>
+      <h4 class="profile-statistic statistic">
+        <a href="/u/saif/journal/">
+          <span class="value numbers" id="journal-year-count">–</span>
+          <span class="definition title-all-caps -small">This year</span>
+        </a>
+      </h4>
+    </div>
+  </header>
+
+  <!-- Full-size avatar lightbox, hidden by default (position:fixed — placement in the DOM doesn't matter) -->
+  <div id="avatar-lightbox" class="avatar-lightbox">
+    <img id="avatar-lightbox-img" src="" alt="Saif — full profile picture" class="avatar-lightbox-img">
+  </div>
+
+  <div class="profile-grid">
+
+  <!-- Top 4 Favorites -->
+  <section class="profile-favorites">
+    <h2 class="section-heading">Favorite Shows</h2>
+    <div class="poster-grid favorites-grid">
+      <div class="card">
+        <a href="/show/?imdb=tt5071412">
+          <img src="https://www.themoviedb.org/t/p/w342/pCGyPVrI9Fzw6rE1Pvi4BIXF6ET.jpg" alt="Ozark" width="150" height="225" decoding="async">
+        </a>
+      </div>
+      <div class="card">
+        <a href="/show/?imdb=tt2149175">
+          <img src="https://www.themoviedb.org/t/p/w342/w1UBlxEXhbKe8sp0fxFZh7MqTce.jpg" alt="The Americans" width="150" height="225" decoding="async">
+        </a>
+      </div>
+      <div class="card">
+        <a href="/show/?imdb=tt0434706">
+          <img src="https://media.themoviedb.org/t/p/w440_and_h660_face/c7YgL8hQoQvh5gSlTy0otMWlO24.jpg" alt="Monster" width="150" height="225" decoding="async">
+        </a>
+      </div>
+      <div class="card">
+        <a href="/show/?imdb=tt0903747">
+          <img src="https://media.themoviedb.org/t/p/w440_and_h660_face/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg" alt="Breaking Bad" width="150" height="225" decoding="async">
+        </a>
+      </div>
+    </div>
+
+    <!-- Rounded stats box: click it -> goes to the year-by-year stats page -->
+    <a href="/u/saif/stats/" class="stats-box">
+      <span class="year numbers">2026</span>
+      <span class="label">STATS</span>
+    </a>
+
+    <!-- Last Watch: single centered poster, same size as a Favorite Shows
+         poster. Filled in from /shows.js below (most recent journalOrder
+         within the current year). -->
+    <div class="last-watched" id="last-watched-section" hidden>
+      <span class="last-watched-label">Last Watch</span>
+      <div class="last-watched-line" aria-hidden="true"></div>
+      <div class="card last-watched-poster">
+        <a href="#" id="last-watched-link">
+          <img id="last-watched-img" src="" alt="" width="150" height="225" decoding="async">
+        </a>
+        <p class="rating" id="last-watched-rating"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2026 Stats — embedded widget, desktop only (mobile keeps the
+       "STATS" link box above, which still opens the full page) -->
+  <section class="profile-stats-embed" id="section-embed-stats">
+    <h2 class="section-heading"><a href="/u/saif/stats/" class="section-heading-link">2026 Stats</a></h2>
+
+    <div id="embed-stats-status" class="stats-status"></div>
+
+    <div id="embed-stats-content" hidden>
+      <div class="stats-hero-row">
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-hours">–</span>
+          <span class="definition">Hours</span>
+        </div>
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-episodes">–</span>
+          <span class="definition">Episodes</span>
+        </div>
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-seasons">–</span>
+          <span class="definition">Seasons</span>
+        </div>
+      </div>
+
+      <div class="stats-donut-panel">
+        <div id="embed-platform-donut-mount"></div>
+        <ul class="stats-legend" id="embed-platform-legend"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ratings + Journal: stacked on mobile, side-by-side at 900px+,
+       stacked again (this time in the right column) at 1024px+ -->
+  <section class="profile-ratings-journal">
+    <div class="dashboard-row">
+      <div class="dash-card">
+        <h2 class="section-heading"><a href="/u/saif/ratings/" class="section-heading-link">Ratings</a></h2>
+        <div class="ratings-panel">
+          <div class="ratings-chart">
+            <div class="ratings-bars" id="ratings-bars">
+              <a class="rbar" href="/u/saif/rating/?stars=0.5" data-rating="0.5"><span class="rbar-edge-label">1/2</span></a>
+              <a class="rbar" href="/u/saif/rating/?stars=1" data-rating="1"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=1.5" data-rating="1.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=2" data-rating="2"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=2.5" data-rating="2.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=3" data-rating="3"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=3.5" data-rating="3.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=4" data-rating="4"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=4.5" data-rating="4.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=5" data-rating="5"><span class="rbar-edge-label">5</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h2 class="section-heading"><a href="/u/saif/journal/" class="section-heading-link">Journal</a></h2>
+        <div class="journal-container">
+          <div class="journal-content">
+            <a class="calendar-badge" href="/u/saif/journal/?year=2026" aria-label="View 2026 journal" style="text-decoration:none;color:inherit;">
+              <div class="rings">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="year-text" id="journal-year-text">–</span>
+            </a>
+            <ul class="entry-list" id="journal-entry-list"></ul>
+          </div>
+          <div class="journal-year-divider" aria-hidden="true"></div>
+          <div class="journal-content" style="margin-top:16px;">
+            <a class="calendar-badge" href="/u/saif/journal/?year=2025" aria-label="View 2025 journal" style="text-decoration:none;color:inherit;">
+              <div class="rings">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="year-text" id="journal-year-text-2025">2025</span>
+            </a>
+            <ul class="entry-list" id="journal-entry-list-2025"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Did Not Finish -->
+  <section class="profile-dnf">
+    <h2 class="section-heading"><a href="/u/saif/dnf/" class="section-heading-link">Did Not Finish</a></h2>
+    <div class="poster-grid favorites-grid" id="index-dnf-grid">
+      <!-- cards generated from /shows.js below (list: "dnf") -->
+    </div>
+  </section>
+
+  <!-- Watchlist -->
+  <section class="profile-watchlist">
+    <h2 class="section-heading"><a href="/u/saif/watchlist/" class="section-heading-link">Watchlist</a></h2>
+    <div class="poster-grid favorites-grid" id="index-watchlist-grid">
+      <!-- cards generated from /shows.js below (list: "watchlist") -->
+    </div>
+  </section>
+
+  </div><!-- /.profile-grid -->
+
+  </div><!-- /.page-content -->
+
+    <!-- Bottom Footer -->
+<footer class="site-footer">
+  <div class="footer-container">
+    <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+  <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+</svg><a href="/about/"><strong>tvbox.</strong></a> Data from <a href="https://www.themoviedb.org/">TMDB</a> | 
+      <a href="https://x.com/csaif_" class="footer-social" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center;">
+        <svg class="footer-social-icon" style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+  <!-- Shown while navigating to the search results page -->
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="spinner">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+
+  <script src="/shows.js?v=1"></script>
+  <script src="/stats.js?v=1"></script>
+  <script>
+    // Shows stat should only reflect actually-watched shows — /shows.js also
+    // holds Did Not Finish / Watchlist entries (tagged via `list`), which
+    // shouldn't count toward this total.
+    document.getElementById('shows-count').textContent =
+      SHOWS.filter(function (s) { return !s.list || s.list === 'watched'; }).length;
+  </script>
+
+  <!-- Did Not Finish / Watchlist mini-grids: same /shows.js data used by
+       /u/saif/dnf/ and /u/saif/watchlist/, filtered by the `list` field
+       so this page never needs its own hardcoded show list. -->
+  <script>
+    (function () {
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function renderMiniGrid(gridId, listKey) {
+        var grid = document.getElementById(gridId);
+        if (!grid) return;
+        var shows = SHOWS.filter(function (s) { return s.list === listKey; }).slice(0, 4);
+
+        grid.innerHTML = shows.map(function (s) {
+          var titleAttr = escapeHtml(s.title);
+          return (
+            '<div class="card">' +
+              '<a href="/show/?imdb=' + s.imdb + '">' +
+                '<img src="' + s.src + '" alt="' + titleAttr + '" width="150" height="225" decoding="async" loading="lazy">' +
+              '</a>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      renderMiniGrid('index-dnf-grid', 'dnf');
+      renderMiniGrid('index-watchlist-grid', 'watchlist');
+    })();
+  </script>
+
+  <!-- Last Watch: the most recently journaled show in the current year
+       (highest journalOrder among shows with journalYear === this year).
+       Falls back to the single most recent journaled show overall if
+       nothing has been journaled yet this year. -->
+  <script>
+    (function () {
+      function starGlyph(v) {
+        var full = Math.floor(v);
+        var half = (v - full) >= 0.5;
+        return '\u2605'.repeat(full) + (half ? '\u00BD' : '');
+      }
+
+      var section = document.getElementById('last-watched-section');
+      var linkEl = document.getElementById('last-watched-link');
+      var imgEl = document.getElementById('last-watched-img');
+      var ratingEl = document.getElementById('last-watched-rating');
+      if (!section || !linkEl || !imgEl) return;
+
+      var journaled = SHOWS.filter(function (s) { return !!s.journalYear; });
+      if (!journaled.length) return;
+
+      var currentYear = new Date().getFullYear();
+      var thisYear = journaled.filter(function (s) { return s.journalYear === currentYear; });
+      var pool = thisYear.length ? thisYear : journaled;
+
+      var lastWatched = pool.reduce(function (latest, s) {
+        return (!latest || s.journalOrder > latest.journalOrder) ? s : latest;
+      }, null);
+
+      if (!lastWatched) return;
+
+      linkEl.href = '/show/?imdb=' + lastWatched.imdb;
+      imgEl.src = lastWatched.src;
+      imgEl.alt = lastWatched.title || '';
+
+      if (ratingEl && lastWatched.rating != null) {
+        ratingEl.innerHTML = '<a href="/u/saif/rating/?stars=' + lastWatched.rating + '" class="rating-link">' + starGlyph(lastWatched.rating) + '</a>';
+      }
+
+      section.hidden = false;
+    })();
+  </script>
+
+  <!-- Journal widget: most-recently-logged shows from /shows.js
+       (journalYear/journalOrder fields), newest first. -->
+  <script>
+    (function () {
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      var journaled = SHOWS.filter(function (s) { return !!s.journalYear; })
+        .sort(function (a, b) { return b.journalOrder - a.journalOrder; });
+
+      var yearCountEl = document.getElementById('journal-year-count');
+      var yearTextEl = document.getElementById('journal-year-text');
+      var listEl = document.getElementById('journal-entry-list');
+      if (!journaled.length || !yearCountEl || !yearTextEl || !listEl) return;
+
+      var latestYear = journaled[0].journalYear;
+
+      yearCountEl.textContent = journaled.filter(function (s) { return s.journalYear === latestYear; }).length;
+      yearTextEl.textContent = latestYear;
+
+      listEl.innerHTML = journaled.slice(0, 2).map(function (s) {
+        return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
+      }).join('');
+
+      // 2025 badge — same idea, just hardcoded to 2025 instead of "whatever
+      // the latest year is". Shows its 2 most recent journal entries.
+      var listEl2025 = document.getElementById('journal-entry-list-2025');
+      if (listEl2025) {
+        var journaled2025 = journaled.filter(function (s) { return s.journalYear === 2025; });
+        listEl2025.innerHTML = journaled2025.length
+          ? journaled2025.slice(0, 2).map(function (s) {
+              return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
+            }).join('')
+          : '<li class="entry-title" style="opacity:0.5;">Nothing logged yet</li>';
+      }
+    })();
+  </script>
+
+  <!-- Ratings bar chart: bar heights are computed live from /shows.js, not
+       hand-typed. Each bar's height is its count relative to whichever
+       rating has the most shows (that one hits 100% height).
+       If nothing in /shows.js is rated yet, every count is 0 and every
+       bar collapses to the flat baseline (.rbar's min-height: 2px). -->
+  <script>
+    (function () {
+      var RATING_STEPS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+      var counts = {};
+      RATING_STEPS.forEach(function (r) { counts[r] = 0; });
+
+      SHOWS.forEach(function (s) {
+        if (s.rating && counts.hasOwnProperty(s.rating)) {
+          counts[s.rating]++;
+        }
+      });
+
+      var maxCount = Math.max.apply(null, RATING_STEPS.map(function (r) { return counts[r]; }));
+
+      var bars = document.querySelectorAll('#ratings-bars .rbar');
+      Array.prototype.forEach.call(bars, function (bar) {
+        var r = parseFloat(bar.dataset.rating);
+        var count = counts[r] || 0;
+        var pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+
+        bar.style.height = pct + '%';
+        bar.title = r + '★ · ' + count;
+      });
+    })();
+  </script>
+
+  <!-- Embedded "2026 Stats" widget for the desktop two-column layout.
+       Only runs on desktop — no point fetching TMDB data for a widget
+       that's display:none on mobile. Reuses STATS_YEARS/TVStats from
+       /stats.js and the same render approach as /u/saif/stats/, just
+       fixed to 2026 with no year switcher. -->
+  <script>
+    (function () {
+      if (!window.matchMedia('(min-width: 1024px)').matches) return;
+      if (!window.STATS_YEARS || !window.TVStats) return;
+
+      var SPINNER_HTML =
+        '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+      var PALETTE = ['#4d8eff', '#29a6ff', '#8cb2f2', '#4b84e8', '#b3c2db', '#a2acbe', '#8490a4', '#4a628c', '#405585'];
+      var OTHER_COLOR = '#30405a';
+
+      function colorFor(item, i) {
+        return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function fmtPct(v) {
+        return (Math.round(v * 10) / 10).toString();
+      }
+
+      function buildDonut(list, centerValue, centerLabel) {
+        var size = 168, cx = 84, cy = 84, r = 64, sw = 22;
+        var circumference = 2 * Math.PI * r;
+        var total = list.reduce(function (s, i) { return s + i.value; }, 0) || 1;
+        var offset = 0;
+
+        var segments = list.map(function (item, i) {
+          var frac = item.value / total;
+          var len = Math.max(frac * circumference, list.length > 1 ? 1.5 : circumference);
+          var gap = list.length > 1 ? 2 : 0;
+          var dasharray = Math.max(len - gap, 0) + ' ' + (circumference - len + gap);
+          var dashoffset = -offset;
+          offset += len;
+          return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
+            'stroke="' + colorFor(item, i) + '" stroke-width="' + sw + '" ' +
+            'stroke-dasharray="' + dasharray + '" stroke-dashoffset="' + dashoffset + '" ' +
+            'stroke-linecap="round" transform="rotate(-90 ' + cx + ' ' + cy + ')" />';
+        }).join('');
+
+        return (
+          '<svg viewBox="0 0 ' + size + ' ' + size + '" class="stats-donut" role="img" aria-label="Platform distribution">' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="' + sw + '"/>' +
+            segments +
+            '<text x="' + cx + '" y="' + (cy - 3) + '" text-anchor="middle" class="stats-donut-center-value numbers">' + escapeHtml(centerValue) + '</text>' +
+            '<text x="' + cx + '" y="' + (cy + 15) + '" text-anchor="middle" class="stats-donut-center-label">' + escapeHtml(centerLabel) + '</text>' +
+          '</svg>'
+        );
+      }
+
+      var statusEl = document.getElementById('embed-stats-status');
+      var content = document.getElementById('embed-stats-content');
+      var heroHours = document.getElementById('embed-stat-hours');
+      var heroEpisodes = document.getElementById('embed-stat-episodes');
+      var heroSeasons = document.getElementById('embed-stat-seasons');
+      var platformMount = document.getElementById('embed-platform-donut-mount');
+      var platformLegend = document.getElementById('embed-platform-legend');
+
+      if (!statusEl || !content) return;
+
+      statusEl.hidden = false;
+      statusEl.innerHTML = SPINNER_HTML;
+
+      var showList = STATS_YEARS[2026] || [];
+      var ids = showList.map(function (s) { return s.imdb; });
+
+      TVStats.fetchAll(ids).then(function (records) {
+        var summary = TVStats.aggregate(showList, records);
+
+        statusEl.hidden = true;
+        statusEl.innerHTML = '';
+
+        if (!summary.showCount) {
+          statusEl.hidden = false;
+          statusEl.innerHTML = '<p class="stats-empty">No shows logged yet.</p>';
+          return;
+        }
+
+        content.hidden = false;
+        heroHours.textContent = fmtPct(summary.hours);
+        heroEpisodes.textContent = Math.round(summary.episodes);
+        heroSeasons.textContent = Math.round(summary.seasons);
+
+        var platformList = TVStats.toRanked(summary.platforms, 5);
+        platformMount.innerHTML = buildDonut(platformList, fmtPct(summary.hours), 'HOURS');
+        platformLegend.innerHTML = platformList.map(function (item, i) {
+          var pct = summary.hours ? fmtPct((item.value / summary.hours) * 100) : '0';
+          return (
+            '<li class="stats-legend-item">' +
+              '<span class="stats-legend-dot" style="background:' + colorFor(item, i) + '"></span>' +
+              '<span class="stats-legend-name">' + escapeHtml(item.name) + '</span>' +
+              '<span class="stats-legend-value"><span class="numbers">' + pct + '%</span></span>' +
+            '</li>'
+          );
+        }).join('');
+      }).catch(function () {
+        statusEl.hidden = false;
+        statusEl.classList.add('-error');
+        statusEl.textContent = 'Something went wrong pulling stats.';
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var form = document.getElementById('home-search-form');
+      var input = document.getElementById('home-search-input');
+      var overlay = document.getElementById('page-loading-overlay');
+
+      function goToResults() {
+        var value = input.value.trim();
+        if (!value) return;
+        overlay.classList.add('-visible');
+        window.location.href = '/search/?q=' + encodeURIComponent(value);
+      }
+
+      // Regular form submit (desktop Enter key, explicit submit button)
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        goToResults();
+      });
+
+      // Mobile keyboards fire a native 'search' event on the input itself
+      // when the on-screen Go/Search key is tapped — this can arrive
+      // instead of, or in a way that doesn't reliably trigger, submit.
+      input.addEventListener('search', function () {
+        goToResults();
+      });
+
+      // Fallback for keyboards/webviews that only fire keydown, not
+      // 'search' or 'submit' — catches Enter as a plain keypress.
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          goToResults();
+        }
+      });
+
+      // The overlay gets turned on right before we navigate to /search/,
+      // and this page is never given a chance to turn it back off — so if
+      // the browser later restores this exact page from its back/forward
+      // cache (e.g. tapping Back from the search results), it's repainted
+      // exactly as frozen: overlay still up, spinner still spinning,
+      // hiding all the real content underneath. Clear it every time this
+      // page is (re)shown so that can't happen.
+      window.addEventListener('pageshow', function () {
+        overlay.classList.remove('-visible');
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var trigger = document.getElementById('avatar-trigger');
+      var lightbox = document.getElementById('avatar-lightbox');
+      var lightboxImg = document.getElementById('avatar-lightbox-img');
+
+      function openLightbox() {
+        lightboxImg.src = trigger.src;
+        lightbox.classList.add('-visible');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove('-visible');
+        document.body.style.overflow = '';
+      }
+
+      trigger.addEventListener('click', openLightbox);
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox();
+        }
+      });
+
+      // clicking anywhere (including the image itself) closes it
+      lightbox.addEventListener('click', closeLightbox);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeLightbox();
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var wrapper = document.getElementById('backdrop');
+      if (!wrapper) return;
+      var image = wrapper.querySelector('.js-backdrop-image');
+
+      var isRetina = window.devicePixelRatio > 1;
+      var isMobile = window.matchMedia('(max-width: 600px)').matches;
+
+      var url = wrapper.dataset.backdrop;
+      if (isMobile && wrapper.dataset.backdropMobile) {
+        url = wrapper.dataset.backdropMobile;
+      } else if (isRetina && wrapper.dataset.backdrop2x) {
+        url = wrapper.dataset.backdrop2x;
+      }
+      if (!url || url.indexOf('PASTE_') === 0) return;
+
+      var offset = wrapper.dataset.offset;
+      if (offset) {
+        image.style.backgroundPosition = 'center ' + offset + '%';
+      }
+
+      var preload = new Image();
+      preload.onload = function () {
+        image.style.backgroundImage = 'url("' + url + '")';
+        image.classList.add('is-loaded');
+      };
+      preload.src = url;
+    })();
+  </script>
+
+  <!-- Name -> Badge morph animation -->
+  <script>
+    (function () {
+      var nameTrigger = document.getElementById('name-trigger');
+      var circleTrigger = document.getElementById('badge-circle-trigger');
+      var avatarImg = document.getElementById('avatar-trigger');
+      var summary = document.querySelector('.profile-summary');
+      var morph = document.getElementById('badge-morph');
+      var morphAvatarImg = document.getElementById('badge-morph-avatar');
+      var morphBadgeImg = document.getElementById('badge-morph-badge');
+      var morphLabel = document.getElementById('badge-morph-label');
+      if (!nameTrigger || !circleTrigger || !avatarImg || !summary || !morph) return;
+
+      var isAnimating = false;
+
+      // Gentle overshoot on the way out (a little "pop" as each shape
+      // settles into place) and a quicker ease-in on the way down.
+      var POP_EASE = 'cubic-bezier(0.22, 1.2, 0.36, 1)';
+      var IN_EASE = 'cubic-bezier(0.45, 0, 0.55, 1)';
+      var MORPH_PROPS = ['width', 'height', 'left', 'top', 'border-radius', 'border-width'];
+
+      function setMorphTransition(duration, easing) {
+        morph.style.transition = MORPH_PROPS.map(function (p) {
+          return p + ' ' + duration + 'ms ' + easing;
+        }).join(', ');
+      }
+
+      function playBadgeAnimation() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        var summaryRect = summary.getBoundingClientRect();
+        var avatarRect = avatarImg.getBoundingClientRect();
+
+        var startLeft = avatarRect.left - summaryRect.left;
+        var startTop = avatarRect.top - summaryRect.top;
+        var startW = avatarRect.width;
+        var startH = avatarRect.height;
+        var centerY = startTop + startH / 2;
+        var dot = Math.max(10, startW * 0.16);
+        var dotLeft = startLeft + startW / 2 - dot / 2;
+        var dotTop = centerY - dot / 2;
+
+        morphAvatarImg.src = avatarImg.currentSrc || avatarImg.src;
+
+        // Snap the morph element exactly on top of the real avatar so the
+        // swap from <img id="avatar-trigger"> to the morph clone is invisible.
+        morph.style.transition = 'none';
+        morph.style.left = startLeft + 'px';
+        morph.style.top = startTop + 'px';
+        morph.style.width = startW + 'px';
+        morph.style.height = startH + 'px';
+        morph.style.borderRadius = '50%';
+        morph.style.borderWidth = '4px';
+        morphAvatarImg.classList.add('-visible');
+        morphBadgeImg.classList.remove('-visible');
+        morph.classList.add('-active');
+        avatarImg.style.opacity = '0';
+        void morph.offsetWidth; // flush styles before re-enabling transitions
+
+        var t = 0;
+
+        requestAnimationFrame(function () {
+          // Phase 1 — shrink the avatar down into a small dot, in place.
+          setMorphTransition(200, IN_EASE);
+          morph.style.width = dot + 'px';
+          morph.style.height = dot + 'px';
+          morph.style.left = dotLeft + 'px';
+          morph.style.top = dotTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '2px';
+        });
+        t += 200;
+
+        setTimeout(function () {
+          // Phase 2 — the badge unfurls out of that point, growing and
+          // sliding to center, covering the name underneath it.
+          nameTrigger.style.transition = 'opacity 0.25s ease';
+          nameTrigger.style.opacity = '0';
+
+          morphBadgeImg.classList.add('-visible');
+          morphAvatarImg.classList.remove('-visible');
+
+          var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+          var badgeScale = isDesktop ? 2 : 1;
+          var badgeW = Math.min(summaryRect.width * 0.8, 300) * badgeScale;
+          var badgeH = badgeW / 3; // badge.webp is a 3:1 image
+          var badgeLeft = (summaryRect.width - badgeW) / 2;
+          var badgeTop = centerY - badgeH / 2;
+          var radius = Math.max(10, Math.round(badgeH * 0.16));
+
+          setMorphTransition(360, POP_EASE);
+          morph.style.width = badgeW + 'px';
+          morph.style.height = badgeH + 'px';
+          morph.style.left = badgeLeft + 'px';
+          morph.style.top = badgeTop + 'px';
+          morph.style.borderRadius = radius + 'px';
+          morph.style.borderWidth = '0px';
+
+          if (morphLabel) {
+            morphLabel.style.setProperty('--badge-left', badgeLeft + 'px');
+            morphLabel.style.setProperty('--badge-top', badgeTop + 'px');
+            morphLabel.style.setProperty('--badge-w', badgeW + 'px');
+            morphLabel.style.setProperty('--badge-h', badgeH + 'px');
+            morphLabel.style.setProperty('--badge-center-y', centerY + 'px');
+            morphLabel.classList.add('-visible');
+          }
+        }, t);
+        t += 360;
+
+        var HOLD = 950;
+        t += HOLD; // Phase 3 — just let the badge sit there for a beat.
+
+        setTimeout(function () {
+          // Phase 4 — the badge folds back down into a point, right back
+          // at the avatar's spot.
+          morphAvatarImg.classList.add('-visible');
+          morphBadgeImg.classList.remove('-visible');
+          if (morphLabel) morphLabel.classList.remove('-visible');
+
+          setMorphTransition(200, IN_EASE);
+          morph.style.width = dot + 'px';
+          morph.style.height = dot + 'px';
+          morph.style.left = dotLeft + 'px';
+          morph.style.top = dotTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '2px';
+
+          nameTrigger.style.opacity = '1';
+        }, t);
+        t += 200;
+
+        setTimeout(function () {
+          // Phase 5 — that point grows back out into the regular profile picture.
+          setMorphTransition(340, POP_EASE);
+          morph.style.width = startW + 'px';
+          morph.style.height = startH + 'px';
+          morph.style.left = startLeft + 'px';
+          morph.style.top = startTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '4px';
+        }, t);
+        t += 340;
+
+        setTimeout(function () {
+          // Phase 6 — done. Hand back to the real avatar image underneath.
+          avatarImg.style.opacity = '1';
+          morph.classList.remove('-active');
+          isAnimating = false;
+        }, t + 40);
+      }
+
+      circleTrigger.addEventListener('click', playBadgeAnimation);
+      circleTrigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          playBadgeAnimation();
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    // Fix for the "still blue after I hit back" issue: when the browser
+    // restores this page from its back/forward cache (bfcache), it can
+    // restore the exact hover/focus state the page had right when you
+    // clicked away — and that doesn't clear until the mouse moves again.
+    // Blurring whatever was focused, on restore, clears that stuck state.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted && document.activeElement) {
+        document.activeElement.blur();
+      }
+    });
+  </script>
+<script src="/auth.js?v=1"></script>
+</body>
+</html>

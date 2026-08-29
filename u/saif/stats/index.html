@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saif's stats</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Stack+Sans+Headline:wght@200..700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       STATS PAGE (/u/saif/stats/)
+       Same warm maroon/orange language as the rest of
+       the site — just pushed a little further for a page
+       that's meant to be looked at, not just scanned.
+       ============================================ */
+
+    .stats-page-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .stats-page-heading h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    /* Mobile: a little air between the "2026 Stats" title and the year
+       pill buttons below it. Scoped below 1024px so it doesn't touch
+       the desktop spacing set further down this stylesheet. */
+    @media (max-width: 1023px) {
+      .stats-page-heading {
+        margin-bottom: 16px;
+      }
+    }
+
+    /* Year pills — identical treatment to /u/saif/journal/'s year selector */
+    .year-pills {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      scrollbar-width: none;      /* Firefox */
+      -ms-overflow-style: none;   /* old Edge/IE */
+    }
+
+    .year-pills::-webkit-scrollbar {
+      display: none;              /* Chrome/Safari */
+    }
+
+    .year-pill {
+      flex: 0 0 auto;
+      padding: 5px 14px;
+      border: 1px solid #1e2a3e;
+      border-radius: 999px;
+      background-color: rgba(255, 255, 255, 0.02);
+      color: #a2acbe;
+      font-family: var(--font-numbers);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .year-pill:hover {
+      border-color: #30405a;
+      transform: translateY(-1px);
+    }
+
+    .year-pill.-active {
+      background-color: #1d222a;
+      border-color: #4d8eff;
+      color: #eaeef5;
+      box-shadow: 0 0 0 1px rgba(77, 142, 255, 0.15), 0 4px 16px rgba(77, 142, 255, 0.08);
+    }
+
+    /* Loading / empty state, hero row, donut, bar lists — all now live
+       in /styles.css as shared "stats widget" classes, since index.html's
+       desktop layout embeds this same widget in its right column. */
+
+    /* ---------- Desktop layer ----------
+       Mobile styles above are untouched; this only adds room and
+       scale once there's real screen width to use. */
+    @media (min-width: 1024px) {
+      .stats-page-heading h1 {
+        font-size: 2rem;
+      }
+      .stats-hero-row {
+        gap: 18px;
+        margin-bottom: 40px;
+      }
+      .stats-hero-card {
+        padding: 34px 10px 28px;
+      }
+      .stats-hero-card .value {
+        font-size: 2.8rem;
+      }
+      .stats-donut-panel,
+      .stats-bar-list {
+        padding: 28px;
+      }
+      .stats-donut {
+        width: 200px;
+        height: 200px;
+      }
+      .stats-legend-item {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-container">
+    <a href="/about/" class="floating-tvbox" aria-label="TV Box">
+      <svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+        <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+      </svg>
+    </a>
+
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <div class="stats-page-heading">
+      <h1><span class="numbers" id="stats-heading-year">–</span> Stats</h1>
+    </div>
+
+    <div class="year-pills" id="stats-year-pills"></div>
+
+    <div id="stats-status" class="stats-status"></div>
+
+    <div id="stats-content" hidden>
+
+      <!-- Hero: hours / episodes / seasons -->
+      <section class="stats-section" id="section-hero">
+        <div class="stats-hero-row">
+          <div class="stats-hero-card">
+            <span class="value numbers" id="stat-hours">–</span>
+            <span class="definition">Hours Watched</span>
+          </div>
+          <div class="stats-hero-card">
+            <span class="value numbers" id="stat-episodes">–</span>
+            <span class="definition">Episodes Watched</span>
+          </div>
+          <div class="stats-hero-card">
+            <span class="value numbers" id="stat-seasons">–</span>
+            <span class="definition">Seasons Completed</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Platforms -->
+      <section class="stats-section" id="section-platforms">
+        <h2 class="section-heading">Platforms</h2>
+        <p class="stats-section-insight" id="platform-insight"></p>
+        <div class="stats-donut-panel">
+          <div id="platform-donut-mount"></div>
+          <ul class="stats-legend" id="platform-legend"></ul>
+        </div>
+      </section>
+
+      <!-- Genres -->
+      <section class="stats-section" id="section-genres">
+        <h2 class="section-heading">Genres</h2>
+        <p class="stats-section-insight" id="genre-insight"></p>
+        <div class="stats-bar-list" id="genre-bars"></div>
+      </section>
+
+      <!-- Creators -->
+      <section class="stats-section" id="section-creators">
+        <h2 class="section-heading">Creators</h2>
+        <p class="stats-section-insight" id="creator-insight"></p>
+        <div class="stats-bar-list" id="creator-bars"></div>
+      </section>
+
+    </div>
+
+  </div><!-- /.page-content -->
+
+    <!-- Bottom Footer -->
+<footer class="site-footer">
+  <div class="footer-container">
+    <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+  <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+</svg><a href="/about/"><strong>tvbox.</strong></a> Data from <a href="https://www.themoviedb.org/">TMDB</a> | 
+      <a href="https://x.com/csaif_" class="footer-social" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center;">
+        <svg class="footer-social-icon" style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+  <!-- Shown while navigating to the search results page -->
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="spinner">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById('home-search-form');
+      var input = document.getElementById('home-search-input');
+      var overlay = document.getElementById('page-loading-overlay');
+
+      function goToResults() {
+        var value = input.value.trim();
+        if (!value) return;
+        overlay.classList.add('-visible');
+        window.location.href = '/search/?q=' + encodeURIComponent(value);
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        goToResults();
+      });
+
+      input.addEventListener('search', function () {
+        goToResults();
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          goToResults();
+        }
+      });
+
+      // The overlay gets turned on right before we navigate to /search/,
+      // and this page is never given a chance to turn it back off — so if
+      // the browser later restores this exact page from its back/forward
+      // cache (e.g. tapping Back from the search results), it's repainted
+      // exactly as frozen: overlay still up, spinner still spinning,
+      // hiding all the real content underneath. Clear it every time this
+      // page is (re)shown so that can't happen.
+      window.addEventListener('pageshow', function () {
+        overlay.classList.remove('-visible');
+      });
+    })();
+  </script>
+
+  <script src="/shows.js?v=1"></script>
+  <script src="/stats.js?v=2"></script>
+  <script>
+    (function () {
+      var SPINNER_HTML =
+        '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+
+      // Warm gradient palette — brightest accent for the #1 spot in any
+      // ranked list, fading down toward deep maroon for the long tail.
+      // "Other" always gets the flat neutral tone at the end.
+      var PALETTE = ['#4d8eff', '#29a6ff', '#8cb2f2', '#4b84e8', '#b3c2db', '#a2acbe', '#8490a4', '#4a628c', '#405585'];
+      var OTHER_COLOR = '#30405a';
+
+      function colorFor(item, i) {
+        return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function fmtPct(v) {
+        return (Math.round(v * 10) / 10).toString();
+      }
+
+      var headingYear = document.getElementById('stats-heading-year');
+      var pillsMount = document.getElementById('stats-year-pills');
+      var statusEl = document.getElementById('stats-status');
+      var content = document.getElementById('stats-content');
+
+      var heroHours = document.getElementById('stat-hours');
+      var heroEpisodes = document.getElementById('stat-episodes');
+      var heroSeasons = document.getElementById('stat-seasons');
+
+      var platformMount = document.getElementById('platform-donut-mount');
+      var platformLegend = document.getElementById('platform-legend');
+      var platformInsight = document.getElementById('platform-insight');
+
+      var genreBars = document.getElementById('genre-bars');
+      var genreInsight = document.getElementById('genre-insight');
+
+      var creatorBars = document.getElementById('creator-bars');
+      var creatorInsight = document.getElementById('creator-insight');
+
+      var sections = Array.prototype.slice.call(document.querySelectorAll('.stats-section'));
+
+      var YEARS = Object.keys(STATS_YEARS).sort(function (a, b) { return b - a; }); // newest first
+      var DEFAULT_YEAR = YEARS[0] || null;
+      var summaryCache = {};
+      var currentYear = null;
+
+      // -------------------------------------------------------------
+      // Reveal-on-load (mirrors /home/'s IntersectionObserver pattern)
+      // -------------------------------------------------------------
+      function revealSections() {
+        sections.forEach(function (el, i) {
+          setTimeout(function () { el.classList.add('-visible'); }, i * 90);
+        });
+      }
+      function hideSections() {
+        sections.forEach(function (el) { el.classList.remove('-visible'); });
+      }
+
+      // -------------------------------------------------------------
+      // Donut chart (Platforms)
+      // -------------------------------------------------------------
+      function buildDonut(list, centerValue, centerLabel) {
+        var size = 168, cx = 84, cy = 84, r = 64, sw = 22;
+        var circumference = 2 * Math.PI * r;
+        var total = list.reduce(function (s, i) { return s + i.value; }, 0) || 1;
+        var offset = 0;
+
+        var segments = list.map(function (item, i) {
+          var frac = item.value / total;
+          var len = Math.max(frac * circumference, list.length > 1 ? 1.5 : circumference);
+          var gap = list.length > 1 ? 2 : 0; // tiny gap between segments
+          var dasharray = Math.max(len - gap, 0) + ' ' + (circumference - len + gap);
+          var dashoffset = -offset;
+          offset += len;
+          return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
+            'stroke="' + colorFor(item, i) + '" stroke-width="' + sw + '" ' +
+            'stroke-dasharray="' + dasharray + '" stroke-dashoffset="' + dashoffset + '" ' +
+            'stroke-linecap="round" transform="rotate(-90 ' + cx + ' ' + cy + ')" />';
+        }).join('');
+
+        return (
+          '<svg viewBox="0 0 ' + size + ' ' + size + '" class="stats-donut" role="img" aria-label="Platform distribution">' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="' + sw + '"/>' +
+            segments +
+            '<text x="' + cx + '" y="' + (cy - 3) + '" text-anchor="middle" class="stats-donut-center-value numbers">' + escapeHtml(centerValue) + '</text>' +
+            '<text x="' + cx + '" y="' + (cy + 15) + '" text-anchor="middle" class="stats-donut-center-label">' + escapeHtml(centerLabel) + '</text>' +
+          '</svg>'
+        );
+      }
+
+      function renderPlatformLegend(list, total) {
+        platformLegend.innerHTML = list.map(function (item, i) {
+          var pct = total ? fmtPct((item.value / total) * 100) : '0';
+          return (
+            '<li class="stats-legend-item">' +
+              '<span class="stats-legend-dot" style="background:' + colorFor(item, i) + '"></span>' +
+              '<span class="stats-legend-name">' + escapeHtml(item.name) + '</span>' +
+              '<span class="stats-legend-value"><span class="numbers">' + pct + '%</span></span>' +
+            '</li>'
+          );
+        }).join('');
+      }
+
+      // -------------------------------------------------------------
+      // Ranked bar list (Genres / Creators)
+      // -------------------------------------------------------------
+      function renderBarList(mount, list, total) {
+        mount.innerHTML = list.map(function (item, i) {
+          var pct = total ? (item.value / total) * 100 : 0;
+          return (
+            '<div class="stats-bar-row">' +
+              '<div class="stats-bar-top">' +
+                '<span class="stats-bar-label"><span class="stats-bar-rank numbers">' + (i + 1) + '</span>' + escapeHtml(item.name) + '</span>' +
+                '<span class="stats-bar-value numbers">' + fmtPct(pct) + '%</span>' +
+              '</div>' +
+              '<div class="stats-bar-track">' +
+                '<div class="stats-bar-fill" data-target="' + pct + '" style="background:' + colorFor(item, i) + '"></div>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+
+        // Animate the fills in, staggered slightly for a cascading feel.
+        var fills = mount.querySelectorAll('.stats-bar-fill');
+        requestAnimationFrame(function () {
+          fills.forEach(function (el, i) {
+            setTimeout(function () {
+              el.style.width = el.dataset.target + '%';
+            }, i * 70);
+          });
+        });
+      }
+
+      // -------------------------------------------------------------
+      // Status helpers
+      // -------------------------------------------------------------
+      function showLoading() {
+        content.hidden = true;
+        statusEl.hidden = false;
+        statusEl.classList.remove('-error');
+        statusEl.innerHTML = SPINNER_HTML + '<span>Crunching the numbers…</span>';
+      }
+
+      function showError(message) {
+        content.hidden = true;
+        statusEl.hidden = false;
+        statusEl.classList.add('-error');
+        statusEl.textContent = message;
+      }
+
+      function hideStatus() {
+        statusEl.hidden = true;
+        statusEl.innerHTML = '';
+      }
+
+      // -------------------------------------------------------------
+      // Main render
+      // -------------------------------------------------------------
+      function displaySummary(summary) {
+        hideStatus();
+        content.hidden = false;
+        hideSections();
+
+        if (!summary.showCount) {
+          content.hidden = true;
+          statusEl.hidden = false;
+          statusEl.classList.remove('-error');
+          statusEl.innerHTML = '<p class="stats-empty">No shows logged for this year yet.</p>';
+          return;
+        }
+
+        heroHours.textContent = fmtPct(summary.hours);
+        heroEpisodes.textContent = Math.round(summary.episodes);
+        heroSeasons.textContent = Math.round(summary.seasons);
+
+        var platformList = TVStats.toRanked(summary.platforms, 6);
+        platformMount.innerHTML = buildDonut(platformList, fmtPct(summary.hours), 'HOURS');
+        renderPlatformLegend(platformList, summary.hours);
+        if (platformList.length) {
+          platformInsight.innerHTML = 'Most watched on <strong>' + escapeHtml(platformList[0].name) + '</strong>, ' +
+            fmtPct((platformList[0].value / summary.hours) * 100) + '% of hours logged.';
+        } else {
+          platformInsight.textContent = '';
+        }
+
+        var genreList = TVStats.toRanked(summary.genres, 8);
+        renderBarList(genreBars, genreList, summary.hours);
+        if (genreList.length) {
+          genreInsight.innerHTML = '<strong>' + escapeHtml(genreList[0].name) + '</strong> led the year, ' +
+            fmtPct((genreList[0].value / summary.hours) * 100) + '% of watch time.';
+        } else {
+          genreInsight.textContent = '';
+        }
+
+        var creatorList = TVStats.toRanked(summary.creators, 8);
+        renderBarList(creatorBars, creatorList, summary.episodes);
+        if (creatorList.length) {
+          creatorInsight.innerHTML = '<strong>' + escapeHtml(creatorList[0].name) + '</strong> behind the most episodes watched, ' +
+            fmtPct((creatorList[0].value / summary.episodes) * 100) + '%.';
+        } else {
+          creatorInsight.textContent = '';
+        }
+
+        revealSections();
+      }
+
+      function setActivePill(year) {
+        var pills = pillsMount.querySelectorAll('.year-pill');
+        pills.forEach(function (pill) {
+          pill.classList.toggle('-active', pill.dataset.year === String(year));
+        });
+        headingYear.textContent = year;
+      }
+
+      function renderYear(year) {
+        currentYear = year;
+        setActivePill(year);
+
+        if (summaryCache[year]) {
+          displaySummary(summaryCache[year]);
+          return;
+        }
+
+        showLoading();
+        var showList = STATS_YEARS[year] || [];
+        var ids = showList.map(function (s) { return s.imdb; });
+
+        TVStats.fetchAll(ids).then(function (records) {
+          if (currentYear !== year) return; // a newer tab click superseded this one
+          var summary = TVStats.aggregate(showList, records);
+          summaryCache[year] = summary;
+          displaySummary(summary);
+        }).catch(function () {
+          if (currentYear !== year) return;
+          showError('Something went wrong pulling stats for ' + year + '. Try again in a moment.');
+        });
+      }
+
+      // -------------------------------------------------------------
+      // Year pills
+      // -------------------------------------------------------------
+      YEARS.forEach(function (year) {
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'year-pill numbers';
+        pill.textContent = year;
+        pill.dataset.year = year;
+        pill.addEventListener('click', function () {
+          renderYear(year);
+        });
+        pillsMount.appendChild(pill);
+      });
+
+      if (DEFAULT_YEAR) {
+        renderYear(DEFAULT_YEAR);
+      } else {
+        showError('No past years to show yet.');
+      }
+    })();
+  </script>
+<script src="/auth.js?v=1"></script>
+</body>
+</html>
