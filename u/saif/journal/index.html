@@ -10,11 +10,10 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Stack+Sans+Headline:wght@200..700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://www.themoviedb.org">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400&display=swap" rel="stylesheet">
   <style>
-    /* Year selector row: small pills in a single line under the header,
-       same border/pill treatment as .genre-tag. The active year gets
-       filled with #2a1d1d (matches the journal-container fill on index). */
     .year-pills {
       display: flex;
       flex-wrap: nowrap;
@@ -54,7 +53,6 @@
       padding: 20px 0;
     }
 
-    /* 4 posters per line, matching /u/saif/watched/ */
     #journal-grid { grid-template-columns: repeat(4, 1fr); }
   </style>
 </head>
@@ -122,9 +120,8 @@
       <div class="poster-grid" id="journal-grid"></div>
     </section>
 
-  </div><!-- /.page-content -->
+  </div>
 
-    <!-- Bottom Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -139,7 +136,6 @@
   </div>
 </footer>
 
-  <!-- Shown while navigating to the search results page -->
   <div id="page-loading-overlay" class="page-loading-overlay">
     <div class="spinner">
       <div></div><div></div><div></div><div></div><div></div><div></div>
@@ -175,13 +171,6 @@
         }
       });
 
-      // The overlay gets turned on right before we navigate to /search/,
-      // and this page is never given a chance to turn it back off — so if
-      // the browser later restores this exact page from its back/forward
-      // cache (e.g. tapping Back from the search results), it's repainted
-      // exactly as frozen: overlay still up, spinner still spinning,
-      // hiding all the real content underneath. Clear it every time this
-      // page is (re)shown so that can't happen.
       window.addEventListener('pageshow', function () {
         overlay.classList.remove('-visible');
       });
@@ -191,9 +180,6 @@
   <script src="/shows.js?v=1"></script>
   <script>
     (function () {
-      // Journal entries come straight from /shows.js — any watched show with
-      // a journalYear is a journal entry, ordered within/across years by
-      // journalOrder. Nothing to maintain here; edit /shows.js only.
       var JOURNAL = {};
       SHOWS.forEach(function (s) {
         if (!s.journalYear) return;
@@ -205,8 +191,6 @@
 
       var years = Object.keys(JOURNAL).sort();
 
-      // Support ?year=2025 in the URL (used by the calendar badges on the
-      // homepage) so linking to a specific year opens directly on it.
       var requestedYear = new URLSearchParams(window.location.search).get('year');
       var DEFAULT_YEAR = (requestedYear && years.indexOf(requestedYear) !== -1)
         ? requestedYear
@@ -215,18 +199,21 @@
       var pillsMount = document.getElementById('year-pills');
       var grid = document.getElementById('journal-grid');
 
+      var EAGER_ROW_SIZE = 4;
+
       function renderGrid(year) {
         var shows = JOURNAL[year] || [];
         if (!shows.length) {
           grid.innerHTML = '<p class="journal-empty">No shows logged for ' + year + ' yet.</p>';
           return;
         }
-        grid.innerHTML = shows.map(function (show) {
+        grid.innerHTML = shows.map(function (show, i) {
           var titleAttr = show.title.replace(/"/g, '&quot;');
+          var loadingAttr = i < EAGER_ROW_SIZE ? 'eager' : 'lazy';
           return (
             '<div class="card" data-title="' + titleAttr + '" data-imdb="' + show.imdb + '">' +
               '<a href="/show/?imdb=' + show.imdb + '">' +
-                '<img src="' + show.src + '" alt="' + titleAttr + '" width="150" height="225" loading="lazy" decoding="async">' +
+                '<img src="' + show.src + '" alt="' + titleAttr + '" width="150" height="225" loading="' + loadingAttr + '" decoding="async">' +
               '</a>' +
             '</div>'
           );
