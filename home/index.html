@@ -103,47 +103,47 @@
 </p>
 </div>
 </footer>
+<script>
+(function () {
+var btn = document.querySelector('.footer-email-btn');
+if (!btn) return;
 
-  <div id="page-loading-overlay" class="page-loading-overlay">
-    <div class="spinner">
-      <div></div><div></div><div></div><div></div><div></div><div></div>
-    </div>
-  </div>
+function fallbackCopy(text) {
+var ta = document.createElement('textarea');
+ta.value = text;
+ta.style.position = 'fixed';
+ta.style.opacity = '0';
+document.body.appendChild(ta);
+ta.focus();
+ta.select();
+try { document.execCommand('copy'); } catch (e) {}
+document.body.removeChild(ta);
+}
 
-  <script>
-    (function () {
-      var form = document.getElementById('home-search-form');
-      var input = document.getElementById('home-search-input');
-      var overlay = document.getElementById('page-loading-overlay');
+function showCopied() {
+btn.classList.remove('-copied');
+void btn.offsetWidth;
+btn.classList.add('-copied');
+clearTimeout(btn._copiedTimeout);
+btn._copiedTimeout = setTimeout(function () {
+btn.classList.remove('-copied');
+}, 1400);
+}
 
-      function goToResults() {
-        var value = input.value.trim();
-        if (!value) return;
-        overlay.classList.add('-visible');
-        window.location.href = '/search/?q=' + encodeURIComponent(value);
-      }
-
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        goToResults();
-      });
-
-      input.addEventListener('search', function () {
-        goToResults();
-      });
-
-      input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-          e.preventDefault();
-          goToResults();
-        }
-      });
-
-      window.addEventListener('pageshow', function () {
-        overlay.classList.remove('-visible');
-      });
-    })();
-  </script>
+btn.addEventListener('click', function () {
+var email = btn.getAttribute('data-email');
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(email).then(showCopied).catch(function () {
+fallbackCopy(email);
+showCopied();
+});
+} else {
+fallbackCopy(email);
+showCopied();
+}
+});
+})();
+</script>
 
   <script>
     (function () {
