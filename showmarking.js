@@ -1,17 +1,3 @@
-/* showmarking.js — single source of truth for the "Add to Watchlist"
-   and "Mark As" controls that sit beneath a show's genre tags on
-   postershow.html (index.html). Loaded on that page via:
-     <script src="/showmarking.js?v=1"></script>
-
-   TO CHANGE THE BUTTON TEXT OR THE MARK AS OPTIONS:
-   Edit the config values below. That's it — nothing else in this file
-   or in index.html needs to change for content edits.
-
-   Nobody is signed in yet anywhere on the site, so every action here
-   (Add to Watchlist, Did Not Finish, Watched, Add to List, and letting
-   go of the star rating) just shows the same "Sign in or Sign up to
-   continue" toast instead of actually saving anything. */
-
 const WATCHLIST_BTN_LABEL = 'Add to Watchlist';
 const MARKAS_BTN_LABEL = 'Mark As';
 const AUTH_PROMPT_MESSAGE = 'Sign in or Sign up to continue';
@@ -27,7 +13,7 @@ const TOAST_VISIBLE_MS = 2200;
 
 document.addEventListener('DOMContentLoaded', () => {
   const actionsBox = document.querySelector('.show-actions');
-  if (!actionsBox) return; // this page has no Add to Watchlist / Mark As block
+  if (!actionsBox) return;
 
   const watchlistBtn = document.getElementById('watchlist-btn');
   const markasBtnLabel = document.getElementById('markas-btn-label');
@@ -36,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const starsTrack = document.getElementById('markas-stars-track');
   const starsFg = document.getElementById('markas-stars-fg');
 
-  // ---- Fill in labels / options from the config above ----
   if (watchlistBtn) watchlistBtn.textContent = WATCHLIST_BTN_LABEL;
   if (markasBtnLabel) markasBtnLabel.textContent = MARKAS_BTN_LABEL;
 
@@ -46,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ).join('');
   }
 
-  // ---- "Sign in or Sign up to continue" toast ----
   let toastEl = null;
   let toastTimer = null;
 
@@ -57,9 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
       toastEl.textContent = AUTH_PROMPT_MESSAGE;
       document.body.appendChild(toastEl);
     }
-    // Restart the fade-in even if a toast is already showing.
     toastEl.classList.remove('-visible');
-    void toastEl.offsetWidth; // force reflow so the transition replays
+    void toastEl.offsetWidth;
     toastEl.classList.add('-visible');
 
     if (toastTimer) clearTimeout(toastTimer);
@@ -72,14 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (markasToggle) markasToggle.checked = false;
   }
 
-  // ---- Add to Watchlist ----
   if (watchlistBtn) {
     watchlistBtn.addEventListener('click', () => {
       showAuthPrompt();
     });
   }
 
-  // ---- Did Not Finish / Watched / Add to List ----
   if (markasOptionsWrap) {
     markasOptionsWrap.addEventListener('click', (e) => {
       const btn = e.target.closest('.markas-option');
@@ -89,9 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ---- Star rating: press-and-drag left/right fills the row
-  // continuously, letting go reports the rating (here: shows the
-  // sign-in prompt) and closes the Mark As box. ----
   if (starsTrack && starsFg) {
     let dragging = false;
 
@@ -128,10 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     starsTrack.addEventListener('pointercancel', finishDrag);
   }
 
-  // ---- Close the Mark As box on scroll, same reasoning as auth.js:
-  // clicking/tapping outside it already closes it for free via the
-  // .markas-backdrop <label>, this just adds the one thing CSS can't
-  // do on its own — reacting to scroll. ----
   window.addEventListener('scroll', () => {
     if (markasToggle && markasToggle.checked) markasToggle.checked = false;
   }, { passive: true });
