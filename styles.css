@@ -14,7 +14,6 @@
 .footer-email-icon{display:block;transition:transform 0.2s ease}
 .footer-email-btn:active .footer-email-icon{transform:scale(1.18)}
 @keyframes footer-email-pop{0%{transform:scale(1)}45%{transform:scale(1.38)}100%{transform:scale(1)}}
-.footer-email-btn.-copied{color:#29a1f7}
 .footer-email-btn.-copied .footer-email-icon{animation:footer-email-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
 .footer-email-tooltip{position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%) translateY(4px) scale(0.92);padding:4px 10px;border-radius:6px;background-color:rgba(0,0,0,0.85);color:#eaeef5;font-family:var(--font-text);font-size:11px;font-weight:600;letter-spacing:0.02em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s ease,transform 0.2s ease;z-index:5}
 .footer-email-btn.-copied .footer-email-tooltip{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
