@@ -19,18 +19,11 @@
   <link rel="preload" as="script" href="/shows.js?v=1">
   <link rel="preload" as="script" href="/stats.js?v=1">
   <style>
-    /* Divider between the 2026 and 2025 journal sections */
     .journal-year-divider {
       height: 1px;
       background: rgba(255, 255, 255, 0.12);
       margin-top: 16px;
     }
-    /*MOBILE*/
-    /* Breathing room between the stacked sections on mobile: Ratings ->
-       Journal (dash-cards inside the same section), then Journal -> Did
-       Not Finish -> Watchlist (separate sections). Scoped below the
-       1024px breakpoint so it never touches the desktop float layout,
-       which already sets its own spacing further down this stylesheet. */
     @media (max-width: 1023px) {
       .dashboard-row .dash-card:first-child {
         margin-bottom: 24px;
@@ -40,7 +33,6 @@
         margin-bottom: 24px;
       }
     }
-    /*DESKTOP*/
     .profile-stats-embed {
       display: none;
     }
@@ -277,14 +269,12 @@
     </div>
   </header>
 
-  <!-- Full-size avatar lightbox, hidden by default (position:fixed — placement in the DOM doesn't matter) -->
   <div id="avatar-lightbox" class="avatar-lightbox">
     <img id="avatar-lightbox-img" src="" alt="Saif — full profile picture" class="avatar-lightbox-img">
   </div>
 
   <div class="profile-grid">
 
-  <!-- Top 4 Favorites -->
   <section class="profile-favorites">
     <h2 class="section-heading">Favorite Shows</h2>
     <div class="poster-grid favorites-grid">
@@ -310,15 +300,11 @@
       </div>
     </div>
 
-    <!-- Rounded stats box: click it -> goes to the year-by-year stats page -->
     <a href="/u/saif/stats/" class="stats-box">
       <span class="year numbers">2026</span>
       <span class="label">STATS</span>
     </a>
 
-    <!-- Last Watch: single centered poster, same size as a Favorite Shows
-         poster. Filled in from /shows.js below (most recent journalOrder
-         within the current year). -->
     <div class="last-watched" id="last-watched-section" hidden>
       <span class="last-watched-label">Last Watch</span>
       <div class="last-watched-line" aria-hidden="true"></div>
@@ -331,8 +317,6 @@
     </div>
   </section>
 
-  <!-- 2026 Stats — embedded widget, desktop only (mobile keeps the
-       "STATS" link box above, which still opens the full page) -->
   <section class="profile-stats-embed" id="section-embed-stats">
     <h2 class="section-heading"><a href="/u/saif/stats/" class="section-heading-link">2026 Stats</a></h2>
 
@@ -361,8 +345,6 @@
     </div>
   </section>
 
-  <!-- Ratings + Journal: stacked on mobile, side-by-side at 900px+,
-       stacked again (this time in the right column) at 1024px+ -->
   <section class="profile-ratings-journal">
     <div class="dashboard-row">
       <div class="dash-card">
@@ -412,27 +394,22 @@
     </div>
   </section>
 
-  <!-- Did Not Finish -->
   <section class="profile-dnf">
     <h2 class="section-heading"><a href="/u/saif/dnf/" class="section-heading-link">Did Not Finish</a></h2>
     <div class="poster-grid favorites-grid" id="index-dnf-grid">
-      <!-- cards generated from /shows.js below (list: "dnf") -->
     </div>
   </section>
 
-  <!-- Watchlist -->
   <section class="profile-watchlist">
     <h2 class="section-heading"><a href="/u/saif/watchlist/" class="section-heading-link">Watchlist</a></h2>
     <div class="poster-grid favorites-grid" id="index-watchlist-grid">
-      <!-- cards generated from /shows.js below (list: "watchlist") -->
     </div>
   </section>
 
-  </div><!-- /.profile-grid -->
+  </div>
 
-  </div><!-- /.page-content -->
+  </div>
 
-    <!-- Bottom Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -447,7 +424,6 @@
   </div>
 </footer>
 
-  <!-- Shown while navigating to the search results page -->
   <div id="page-loading-overlay" class="page-loading-overlay">
     <div class="spinner">
       <div></div><div></div><div></div><div></div><div></div><div></div>
@@ -457,16 +433,10 @@
   <script src="/shows.js?v=1"></script>
   <script src="/stats.js?v=1"></script>
   <script>
-    // Shows stat should only reflect actually-watched shows — /shows.js also
-    // holds Did Not Finish / Watchlist entries (tagged via `list`), which
-    // shouldn't count toward this total.
     document.getElementById('shows-count').textContent =
       SHOWS.filter(function (s) { return !s.list || s.list === 'watched'; }).length;
   </script>
 
-  <!-- Did Not Finish / Watchlist mini-grids: same /shows.js data used by
-       /u/saif/dnf/ and /u/saif/watchlist/, filtered by the `list` field
-       so this page never needs its own hardcoded show list. -->
   <script>
     (function () {
       function escapeHtml(str) {
@@ -497,10 +467,6 @@
     })();
   </script>
 
-  <!-- Last Watch: the most recently journaled show in the current year
-       (highest journalOrder among shows with journalYear === this year).
-       Falls back to the single most recent journaled show overall if
-       nothing has been journaled yet this year. -->
   <script>
     (function () {
       function starGlyph(v) {
@@ -540,8 +506,6 @@
     })();
   </script>
 
-  <!-- Journal widget: most-recently-logged shows from /shows.js
-       (journalYear/journalOrder fields), newest first. -->
   <script>
     (function () {
       function escapeHtml(str) {
@@ -567,8 +531,6 @@
         return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
       }).join('');
 
-      // 2025 badge — same idea, just hardcoded to 2025 instead of "whatever
-      // the latest year is". Shows its 2 most recent journal entries.
       var listEl2025 = document.getElementById('journal-entry-list-2025');
       if (listEl2025) {
         var journaled2025 = journaled.filter(function (s) { return s.journalYear === 2025; });
@@ -581,11 +543,6 @@
     })();
   </script>
 
-  <!-- Ratings bar chart: bar heights are computed live from /shows.js, not
-       hand-typed. Each bar's height is its count relative to whichever
-       rating has the most shows (that one hits 100% height).
-       If nothing in /shows.js is rated yet, every count is 0 and every
-       bar collapses to the flat baseline (.rbar's min-height: 2px). -->
   <script>
     (function () {
       var RATING_STEPS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -612,11 +569,6 @@
     })();
   </script>
 
-  <!-- Embedded "2026 Stats" widget for the desktop two-column layout.
-       Only runs on desktop — no point fetching TMDB data for a widget
-       that's display:none on mobile. Reuses STATS_YEARS/TVStats from
-       /stats.js and the same render approach as /u/saif/stats/, just
-       fixed to 2026 with no year switcher. -->
   <script>
     (function () {
       if (!window.matchMedia('(min-width: 1024px)').matches) return;
@@ -736,21 +688,15 @@
         window.location.href = '/search/?q=' + encodeURIComponent(value);
       }
 
-      // Regular form submit (desktop Enter key, explicit submit button)
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         goToResults();
       });
 
-      // Mobile keyboards fire a native 'search' event on the input itself
-      // when the on-screen Go/Search key is tapped — this can arrive
-      // instead of, or in a way that doesn't reliably trigger, submit.
       input.addEventListener('search', function () {
         goToResults();
       });
 
-      // Fallback for keyboards/webviews that only fire keydown, not
-      // 'search' or 'submit' — catches Enter as a plain keypress.
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
           e.preventDefault();
@@ -758,13 +704,6 @@
         }
       });
 
-      // The overlay gets turned on right before we navigate to /search/,
-      // and this page is never given a chance to turn it back off — so if
-      // the browser later restores this exact page from its back/forward
-      // cache (e.g. tapping Back from the search results), it's repainted
-      // exactly as frozen: overlay still up, spinner still spinning,
-      // hiding all the real content underneath. Clear it every time this
-      // page is (re)shown so that can't happen.
       window.addEventListener('pageshow', function () {
         overlay.classList.remove('-visible');
       });
@@ -796,7 +735,6 @@
         }
       });
 
-      // clicking anywhere (including the image itself) closes it
       lightbox.addEventListener('click', closeLightbox);
 
       document.addEventListener('keydown', function (e) {
@@ -836,7 +774,6 @@
     })();
   </script>
 
-  <!-- Name -> Badge morph animation -->
   <script>
     (function () {
       var nameTrigger = document.getElementById('name-trigger');
@@ -851,8 +788,6 @@
 
       var isAnimating = false;
 
-      // Gentle overshoot on the way out (a little "pop" as each shape
-      // settles into place) and a quicker ease-in on the way down.
       var POP_EASE = 'cubic-bezier(0.22, 1.2, 0.36, 1)';
       var IN_EASE = 'cubic-bezier(0.45, 0, 0.55, 1)';
       var MORPH_PROPS = ['width', 'height', 'left', 'top', 'border-radius', 'border-width'];
@@ -881,8 +816,6 @@
 
         morphAvatarImg.src = avatarImg.currentSrc || avatarImg.src;
 
-        // Snap the morph element exactly on top of the real avatar so the
-        // swap from <img id="avatar-trigger"> to the morph clone is invisible.
         morph.style.transition = 'none';
         morph.style.left = startLeft + 'px';
         morph.style.top = startTop + 'px';
@@ -894,12 +827,11 @@
         morphBadgeImg.classList.remove('-visible');
         morph.classList.add('-active');
         avatarImg.style.opacity = '0';
-        void morph.offsetWidth; // flush styles before re-enabling transitions
+        void morph.offsetWidth;
 
         var t = 0;
 
         requestAnimationFrame(function () {
-          // Phase 1 — shrink the avatar down into a small dot, in place.
           setMorphTransition(200, IN_EASE);
           morph.style.width = dot + 'px';
           morph.style.height = dot + 'px';
@@ -911,8 +843,6 @@
         t += 200;
 
         setTimeout(function () {
-          // Phase 2 — the badge unfurls out of that point, growing and
-          // sliding to center, covering the name underneath it.
           nameTrigger.style.transition = 'opacity 0.25s ease';
           nameTrigger.style.opacity = '0';
 
@@ -922,7 +852,7 @@
           var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
           var badgeScale = isDesktop ? 2 : 1;
           var badgeW = Math.min(summaryRect.width * 0.8, 300) * badgeScale;
-          var badgeH = badgeW / 3; // badge.webp is a 3:1 image
+          var badgeH = badgeW / 3;
           var badgeLeft = (summaryRect.width - badgeW) / 2;
           var badgeTop = centerY - badgeH / 2;
           var radius = Math.max(10, Math.round(badgeH * 0.16));
@@ -947,11 +877,9 @@
         t += 360;
 
         var HOLD = 950;
-        t += HOLD; // Phase 3 — just let the badge sit there for a beat.
+        t += HOLD;
 
         setTimeout(function () {
-          // Phase 4 — the badge folds back down into a point, right back
-          // at the avatar's spot.
           morphAvatarImg.classList.add('-visible');
           morphBadgeImg.classList.remove('-visible');
           if (morphLabel) morphLabel.classList.remove('-visible');
@@ -969,7 +897,6 @@
         t += 200;
 
         setTimeout(function () {
-          // Phase 5 — that point grows back out into the regular profile picture.
           setMorphTransition(340, POP_EASE);
           morph.style.width = startW + 'px';
           morph.style.height = startH + 'px';
@@ -981,7 +908,6 @@
         t += 340;
 
         setTimeout(function () {
-          // Phase 6 — done. Hand back to the real avatar image underneath.
           avatarImg.style.opacity = '1';
           morph.classList.remove('-active');
           isAnimating = false;
@@ -999,11 +925,6 @@
   </script>
 
   <script>
-    // Fix for the "still blue after I hit back" issue: when the browser
-    // restores this page from its back/forward cache (bfcache), it can
-    // restore the exact hover/focus state the page had right when you
-    // clicked away — and that doesn't clear until the mouse moves again.
-    // Blurring whatever was focused, on restore, clears that stuck state.
     window.addEventListener('pageshow', function (e) {
       if (e.persisted && document.activeElement) {
         document.activeElement.blur();
