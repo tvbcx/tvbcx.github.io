@@ -74,7 +74,6 @@
 <path d="M1.00977 15.39H5.00977" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
 <path d="M22.209 5.41992C16.599 16.0599 9.39906 16.0499 3.78906 5.41992" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
-<span class="email-copy-toast" role="status" aria-live="polite">email copied</span>
 </button></p>
 <p class="about-paragraph" style="opacity: 0.4;"><br><br><span class="saif-credit" style="opacity: 1;">FOSS</span></p>
 </div>
@@ -98,6 +97,7 @@
 <div></div><div></div><div></div><div></div><div></div><div></div>
 </div>
 </div>
+<div id="email-toast" class="email-toast" role="status" aria-live="polite">Email copied</div>
 <script>
 (function () {
 var form = document.getElementById('home-search-form');
@@ -137,6 +137,8 @@ var btn = document.getElementById('email-copy-btn');
 if (!btn) return;
 var email = 'gsaif@proton.me';
 var resetTimer = null;
+var toast = document.getElementById('email-toast');
+var toastTimer = null;
 
 function fallbackCopy(text) {
 var ta = document.createElement('textarea');
@@ -151,14 +153,25 @@ try { document.execCommand('copy'); } catch (err) {}
 document.body.removeChild(ta);
 }
 
+function showToast() {
+if (!toast) return;
+if (toastTimer) clearTimeout(toastTimer);
+toast.classList.add('-visible');
+toastTimer = setTimeout(function () {
+toast.classList.remove('-visible');
+}, 1600);
+}
+
 function playCopiedAnimation() {
 if (resetTimer) clearTimeout(resetTimer);
+btn.classList.add('-touched');
 btn.classList.remove('-copied');
 void btn.offsetWidth;
 btn.classList.add('-copied');
 resetTimer = setTimeout(function () {
 btn.classList.remove('-copied');
-}, 1400);
+}, 350);
+showToast();
 }
 
 btn.addEventListener('click', function () {
