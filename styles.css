@@ -9,7 +9,8 @@
 @media (min-width:1024px){.email-copy-btn{width:21px;height:21px}.email-copy-icon{width:21px;height:21px}}
 
 .footer-email-btn{display:inline-flex;align-items:center;justify-content:center;position:relative;background:none;border:none;padding:0;margin:0;font:inherit;line-height:0;cursor:pointer;color:#828ea1;-webkit-tap-highlight-color:transparent;transition:color 0.15s ease}
-.footer-email-btn:hover,.footer-email-btn:focus-visible{color:#29a1f7}
+.footer-email-btn:focus-visible{color:#29a1f7}
+@media (hover:hover) and (pointer:fine){.footer-email-btn:hover{color:#29a1f7}}
 .footer-email-btn:focus-visible{outline:2px solid #29a1f7;outline-offset:3px;border-radius:4px}
 .footer-email-icon{display:block;transition:transform 0.2s ease}
 .footer-email-btn:active .footer-email-icon{transform:scale(1.18)}
