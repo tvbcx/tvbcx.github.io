@@ -10,111 +10,26 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Stack+Sans+Headline:wght@200..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link rel="preload" as="script" href="/stats.js?v=2">
   <style>
-    /* ============================================
-       STATS PAGE (/u/saif/stats/)
-       Same warm maroon/orange language as the rest of
-       the site — just pushed a little further for a page
-       that's meant to be looked at, not just scanned.
-       ============================================ */
-
-    .stats-page-heading {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .stats-page-heading h1 {
-      margin: 0;
-      font-size: 1.6rem;
-    }
-
-    /* Mobile: a little air between the "2026 Stats" title and the year
-       pill buttons below it. Scoped below 1024px so it doesn't touch
-       the desktop spacing set further down this stylesheet. */
-    @media (max-width: 1023px) {
-      .stats-page-heading {
-        margin-bottom: 16px;
-      }
-    }
-
-    /* Year pills — identical treatment to /u/saif/journal/'s year selector */
-    .year-pills {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      margin-bottom: 12px;
-      scrollbar-width: none;      /* Firefox */
-      -ms-overflow-style: none;   /* old Edge/IE */
-    }
-
-    .year-pills::-webkit-scrollbar {
-      display: none;              /* Chrome/Safari */
-    }
-
-    .year-pill {
-      flex: 0 0 auto;
-      padding: 5px 14px;
-      border: 1px solid #1e2a3e;
-      border-radius: 999px;
-      background-color: rgba(255, 255, 255, 0.02);
-      color: #a2acbe;
-      font-family: var(--font-numbers);
-      font-size: 13px;
-      letter-spacing: 0.03em;
-      cursor: pointer;
-      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
-    }
-
-    .year-pill:hover {
-      border-color: #30405a;
-      transform: translateY(-1px);
-    }
-
-    .year-pill.-active {
-      background-color: #1d222a;
-      border-color: #4d8eff;
-      color: #eaeef5;
-      box-shadow: 0 0 0 1px rgba(77, 142, 255, 0.15), 0 4px 16px rgba(77, 142, 255, 0.08);
-    }
-
-    /* Loading / empty state, hero row, donut, bar lists — all now live
-       in /styles.css as shared "stats widget" classes, since index.html's
-       desktop layout embeds this same widget in its right column. */
-
-    /* ---------- Desktop layer ----------
-       Mobile styles above are untouched; this only adds room and
-       scale once there's real screen width to use. */
-    @media (min-width: 1024px) {
-      .stats-page-heading h1 {
-        font-size: 2rem;
-      }
-      .stats-hero-row {
-        gap: 18px;
-        margin-bottom: 40px;
-      }
-      .stats-hero-card {
-        padding: 34px 10px 28px;
-      }
-      .stats-hero-card .value {
-        font-size: 2.8rem;
-      }
-      .stats-donut-panel,
-      .stats-bar-list {
-        padding: 28px;
-      }
-      .stats-donut {
-        width: 200px;
-        height: 200px;
-      }
-      .stats-legend-item {
-        font-size: 14px;
-      }
+    .stats-page-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
+    .stats-page-heading h1{margin:0;font-size:1.6rem}
+    @media (max-width:1023px){.stats-page-heading{margin-bottom:16px}}
+    .year-pills{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;-ms-overflow-style:none}
+    .year-pills::-webkit-scrollbar{display:none}
+    .year-pill{flex:0 0 auto;padding:5px 14px;border:1px solid #1e2a3e;border-radius:999px;background-color:rgba(255,255,255,0.02);color:#a2acbe;font-family:var(--font-numbers);font-size:13px;letter-spacing:0.03em;cursor:pointer;transition:border-color 0.15s ease,background-color 0.15s ease,color 0.15s ease,transform 0.15s ease}
+    .year-pill:hover{border-color:#30405a;transform:translateY(-1px)}
+    .year-pill.-active{background-color:#1d222a;border-color:#4d8eff;color:#eaeef5;box-shadow:0 0 0 1px rgba(77,142,255,0.15),0 4px 16px rgba(77,142,255,0.08)}
+    @media (min-width:1024px){
+      .stats-page-heading h1{font-size:2rem}
+      .stats-hero-row{gap:18px;margin-bottom:40px}
+      .stats-hero-card{padding:34px 10px 28px}
+      .stats-hero-card .value{font-size:2.2rem}
+      .stats-donut-panel,.stats-bar-list{padding:28px}
+      .stats-donut{width:200px;height:200px}
+      .stats-legend-item{font-size:14px}
     }
   </style>
 </head>
@@ -183,8 +98,6 @@
     <div id="stats-status" class="stats-status"></div>
 
     <div id="stats-content" hidden>
-
-      <!-- Hero: hours / episodes / seasons -->
       <section class="stats-section" id="section-hero">
         <div class="stats-hero-row">
           <div class="stats-hero-card">
@@ -201,8 +114,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Platforms -->
       <section class="stats-section" id="section-platforms">
         <h2 class="section-heading">Platforms</h2>
         <p class="stats-section-insight" id="platform-insight"></p>
@@ -211,15 +122,11 @@
           <ul class="stats-legend" id="platform-legend"></ul>
         </div>
       </section>
-
-      <!-- Genres -->
       <section class="stats-section" id="section-genres">
         <h2 class="section-heading">Genres</h2>
         <p class="stats-section-insight" id="genre-insight"></p>
         <div class="stats-bar-list" id="genre-bars"></div>
       </section>
-
-      <!-- Creators -->
       <section class="stats-section" id="section-creators">
         <h2 class="section-heading">Creators</h2>
         <p class="stats-section-insight" id="creator-insight"></p>
@@ -228,9 +135,7 @@
 
     </div>
 
-  </div><!-- /.page-content -->
-
-    <!-- Bottom Footer -->
+  </div>
 <footer class="site-footer">
   <div class="footer-container">
     <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -244,8 +149,6 @@
     </p>
   </div>
 </footer>
-
-  <!-- Shown while navigating to the search results page -->
   <div id="page-loading-overlay" class="page-loading-overlay">
     <div class="spinner">
       <div></div><div></div><div></div><div></div><div></div><div></div>
@@ -281,13 +184,6 @@
         }
       });
 
-      // The overlay gets turned on right before we navigate to /search/,
-      // and this page is never given a chance to turn it back off — so if
-      // the browser later restores this exact page from its back/forward
-      // cache (e.g. tapping Back from the search results), it's repainted
-      // exactly as frozen: overlay still up, spinner still spinning,
-      // hiding all the real content underneath. Clear it every time this
-      // page is (re)shown so that can't happen.
       window.addEventListener('pageshow', function () {
         overlay.classList.remove('-visible');
       });
@@ -301,9 +197,6 @@
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
 
-      // Warm gradient palette — brightest accent for the #1 spot in any
-      // ranked list, fading down toward deep maroon for the long tail.
-      // "Other" always gets the flat neutral tone at the end.
       var PALETTE = ['#4d8eff', '#29a6ff', '#8cb2f2', '#4b84e8', '#b3c2db', '#a2acbe', '#8490a4', '#4a628c', '#405585'];
       var OTHER_COLOR = '#30405a';
 
@@ -342,14 +235,11 @@
 
       var sections = Array.prototype.slice.call(document.querySelectorAll('.stats-section'));
 
-      var YEARS = Object.keys(STATS_YEARS).sort(function (a, b) { return b - a; }); // newest first
+      var YEARS = Object.keys(STATS_YEARS).sort(function (a, b) { return b - a; });
       var DEFAULT_YEAR = YEARS[0] || null;
       var summaryCache = {};
       var currentYear = null;
 
-      // -------------------------------------------------------------
-      // Reveal-on-load (mirrors /home/'s IntersectionObserver pattern)
-      // -------------------------------------------------------------
       function revealSections() {
         sections.forEach(function (el, i) {
           setTimeout(function () { el.classList.add('-visible'); }, i * 90);
@@ -359,9 +249,6 @@
         sections.forEach(function (el) { el.classList.remove('-visible'); });
       }
 
-      // -------------------------------------------------------------
-      // Donut chart (Platforms)
-      // -------------------------------------------------------------
       function buildDonut(list, centerValue, centerLabel) {
         var size = 168, cx = 84, cy = 84, r = 64, sw = 22;
         var circumference = 2 * Math.PI * r;
@@ -371,7 +258,7 @@
         var segments = list.map(function (item, i) {
           var frac = item.value / total;
           var len = Math.max(frac * circumference, list.length > 1 ? 1.5 : circumference);
-          var gap = list.length > 1 ? 2 : 0; // tiny gap between segments
+          var gap = list.length > 1 ? 2 : 0;
           var dasharray = Math.max(len - gap, 0) + ' ' + (circumference - len + gap);
           var dashoffset = -offset;
           offset += len;
@@ -404,9 +291,6 @@
         }).join('');
       }
 
-      // -------------------------------------------------------------
-      // Ranked bar list (Genres / Creators)
-      // -------------------------------------------------------------
       function renderBarList(mount, list, total) {
         mount.innerHTML = list.map(function (item, i) {
           var pct = total ? (item.value / total) * 100 : 0;
@@ -423,7 +307,6 @@
           );
         }).join('');
 
-        // Animate the fills in, staggered slightly for a cascading feel.
         var fills = mount.querySelectorAll('.stats-bar-fill');
         requestAnimationFrame(function () {
           fills.forEach(function (el, i) {
@@ -434,9 +317,6 @@
         });
       }
 
-      // -------------------------------------------------------------
-      // Status helpers
-      // -------------------------------------------------------------
       function showLoading() {
         content.hidden = true;
         statusEl.hidden = false;
@@ -456,9 +336,6 @@
         statusEl.innerHTML = '';
       }
 
-      // -------------------------------------------------------------
-      // Main render
-      // -------------------------------------------------------------
       function displaySummary(summary) {
         hideStatus();
         content.hidden = false;
@@ -529,7 +406,7 @@
         var ids = showList.map(function (s) { return s.imdb; });
 
         TVStats.fetchAll(ids).then(function (records) {
-          if (currentYear !== year) return; // a newer tab click superseded this one
+          if (currentYear !== year) return;
           var summary = TVStats.aggregate(showList, records);
           summaryCache[year] = summary;
           displaySummary(summary);
@@ -539,9 +416,6 @@
         });
       }
 
-      // -------------------------------------------------------------
-      // Year pills
-      // -------------------------------------------------------------
       YEARS.forEach(function (year) {
         var pill = document.createElement('button');
         pill.type = 'button';
