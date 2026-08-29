@@ -16,10 +16,8 @@
 </head>
 <body>
 
-  <!-- HERO: auto-rotating backdrop carousel built from this week's trending shows -->
   <div id="hero-carousel" class="hero-carousel">
     <div class="hero-skeleton js-hero-skeleton"></div>
-    <!-- .hero-slide elements get injected here by JS -->
     <div class="hero-mask"></div>
 
     <form class="group floating-search -centered" id="home-search-form" action="/search/" method="get">
@@ -84,12 +82,10 @@
 
   <div class="page-content">
 
-    <!-- Rows injected by JS: Trending / Popular / Top Rated / On The Air -->
     <div id="rows-mount"></div>
 
-  </div><!-- /.page-content -->
+  </div>
 
-    <!-- Bottom Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -110,7 +106,6 @@
     </div>
   </div>
 
-  <!-- Search bar wiring (same behavior as every other page) -->
   <script>
     (function () {
       var form = document.getElementById('home-search-form');
@@ -133,8 +128,6 @@
         goToResults();
       });
 
-      // Fallback for keyboards/webviews that only fire keydown, not
-      // 'search' or 'submit' — catches Enter as a plain keypress.
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
           e.preventDefault();
@@ -142,23 +135,14 @@
         }
       });
 
-      // The overlay gets turned on right before we navigate to /search/,
-      // and this page is never given a chance to turn it back off — so if
-      // the browser later restores this exact page from its back/forward
-      // cache (e.g. tapping Back from the search results), it's repainted
-      // exactly as frozen: overlay still up, spinner still spinning,
-      // hiding all the real content underneath. Clear it every time this
-      // page is (re)shown so that can't happen.
       window.addEventListener('pageshow', function () {
         overlay.classList.remove('-visible');
       });
     })();
   </script>
 
-  <!-- Discover page: hero carousel + rows, all live from TMDB -->
   <script>
     (function () {
-      // Same v3 TMDB key used on /show/ / /search/ — client-side only.
       var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
       var TMDB_BASE = 'https://api.themoviedb.org/3';
       var POSTER_BASE = 'https://image.tmdb.org/t/p/w342';
@@ -185,9 +169,6 @@
           .then(function (data) { return data.results || []; });
       }
 
-      // ---------------------------------------------------------
-      // HERO CAROUSEL
-      // ---------------------------------------------------------
       var heroEl = document.getElementById('hero-carousel');
       var heroSkeleton = heroEl.querySelector('.js-hero-skeleton');
       var heroContent = document.getElementById('hero-content');
@@ -265,9 +246,6 @@
         heroTimer = null;
       }
 
-      // ---------------------------------------------------------
-      // DISCOVER ROWS
-      // ---------------------------------------------------------
       var rowsMount = document.getElementById('rows-mount');
 
       var ROWS = [
@@ -339,7 +317,6 @@
           refs.track.appendChild(card);
         });
 
-        // Prev/next nav arrows (desktop only — CSS hides them under 768px)
         var prevBtn = document.createElement('button');
         prevBtn.type = 'button';
         prevBtn.className = 'carousel-nav -prev';
@@ -361,7 +338,6 @@
         refs.wrap.appendChild(prevBtn);
         refs.wrap.appendChild(nextBtn);
 
-        // Fade/slide the whole row in once it's on screen
         observeReveal(refs.section);
       }
 
@@ -384,7 +360,6 @@
         }
       }
 
-      // Kick off hero + all four rows in parallel
       fetchTmdb('/trending/tv/week').then(buildHero).catch(function (err) {
         console.error('Hero load failed:', err);
         heroSkeleton.style.display = 'none';
