@@ -7,13 +7,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>...</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
   <link rel="preconnect" href="https://image.tmdb.org">
-  <link rel="preload" as="script" href="/auth.js?v=1">
-  <link rel="preload" as="script" href="/showmarking.js?v=1">
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400&display=swap" rel="stylesheet">
   <style>
     #show-poster-img {
@@ -148,7 +146,7 @@
 
     <section id="show-hero" class="show-hero" hidden>
       <div class="show-poster">
-        <img id="show-poster-img" alt="">
+        <img id="show-poster-img" alt="" fetchpriority="high" decoding="async">
       </div>
 
       <div class="show-hero-info">
