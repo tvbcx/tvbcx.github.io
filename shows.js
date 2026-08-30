@@ -1,6 +1,6 @@
 var SHOWS = [
-  { title: "The Americans",                      imdb: "tt2149175",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/0/2164.jpg",           rating: null },
-  { title: "Money Heist",                        imdb: "tt13696452", src: "https://static.tvmaze.com/uploads/images/medium_untouched/346/865957.jpg",       rating: 3.5 },
+  { title: "The Americans",                      imdb: "tt2149175",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/w1UBlxEXhbKe8sp0fxFZh7MqTce.jpg",           rating: null },
+  { title: "Money Heist",                        imdb: "tt13696452", src: "https://image.tmdb.org/t/p/w440_and_h660_face/dmnwJGVergOFWCiLbPsQTyyzePw.jpg",       rating: 3.5 },
   { title: "Dark",                               imdb: "tt5753856",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/201/502948.jpg",       rating: 3.5  },
   { title: "Prison Break",                       imdb: "tt0455275",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/48/122451.jpg",        rating: 4    },
   { title: "Squid Game",                         imdb: "tt10919420", src: "https://static.tvmaze.com/uploads/images/medium_portrait/576/1440521.jpg",       rating: 4    , journalYear: 2023, journalOrder: 11 },
@@ -9,7 +9,7 @@ var SHOWS = [
   { title: "The Queen's Gambit",                 imdb: "tt10048342", src: "https://static.tvmaze.com/uploads/images/medium_portrait/510/1275203.jpg",       rating: 4    , journalYear: 2022, journalOrder: 8 },
   { title: "Game of Thrones",                    imdb: "tt0944947",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/498/1245274.jpg",       rating: 5    },
   { title: "Mr. Robot",                          imdb: "tt4158110",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/211/528026.jpg",        rating: 4.5 },
-  { title: "When They See Us",                   imdb: "tt7137906",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/244/610155.jpg",        rating: 4    },
+  { title: "When They See Us",                   imdb: "tt7137906",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/oPv3nNtkuc6EPEql5lgdOuQNHuG.jpg",        rating: 4    },
   { title: "Ozark",                              imdb: "tt5071412",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/398/996611.jpg",        rating: null , journalYear: 2023, journalOrder: 14 },
   { title: "Dexter",                             imdb: "tt0773262",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/39/99906.jpg",         rating: 4    , journalYear: 2024, journalOrder: 20 },
   { title: "Lupin",                              imdb: "tt2531336",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/286/715734.jpg",       rating: 3    , journalYear: 2022, journalOrder: 1 },
