@@ -140,6 +140,96 @@
         margin-bottom: 12px !important;
       }
     }
+
+    /* Hide the grain texture over the backdrop image/fade area so that
+       region reads as a plain color (matching .backdropmask's own fade),
+       then smoothly bring the grain back in once the fade completes. */
+    body::before {
+      -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0px, transparent 60px,
+        rgba(0,0,0,0.06) 112px, rgba(0,0,0,0.13) 160px,
+        rgba(0,0,0,0.22) 200px, rgba(0,0,0,0.33) 232px,
+        rgba(0,0,0,0.45) 260px, rgba(0,0,0,0.58) 284px,
+        rgba(0,0,0,0.68) 304px, rgba(0,0,0,0.78) 324px,
+        rgba(0,0,0,0.86) 340px, rgba(0,0,0,0.91) 356px,
+        rgba(0,0,0,0.95) 372px, rgba(0,0,0,0.98) 384px,
+        #000 400px, #000 100%);
+      mask-image: linear-gradient(to bottom,
+        transparent 0px, transparent 60px,
+        rgba(0,0,0,0.06) 112px, rgba(0,0,0,0.13) 160px,
+        rgba(0,0,0,0.22) 200px, rgba(0,0,0,0.33) 232px,
+        rgba(0,0,0,0.45) 260px, rgba(0,0,0,0.58) 284px,
+        rgba(0,0,0,0.68) 304px, rgba(0,0,0,0.78) 324px,
+        rgba(0,0,0,0.86) 340px, rgba(0,0,0,0.91) 356px,
+        rgba(0,0,0,0.95) 372px, rgba(0,0,0,0.98) 384px,
+        #000 400px, #000 100%);
+    }
+    @media (max-width: 420px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 39px,
+          rgba(0,0,0,0.06) 73px, rgba(0,0,0,0.13) 104px,
+          rgba(0,0,0,0.22) 130px, rgba(0,0,0,0.33) 151px,
+          rgba(0,0,0,0.45) 169px, rgba(0,0,0,0.58) 185px,
+          rgba(0,0,0,0.68) 198px, rgba(0,0,0,0.78) 211px,
+          rgba(0,0,0,0.86) 221px, rgba(0,0,0,0.91) 231px,
+          rgba(0,0,0,0.95) 242px, rgba(0,0,0,0.98) 250px,
+          #000 260px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 39px,
+          rgba(0,0,0,0.06) 73px, rgba(0,0,0,0.13) 104px,
+          rgba(0,0,0,0.22) 130px, rgba(0,0,0,0.33) 151px,
+          rgba(0,0,0,0.45) 169px, rgba(0,0,0,0.58) 185px,
+          rgba(0,0,0,0.68) 198px, rgba(0,0,0,0.78) 211px,
+          rgba(0,0,0,0.86) 221px, rgba(0,0,0,0.91) 231px,
+          rgba(0,0,0,0.95) 242px, rgba(0,0,0,0.98) 250px,
+          #000 260px, #000 100%);
+      }
+    }
+    @media (min-width: 1024px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 69px,
+          rgba(0,0,0,0.06) 129px, rgba(0,0,0,0.13) 184px,
+          rgba(0,0,0,0.22) 230px, rgba(0,0,0,0.33) 267px,
+          rgba(0,0,0,0.45) 299px, rgba(0,0,0,0.58) 327px,
+          rgba(0,0,0,0.68) 350px, rgba(0,0,0,0.78) 373px,
+          rgba(0,0,0,0.86) 391px, rgba(0,0,0,0.91) 409px,
+          rgba(0,0,0,0.95) 428px, rgba(0,0,0,0.98) 442px,
+          #000 460px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 69px,
+          rgba(0,0,0,0.06) 129px, rgba(0,0,0,0.13) 184px,
+          rgba(0,0,0,0.22) 230px, rgba(0,0,0,0.33) 267px,
+          rgba(0,0,0,0.45) 299px, rgba(0,0,0,0.58) 327px,
+          rgba(0,0,0,0.68) 350px, rgba(0,0,0,0.78) 373px,
+          rgba(0,0,0,0.86) 391px, rgba(0,0,0,0.91) 409px,
+          rgba(0,0,0,0.95) 428px, rgba(0,0,0,0.98) 442px,
+          #000 460px, #000 100%);
+      }
+    }
+    @media (min-width: 1440px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 75px,
+          rgba(0,0,0,0.06) 140px, rgba(0,0,0,0.13) 200px,
+          rgba(0,0,0,0.22) 250px, rgba(0,0,0,0.33) 290px,
+          rgba(0,0,0,0.45) 325px, rgba(0,0,0,0.58) 355px,
+          rgba(0,0,0,0.68) 380px, rgba(0,0,0,0.78) 405px,
+          rgba(0,0,0,0.86) 425px, rgba(0,0,0,0.91) 445px,
+          rgba(0,0,0,0.95) 465px, rgba(0,0,0,0.98) 480px,
+          #000 500px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 75px,
+          rgba(0,0,0,0.06) 140px, rgba(0,0,0,0.13) 200px,
+          rgba(0,0,0,0.22) 250px, rgba(0,0,0,0.33) 290px,
+          rgba(0,0,0,0.45) 325px, rgba(0,0,0,0.58) 355px,
+          rgba(0,0,0,0.68) 380px, rgba(0,0,0,0.78) 405px,
+          rgba(0,0,0,0.86) 425px, rgba(0,0,0,0.91) 445px,
+          rgba(0,0,0,0.95) 465px, rgba(0,0,0,0.98) 480px,
+          #000 500px, #000 100%);
+      }
+    }
   </style>
 </head>
 <body class="profile-page">
