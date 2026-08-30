@@ -43,10 +43,10 @@ var SHOWS = [
   { title: "Presumed Innocent",                  imdb: "tt17677860", src: "https://static.tvmaze.com/uploads/images/medium_portrait/520/1301035.jpg",       rating: 3    , journalYear: 2024, journalOrder: 17 },
   { title: "The Day of the Jackal",              imdb: "tt24053860", src: "https://static.tvmaze.com/uploads/images/medium_portrait/541/1352923.jpg",       rating: 3    },
 
-  { title: "Dune: Prophecy",                     imdb: "tt10466872", src: "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358056.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 26 },
-  { title: "Dexter: Resurrection",               imdb: "tt33043892", src: "https://static.tvmaze.com/uploads/images/medium_portrait/577/1443218.jpg",       rating: 2.5  , journalYear: 2025, journalOrder: 27 },
-  { title: "The Last of Us",                     imdb: "tt3581920",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 28 },
-  { title: "Adolescence",                        imdb: "tt31806037", src: "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg",       rating: 4.5  , journalYear: 2025, journalOrder: 24 },
+  { title: "Dexter: Resurrection",               imdb: "tt33043892", src: "https://static.tvmaze.com/uploads/images/medium_portrait/577/1443218.jpg",       rating: 2.5  , journalYear: 2025, journalOrder: 25 },
+  { title: "The Last of Us",                     imdb: "tt3581920",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 26 },
+  { title: "Dune: Prophecy",                     imdb: "tt10466872", src: "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358056.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 27 },
+  { title: "Adolescence",                        imdb: "tt31806037", src: "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg",       rating: 4.5  , journalYear: 2025, journalOrder: 28 },
   { title: "Your Honor",                         imdb: "tt7440726",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/287/717558.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31 },
   { title: "Task",                               imdb: "tt28013708", src: "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466647.jpg",       rating: 3    , journalYear: 2026, journalOrder: 33 },
 
