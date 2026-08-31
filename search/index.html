@@ -15,8 +15,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400&display=swap" rel="stylesheet">
   <style>
     #results-container.results-container {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 340px);
+      justify-content: center;
       gap: 0.85rem;
     }
 
@@ -29,6 +30,8 @@
       text-decoration: none;
       color: inherit;
       border: 1px solid transparent;
+      width: 340px;
+      box-sizing: border-box;
       transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
 
@@ -138,6 +141,15 @@
     }
 
     @media (max-width: 480px) {
+      #results-container.results-container {
+        grid-template-columns: 100%;
+        justify-content: stretch;
+      }
+
+      #results-container .result-item {
+        width: 100%;
+      }
+
       #results-container .poster {
         width: 64px;
         height: 96px;
