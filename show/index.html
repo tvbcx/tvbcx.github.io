@@ -178,71 +178,46 @@
             </div>
           </div>
 
-          <input type="checkbox" id="watchdates-toggle" class="auth-checkbox">
-          <label for="watchdates-toggle" class="watchdates-backdrop" aria-hidden="true"></label>
+          <input type="checkbox" id="watchdate-toggle" class="auth-checkbox">
 
-          <div class="watchdates-popover" id="watchdates-popover">
-            <div class="watchdates-header">
-              <h3 class="watchdates-title">When did you watch this?</h3>
-              <label for="watchdates-toggle" class="watchdates-close" aria-label="Close">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 1 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"/></svg>
+          <label for="watchdate-toggle" class="watchdate-backdrop" aria-hidden="true"></label>
+
+          <div class="watchdate-popover" id="watchdate-popover">
+            <div class="wd-header">
+              <div class="wd-header-text">
+                <span class="wd-title">Log your watch</span>
+                <span class="wd-subtitle" id="wd-show-name">this show</span>
+              </div>
+              <label for="watchdate-toggle" class="wd-close" aria-label="Close">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </label>
             </div>
 
-            <div class="watchdates-chips">
-              <button type="button" class="watchdates-chip -active" id="chip-start" data-field="start">
-                <span class="chip-label">Started</span>
-                <span class="chip-value numbers" id="chip-start-value">Select date</span>
+            <div class="wd-fields">
+              <button type="button" class="wd-field -active" id="wd-field-start" data-field="start">
+                <span class="wd-field-label">Started</span>
+                <span class="wd-field-value" id="wd-value-start">Select date</span>
               </button>
-              <div class="watchdates-chip-arrow" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="14" height="14"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
-              </div>
-              <button type="button" class="watchdates-chip" id="chip-end" data-field="end">
-                <span class="chip-label">Finished</span>
-                <span class="chip-value numbers" id="chip-end-value">Select date</span>
+              <span class="wd-fields-arrow" aria-hidden="true">→</span>
+              <button type="button" class="wd-field" id="wd-field-end" data-field="end">
+                <span class="wd-field-label">Finished</span>
+                <span class="wd-field-value" id="wd-value-end">Select date</span>
               </button>
             </div>
 
-            <label class="watchdates-stillwatching">
-              <input type="checkbox" id="watchdates-still-watching">
-              <span>I'm still watching this show</span>
+            <div class="wd-calendars" id="wd-calendars">
+              <div class="wd-calendar" id="wd-calendar-start" data-field="start"></div>
+              <div class="wd-calendar -inactive" id="wd-calendar-end" data-field="end"></div>
+            </div>
+
+            <label class="wd-nodate">
+              <input type="checkbox" id="wd-no-dates">
+              <span>I don't remember the exact dates</span>
             </label>
 
-            <div class="watchdates-nav">
-              <button type="button" class="watchdates-navbtn" id="watchdates-prev" aria-label="Previous month">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-              </button>
-
-              <div class="watchdates-selects">
-                <select class="watchdates-select" id="watchdates-month-select" aria-label="Month"></select>
-                <select class="watchdates-select" id="watchdates-year-select" aria-label="Year"></select>
-              </div>
-
-              <button type="button" class="watchdates-navbtn" id="watchdates-next" aria-label="Next month">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
-              </button>
-            </div>
-
-            <div class="watchdates-calendars">
-              <div class="watchdates-cal" id="watchdates-cal-1">
-                <div class="watchdates-cal-monthlabel numbers" id="watchdates-cal-1-label"></div>
-                <div class="watchdates-weekdays">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                </div>
-                <div class="watchdates-days" id="watchdates-days-1"></div>
-              </div>
-              <div class="watchdates-cal -second" id="watchdates-cal-2">
-                <div class="watchdates-cal-monthlabel numbers" id="watchdates-cal-2-label"></div>
-                <div class="watchdates-weekdays">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                </div>
-                <div class="watchdates-days" id="watchdates-days-2"></div>
-              </div>
-            </div>
-
-            <div class="watchdates-footer">
-              <button type="button" class="watchdates-btn -ghost" id="watchdates-cancel">Cancel</button>
-              <button type="button" class="watchdates-btn -primary" id="watchdates-save" disabled>Save</button>
+            <div class="wd-actions">
+              <button type="button" class="wd-btn -ghost" id="wd-cancel-btn">Cancel</button>
+              <button type="button" class="wd-btn -primary" id="wd-save-btn">Save</button>
             </div>
           </div>
         </div>
@@ -431,6 +406,8 @@ showCopied();
 
             document.getElementById('show-title').textContent = show.name || 'Untitled';
             document.title = (show.name || 'Untitled') + ' ǀ tvbox';
+
+            window.tvboxShowMeta = { name: show.name || 'this show', firstAirDate: show.first_air_date || null };
 
             var year = yearFromDate(show.first_air_date);
             var metaParts = [];
