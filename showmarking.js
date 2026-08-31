@@ -55,6 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (markasToggle) markasToggle.checked = false;
   }
 
+  // Reset stars to empty every time the popover opens
+  if (markasToggle && starsFg) {
+    markasToggle.addEventListener('change', () => {
+      if (markasToggle.checked) {
+        starsFg.style.width = '0%';
+      }
+    });
+  }
+
   if (watchlistBtn) {
     watchlistBtn.addEventListener('click', () => {
       showAuthPrompt();
@@ -80,8 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return Math.max(0, Math.min(100, pct));
     }
 
+    // Snap to the nearest half-star increment.
+    // 5 stars = 100%, so each full star = 20% and each half star = 10%.
+    function snapToHalfStar(pct) {
+      return Math.max(0, Math.min(100, Math.round(pct / 10) * 10));
+    }
+
     function setFill(pct) {
-      starsFg.style.width = pct + '%';
+      starsFg.style.width = snapToHalfStar(pct) + '%';
     }
 
     starsTrack.addEventListener('pointerdown', (e) => {
