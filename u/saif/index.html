@@ -958,7 +958,7 @@ showCopied();
           var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
           var badgeScale = isDesktop ? 2 : 1;
           var badgeW = Math.min(summaryRect.width * 0.8, 300) * badgeScale;
-          var badgeH = badgeW / 3;
+          var badgeH = isDesktop ? startH : badgeW / 3;
           var badgeLeft = (summaryRect.width - badgeW) / 2;
           var badgeTop = centerY - badgeH / 2;
           var radius = Math.max(10, Math.round(badgeH * 0.16));
