@@ -14,7 +14,7 @@ const SIGNIN_LOADING_HTML = `
 `;
 
 const SIGNUP_HTML = `
-  <div class="auth-modal-caption">WIP</div>
+  <div class="auth-modal-caption">Under dev</div>
 `;
 
 const SIGNIN_ERROR_MESSAGE = 'Invalid username or password';
