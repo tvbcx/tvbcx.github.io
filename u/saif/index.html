@@ -147,12 +147,126 @@
       }
     }
 
-    @media (aspect-ratio: 4/3) {
+    /* Squarish 4:3-ish screens (classic iPad landscape, old tablets/monitors,
+       resized windows) sit in an awkward gap: often ≥1024px wide so they'd
+       otherwise get the full desktop two-column layout, but with much less
+       vertical room to show it in. This keeps the two-column layout (it's
+       still wide enough to earn it) but tightens everything vertically so
+       more content fits without excess scrolling, and narrows the sidebar
+       a bit since the main column has less width to spare than on a real
+       desktop monitor. Range covers ~4:3 up to ~5:4 so it isn't limited to
+       one exact ratio. */
+    @media (min-aspect-ratio: 5/4) and (max-aspect-ratio: 4/3) and (min-width: 700px) {
       .profile-favorites .section-heading,
       .profile-stats-embed .section-heading {
         color: #fff;
         border-bottom-color: #000;
-        padding-bottom: 8px;
+        padding-bottom: 6px;
+      }
+
+      .profile-grid {
+        display: block;
+      }
+      .profile-grid::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-watchlist {
+        float: left;
+        clear: left;
+        width: calc(100% - 300px);
+      }
+      .profile-stats-embed,
+      .profile-ratings-journal {
+        float: right;
+        clear: right;
+        width: 280px;
+        display: block;
+      }
+      .profile-favorites .stats-box {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+      .profile-favorites,
+      .profile-dnf {
+        margin-top: 0 !important;
+        margin-bottom: 18px !important;
+      }
+      .profile-watchlist {
+        margin-top: 0 !important;
+        margin-bottom: 18px !important;
+      }
+      .profile-stats-embed {
+        margin-bottom: 18px !important;
+      }
+
+      .profile-ratings-journal .dashboard-row {
+        display: block;
+      }
+      .profile-ratings-journal .dash-card:first-child {
+        margin-bottom: 18px;
+      }
+
+      /* Compact stats card so the narrower sidebar doesn't force wrapping */
+      .profile-stats-embed .stats-hero-card {
+        padding: 12px 4px 10px;
+      }
+      .profile-stats-embed .stats-hero-card .value {
+        font-size: 1.25rem;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .profile-stats-embed .stats-donut-panel {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+      }
+      .profile-stats-embed .stats-donut {
+        width: 84px;
+        height: 84px;
+      }
+      .profile-stats-embed .stats-legend {
+        width: auto;
+      }
+      .profile-stats-embed .stats-legend-item {
+        font-size: 11px;
+        gap: 5px;
+      }
+      .profile-stats-embed .stats-legend-name {
+        max-width: 85px;
+      }
+
+      /* Trim the hero backdrop fade — a squarer viewport has less height
+         to spare, so a full-height desktop-style fade eats too much of it. */
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 55px,
+          rgba(0,0,0,0.06) 103px, rgba(0,0,0,0.13) 147px,
+          rgba(0,0,0,0.22) 184px, rgba(0,0,0,0.33) 214px,
+          rgba(0,0,0,0.45) 239px, rgba(0,0,0,0.58) 262px,
+          rgba(0,0,0,0.68) 280px, rgba(0,0,0,0.78) 299px,
+          rgba(0,0,0,0.86) 313px, rgba(0,0,0,0.91) 327px,
+          rgba(0,0,0,0.95) 342px, rgba(0,0,0,0.98) 354px,
+          #000 368px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 55px,
+          rgba(0,0,0,0.06) 103px, rgba(0,0,0,0.13) 147px,
+          rgba(0,0,0,0.22) 184px, rgba(0,0,0,0.33) 214px,
+          rgba(0,0,0,0.45) 239px, rgba(0,0,0,0.58) 262px,
+          rgba(0,0,0,0.68) 280px, rgba(0,0,0,0.78) 299px,
+          rgba(0,0,0,0.86) 313px, rgba(0,0,0,0.91) 327px,
+          rgba(0,0,0,0.95) 342px, rgba(0,0,0,0.98) 354px,
+          #000 368px, #000 100%);
       }
     }
 
