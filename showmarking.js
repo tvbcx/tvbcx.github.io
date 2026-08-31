@@ -11,6 +11,12 @@ const MARKAS_OPTIONS = [
 const STAR_COUNT = 5;
 const TOAST_VISIBLE_MS = 2200;
 
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const MIN_WATCHDATES_YEAR = 1950;
+
 document.addEventListener('DOMContentLoaded', () => {
   const actionsBox = document.querySelector('.show-actions');
   if (!actionsBox) return;
@@ -21,6 +27,255 @@ document.addEventListener('DOMContentLoaded', () => {
   const markasOptionsWrap = document.getElementById('markas-options');
   const starsTrack      = document.getElementById('markas-stars-track');
   const starsFg         = document.getElementById('markas-stars-fg');
+
+  // ---- "Mark As > Watched" date-range popover ----
+  const watchdatesToggle   = document.getElementById('watchdates-toggle');
+  const chipStart          = document.getElementById('chip-start');
+  const chipEnd            = document.getElementById('chip-end');
+  const chipStartValue     = document.getElementById('chip-start-value');
+  const chipEndValue       = document.getElementById('chip-end-value');
+  const stillWatchingBox   = document.getElementById('watchdates-still-watching');
+  const prevBtn            = document.getElementById('watchdates-prev');
+  const nextBtn            = document.getElementById('watchdates-next');
+  const monthSelect        = document.getElementById('watchdates-month-select');
+  const yearSelect         = document.getElementById('watchdates-year-select');
+  const cal1Label          = document.getElementById('watchdates-cal-1-label');
+  const cal2Label          = document.getElementById('watchdates-cal-2-label');
+  const days1Wrap          = document.getElementById('watchdates-days-1');
+  const days2Wrap          = document.getElementById('watchdates-days-2');
+  const watchdatesSaveBtn  = document.getElementById('watchdates-save');
+  const watchdatesCancelBtn = document.getElementById('watchdates-cancel');
+
+  const hasWatchDatesUI = watchdatesToggle && chipStart && chipEnd && days1Wrap && days2Wrap;
+
+  if (hasWatchDatesUI) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let baseMonth = today.getMonth();
+    let baseYear  = today.getFullYear();
+    let startDate = null;
+    let endDate   = null;
+    let activeField = 'start';
+    let stillWatching = false;
+    let watchDatesConfirmed = false;
+
+    MONTH_NAMES.forEach((name, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = name;
+      monthSelect.appendChild(opt);
+    });
+    for (let y = today.getFullYear(); y >= MIN_WATCHDATES_YEAR; y--) {
+      const opt = document.createElement('option');
+      opt.value = String(y);
+      opt.textContent = String(y);
+      yearSelect.appendChild(opt);
+    }
+
+    function isSameDay(a, b) {
+      return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+    }
+
+    function formatDate(d) {
+      return MONTH_NAMES[d.getMonth()].slice(0, 3) + ' ' + d.getDate() + ', ' + d.getFullYear();
+    }
+
+    function setActiveField(field) {
+      activeField = field;
+      chipStart.classList.toggle('-active', field === 'start');
+      chipEnd.classList.toggle('-active', field === 'end');
+    }
+
+    function updateChips() {
+      if (startDate) {
+        chipStartValue.textContent = formatDate(startDate);
+        chipStart.classList.add('-filled');
+      } else {
+        chipStartValue.textContent = 'Select date';
+        chipStart.classList.remove('-filled');
+      }
+
+      if (stillWatching) {
+        chipEndValue.textContent = 'Still watching';
+        chipEnd.classList.add('-filled');
+      } else if (endDate) {
+        chipEndValue.textContent = formatDate(endDate);
+        chipEnd.classList.add('-filled');
+      } else {
+        chipEndValue.textContent = 'Select date';
+        chipEnd.classList.remove('-filled');
+      }
+
+      chipEnd.classList.toggle('-disabled', stillWatching);
+    }
+
+    function updateSaveState() {
+      watchdatesSaveBtn.disabled = !(startDate && (stillWatching || endDate));
+    }
+
+    function buildMonthGrid(container, year, month) {
+      container.innerHTML = '';
+
+      const firstOfMonth = new Date(year, month, 1);
+      const startWeekday = firstOfMonth.getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+      const cells = [];
+      for (let i = startWeekday - 1; i >= 0; i--) {
+        cells.push({ date: new Date(year, month - 1, prevMonthTotalDays - i), outside: true });
+      }
+      for (let d = 1; d <= totalDays; d++) {
+        cells.push({ date: new Date(year, month, d), outside: false });
+      }
+      while (cells.length % 7 !== 0) {
+        const last = cells[cells.length - 1].date;
+        const next = new Date(last);
+        next.setDate(next.getDate() + 1);
+        cells.push({ date: next, outside: true });
+      }
+
+      cells.forEach((cell) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'watchdates-day';
+        btn.textContent = String(cell.date.getDate());
+
+        const isFuture = cell.date.getTime() > today.getTime();
+        if (cell.outside) btn.classList.add('-outside');
+        if (isFuture) btn.classList.add('-future');
+        if (isSameDay(cell.date, today)) btn.classList.add('-today');
+
+        if (startDate && isSameDay(cell.date, startDate)) {
+          btn.classList.add(endDate ? '-range-start' : '-single');
+        }
+        if (endDate && isSameDay(cell.date, endDate)) {
+          btn.classList.add('-range-end');
+        }
+        if (startDate && endDate && cell.date > startDate && cell.date < endDate) {
+          btn.classList.add('-in-range');
+        }
+
+        if (!cell.outside && !isFuture) {
+          btn.addEventListener('click', () => handleDayClick(cell.date));
+        }
+
+        container.appendChild(btn);
+      });
+    }
+
+    function renderCalendars() {
+      monthSelect.value = String(baseMonth);
+      yearSelect.value = String(baseYear);
+
+      const secondMonth = (baseMonth + 1) % 12;
+      const secondYear  = baseMonth === 11 ? baseYear + 1 : baseYear;
+
+      cal1Label.textContent = MONTH_NAMES[baseMonth] + ' ' + baseYear;
+      cal2Label.textContent = MONTH_NAMES[secondMonth] + ' ' + secondYear;
+
+      buildMonthGrid(days1Wrap, baseYear, baseMonth);
+      buildMonthGrid(days2Wrap, secondYear, secondMonth);
+    }
+
+    function handleDayClick(date) {
+      if (activeField === 'start') {
+        startDate = date;
+        if (endDate && endDate < startDate) endDate = null;
+        if (!stillWatching) setActiveField('end');
+      } else {
+        if (startDate && date < startDate) {
+          endDate = startDate;
+          startDate = date;
+        } else {
+          endDate = date;
+        }
+      }
+      updateChips();
+      renderCalendars();
+      updateSaveState();
+    }
+
+    function openWatchDates() {
+      startDate = null;
+      endDate = null;
+      stillWatching = false;
+      stillWatchingBox.checked = false;
+      baseMonth = today.getMonth();
+      baseYear = today.getFullYear();
+      setActiveField('start');
+      updateChips();
+      renderCalendars();
+      updateSaveState();
+      watchdatesToggle.checked = true;
+    }
+
+    chipStart.addEventListener('click', () => setActiveField('start'));
+    chipEnd.addEventListener('click', () => {
+      if (!stillWatching) setActiveField('end');
+    });
+
+    stillWatchingBox.addEventListener('change', () => {
+      stillWatching = stillWatchingBox.checked;
+      if (stillWatching) {
+        endDate = null;
+        setActiveField('start');
+      }
+      updateChips();
+      renderCalendars();
+      updateSaveState();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      baseMonth--;
+      if (baseMonth < 0) { baseMonth = 11; baseYear--; }
+      renderCalendars();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      baseMonth++;
+      if (baseMonth > 11) { baseMonth = 0; baseYear++; }
+      renderCalendars();
+    });
+
+    monthSelect.addEventListener('change', () => {
+      baseMonth = parseInt(monthSelect.value, 10);
+      renderCalendars();
+    });
+
+    yearSelect.addEventListener('change', () => {
+      baseYear = parseInt(yearSelect.value, 10);
+      renderCalendars();
+    });
+
+    watchdatesCancelBtn.addEventListener('click', () => {
+      watchdatesToggle.checked = false;
+    });
+
+    watchdatesSaveBtn.addEventListener('click', () => {
+      if (watchdatesSaveBtn.disabled) return;
+      watchDatesConfirmed = true;
+      watchdatesToggle.checked = false;
+      showAuthPrompt();
+    });
+
+    watchdatesToggle.addEventListener('change', () => {
+      if (!watchdatesToggle.checked && !watchDatesConfirmed) {
+        const watchedBtn = markasOptionsWrap && markasOptionsWrap.querySelector('[data-action="watched"]');
+        if (watchedBtn) watchedBtn.classList.remove('-highlighted');
+      }
+      watchDatesConfirmed = false;
+    });
+
+    window.addEventListener('scroll', () => {
+      if (watchdatesToggle.checked) watchdatesToggle.checked = false;
+    }, { passive: true });
+
+    actionsBox._openWatchDates = openWatchDates;
+  }
 
   if (watchlistBtn)    watchlistBtn.textContent   = WATCHLIST_BTN_LABEL;
   if (markasBtnLabel)  markasBtnLabel.textContent  = MARKAS_BTN_LABEL;
@@ -74,6 +329,17 @@ document.addEventListener('DOMContentLoaded', () => {
     markasOptionsWrap.addEventListener('click', (e) => {
       const btn = e.target.closest('.markas-option');
       if (!btn) return;
+
+      if (btn.dataset.action === 'watched' && actionsBox._openWatchDates) {
+        markasOptionsWrap.querySelectorAll('.markas-option').forEach((el) => {
+          el.classList.remove('-highlighted');
+        });
+        btn.classList.add('-highlighted');
+        closeMarkAs();
+        actionsBox._openWatchDates();
+        return;
+      }
+
       closeMarkAs();
       showAuthPrompt();
     });
