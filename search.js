@@ -104,9 +104,9 @@
   function runSearch(query) {
     var requestId = ++currentRequestId;
 
-    document.title = query.trim()
-      ? 'Search: ' + query.trim() + ' — TVbox'
-      : 'Search TV Shows — TVbox';
+document.title = query.trim()
+  ? query.trim() + ' | tvbox'
+  : 'Search TV Shows ǀ tvbox';
 
     if (!query.trim()) {
       clearResults();
