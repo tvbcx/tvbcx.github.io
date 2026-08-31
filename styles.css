@@ -3222,7 +3222,11 @@ body.about-page {
   }
 
   .profile-header .person-display-name,
-  .profile-favorites .section-heading,
+  .profile-favorites .section-heading {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
   .profile-stats-embed .section-heading {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9)
   }
