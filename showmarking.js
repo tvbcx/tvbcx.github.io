@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (markasToggle) markasToggle.checked = false;
   }
 
-  // Reset stars to empty every time the popover opens
   if (markasToggle && starsFg) {
     markasToggle.addEventListener('change', () => {
       if (markasToggle.checked) {
@@ -104,20 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return Math.max(0, Math.min(100, pct));
     }
 
-    // Build the 10 valid snap percentages (½ and whole for each of 5 stars).
-    //
-    // Why not just multiples of 10%?
-    // Each star "slot" = glyph width + letter-spacing.
-    // The letter-spacing sits AFTER the glyph, so the visual midpoint of a
-    // glyph is NOT at 10% of the total track — it's closer to 8%.
-    // We read the rendered letter-spacing from the computed style so this
-    // works correctly on both mobile (font 26px / ls 6px) and desktop
-    // (font 32px / ls 8px) without hard-coding anything.
-    //
-    //  slot    = totalWidth / 5
-    //  glyph   = slot - letterSpacing          (≈ font-size)
-    //  half-i  = (i * slot + glyph * 0.5) / totalWidth * 100
-    //  full-i  = (i + 1) / 5 * 100            (end of slot looks same as end of glyph)
     function buildSnapPoints() {
       const rect         = starsTrack.getBoundingClientRect();
       const totalWidth   = rect.width;
@@ -131,17 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const pts = [];
       for (let i = 0; i < STAR_COUNT; i++) {
         const starStart = i * slotWidth;
-        pts.push((starStart + glyphWidth * 0.5) / totalWidth * 100); // half star
-        pts.push((i + 1) * slotWidth / totalWidth * 100);            // full star
+        pts.push((starStart + glyphWidth * 0.5) / totalWidth * 100);
+        pts.push((i + 1) * slotWidth / totalWidth * 100);
       }
       return pts;
     }
 
     function snapToHalfStar(pct) {
       const pts = buildSnapPoints();
-      if (!pts.length) return Math.round(pct / 10) * 10; // fallback
+      if (!pts.length) return Math.round(pct / 10) * 10;
 
-      // Snap to 0 (no fill) if cursor is before the midpoint of the first snap
       if (pct < pts[0] / 2) return 0;
 
       let nearest = pts[0];
@@ -179,10 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
     starsTrack.addEventListener('pointercancel', finishDrag);
   }
 
-  // =====================================================================
-  // Watched date-range popover
-  // =====================================================================
-
   const watchdateToggle  = document.getElementById('watchdate-toggle');
   const wdPopover         = document.getElementById('watchdate-popover');
   const wdShowNameEl      = document.getElementById('wd-show-name');
@@ -199,12 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
     start: document.getElementById('wd-value-start'),
     end:   document.getElementById('wd-value-end'),
   };
-  const wdNoDatesBox = document.getElementById('wd-no-dates');
-  const wdCancelBtn  = document.getElementById('wd-cancel-btn');
-  const wdSaveBtn    = document.getElementById('wd-save-btn');
+  const wdQuickBtn  = document.getElementById('wd-quick-btn');
+  const wdCancelBtn = document.getElementById('wd-cancel-btn');
+  const wdSaveBtn   = document.getElementById('wd-save-btn');
 
   if (!watchdateToggle || !wdPopover || !wdCalendars.start || !wdCalendars.end) {
-    return; // markup not present, nothing more to wire up
+    return;
   }
 
   function todayMidnight() {
@@ -340,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       html += '</div>';
 
-    } else { // years
+    } else {
       const min = wdMinDateFor(field);
       const max = wdMaxDateFor(field);
       const pageStart = Math.floor(state.view.getFullYear() / 12) * 12;
@@ -393,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
     wd[field].view = new Date(date.getFullYear(), date.getMonth(), 1);
     wdValues[field].textContent = formatDate(date);
 
-    // Keep start/end sane relative to each other
     if (field === 'start' && wd.end.date && wd.end.date < date) {
       wd.end.date = null;
       wdValues.end.textContent = 'Select date';
@@ -444,14 +423,16 @@ document.addEventListener('DOMContentLoaded', () => {
   wdFields.start.addEventListener('click', () => setWdActiveField('start'));
   wdFields.end.addEventListener('click', () => setWdActiveField('end'));
 
-  if (wdNoDatesBox) {
-    wdNoDatesBox.addEventListener('change', () => {
-      const disabled = wdNoDatesBox.checked;
-      [wdCalendarsWrap, wdFields.start, wdFields.end].forEach((el) => {
-        if (!el) return;
-        el.style.opacity = disabled ? '0.35' : '';
-        el.style.pointerEvents = disabled ? 'none' : '';
-      });
+  if (wdQuickBtn) {
+    wdQuickBtn.addEventListener('click', () => {
+      wd.start.date = null;
+      wd.end.date = null;
+      wdValues.start.textContent = 'Select date';
+      wdValues.end.textContent = 'Select date';
+
+      if (watchedMarkasBtn) watchedMarkasBtn.classList.add('-selected');
+      closeWatchedPopover();
+      showAuthPrompt();
     });
   }
 
@@ -491,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setWdActiveField(wdActiveField);
   });
 
-  // Initial render so the calendar is ready the moment it's opened
   renderWdCalendar('start');
   renderWdCalendar('end');
 
