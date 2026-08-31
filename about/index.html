@@ -18,45 +18,50 @@
 <body class="about-page">
 <div class="about-layout">
 <div class="about-media">
-<a href="/about/" class="floating-tvbox" aria-label="TV Box">
-<svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
-<circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
-<text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
-</svg>
-</a>
-<a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
-<svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
-<path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
-</svg>
-</a>
-<input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
-<input type="checkbox" id="signin-toggle" class="auth-checkbox">
-<input type="checkbox" id="signup-toggle" class="auth-checkbox">
-<label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
-<svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
-<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
-</svg>
-</label>
-<label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
-<div class="auth-dropdown">
-<label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
-<label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
-</div>
-<div class="auth-modal-wrap signin-modal-wrap">
-<label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
-<div class="auth-modal-box"></div>
-</div>
-<div class="auth-modal-wrap signup-modal-wrap">
-<label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
-<div class="auth-modal-box"></div>
-</div>
-<form class="group floating-search" id="home-search-form" action="/search/" method="get">
-<svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
-<path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
-</svg>
-<input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
-<button type="submit" hidden>Search</button>
-</form>
+  <header class="site-header">
+    <div class="header-container">
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+    </div>
+  </header>
 <picture>
 <source media="(min-width: 641px)" srcset="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/sv%20back.webp">
 <source media="(max-width: 640px)" srcset="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/sv%20vert.webp">
