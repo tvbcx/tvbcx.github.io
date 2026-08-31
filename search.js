@@ -35,6 +35,14 @@
     return dateStr.slice(0, 4);
   }
 
+  var STAR_ICON_SVG =
+    '<svg class="star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.75l2.87 6.13 6.63.7-4.93 4.6 1.32 6.62L12 17.9l-5.89 3.9 1.32-6.62-4.93-4.6 6.63-.7L12 2.75z"></path></svg>';
+
+  function formatRating(voteAverage, voteCount) {
+    if (!voteAverage || !voteCount) return '';
+    return voteAverage.toFixed(1);
+  }
+
   function buildCard(show) {
     var item = document.createElement('a');
     item.className = 'result-item';
@@ -44,12 +52,17 @@
       ? IMG_BASE + show.poster_path
       : 'poster-placeholder.jpg';
 
+    var rating = formatRating(show.vote_average, show.vote_count);
+
     item.innerHTML =
       '<img class="poster" src="' + posterSrc + '" alt="' + escapeHtml(show.name) + '" loading="lazy" decoding="async">' +
       '<div class="details">' +
         '<div class="header">' +
           '<h2 class="title">' + escapeHtml(show.name) + '</h2>' +
-          (yearFromDate(show.first_air_date) ? '<span class="year numbers">' + yearFromDate(show.first_air_date) + '</span>' : '') +
+          '<div class="meta">' +
+            (yearFromDate(show.first_air_date) ? '<span class="year numbers">' + yearFromDate(show.first_air_date) + '</span>' : '') +
+            (rating ? '<span class="rating numbers">' + STAR_ICON_SVG + rating + '</span>' : '') +
+          '</div>' +
         '</div>' +
         (show.overview ? '<p class="overview">' + escapeHtml(show.overview) + '</p>' : '') +
         '<div class="creator">' +
