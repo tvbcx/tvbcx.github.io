@@ -2090,7 +2090,8 @@ hr {
 }
 
 .search-page-heading {
-  margin-top: 0px
+  margin-top: 0px;
+  text-align: center;
 }
 
 .search-status {
