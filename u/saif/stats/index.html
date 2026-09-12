@@ -12,35 +12,131 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400..700&display=swap" rel="stylesheet">
   <link rel="preload" as="script" href="/shows.js?v=1">
-  <link rel="preload" as="script" href="/stats.js?v=2">
+  <link rel="preload" as="script" href="/stats.js?v=3">
   <style>
-    .stats-page-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
-    .stats-page-heading h1{margin:0;font-size:1.6rem}
-    @media (max-width:1023px){.stats-page-heading{margin-bottom:16px}}
-    .year-pills{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;-ms-overflow-style:none}
-    .year-pills::-webkit-scrollbar{display:none}
-    .year-pill{flex:0 0 auto;padding:5px 14px;border:1px solid #1e2a3e;border-radius:999px;background-color:rgba(255,255,255,0.02);color:#a2acbe;font-family:var(--font-numbers);font-size:13px;letter-spacing:0.03em;cursor:pointer;transition:border-color 0.15s ease,background-color 0.15s ease,color 0.15s ease,transform 0.15s ease}
-    .year-pill:hover{border-color:#30405a;transform:translateY(-1px)}
-    .year-pill.-active{background-color:#1d222a;border-color:#4d8eff;color:#eaeef5;box-shadow:0 0 0 1px rgba(77,142,255,0.15),0 4px 16px rgba(77,142,255,0.08)}
-    @media (min-width:1024px){
-      .stats-page-heading h1{font-size:2rem}
-      .stats-hero-row{gap:18px;margin-bottom:40px}
-      .stats-hero-card{padding:34px 10px 28px}
-      .stats-hero-card .value{font-size:2.2rem}
-      .stats-donut-panel,.stats-bar-list{padding:28px}
-      .stats-donut{width:200px;height:200px}
-      .stats-legend-item{font-size:14px}
+    .site-header { position: relative; height: 52px; background-color: #0b121e; }
+    @media (min-width: 1024px) { .site-header { height: 76px; } }
+    .page-content { padding-top: 0px; }
+
+    /* ------------------------------------------------------------------
+       Stats page (v2) — everything below is scoped under .stx-* so it
+       can't leak into the shared profile-embed widget on index.html,
+       which reuses the older .stats-hero-card / .stats-donut-panel /
+       .stats-legend classes from styles.css.
+    ------------------------------------------------------------------ */
+
+    .stx-page { margin-top: 6px; }
+
+    .stx-top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+    .stx-top-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .stx-title { margin: 0; font-size: 1.5rem; line-height: 1.15; color: #fff; display: flex; align-items: baseline; gap: 9px; }
+    .stx-title .numbers { color: #4d8eff; font-weight: 400; }
+    .stx-title-label { color: #eaeef5; }
+    .stx-meta { margin: 0; font-size: 12.5px; color: #8490a4; min-height: 1.4em; }
+    .stx-meta strong { color: #b3c2db; font-weight: 600; }
+    .stx-meta .numbers { color: #b3c2db; }
+
+    .year-pills { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none; }
+    .year-pills::-webkit-scrollbar { display: none; }
+    .year-pill { flex: 0 0 auto; padding: 6px 15px; border: 1px solid #1e2a3e; border-radius: 8px; background-color: rgba(255,255,255,0.02); color: #8490a4; font-family: var(--font-numbers); font-size: 13px; letter-spacing: 0.02em; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease; }
+    .year-pill:hover { border-color: #30405a; color: #b3c2db; }
+    .year-pill.-active { background-color: #4d8eff; border-color: #4d8eff; color: #071019; font-weight: 700; }
+
+    .stx-status { display: flex; align-items: center; justify-content: center; gap: 10px; color: #8490a4; font-size: 13px; padding: 60px 0; }
+    .stx-status.-error { color: #29a6ff; }
+    .stx-status[hidden] { display: none; }
+    .stx-empty { color: rgba(234,238,245,0.5); font-size: 13px; padding: 8px 0; }
+
+    /* KPI strip — hairline grid, deliberately flat/tabular rather than
+       glowing gradient cards. */
+    .stx-hero { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background-color: #1e2a3e; border: 1px solid #1e2a3e; border-radius: 14px; overflow: hidden; margin-bottom: 18px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .stx-hero.-visible { opacity: 1; transform: translateY(0); }
+    .stx-hero-item { background-color: #0b121e; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; }
+    .stx-hero-value { font-size: 1.55rem; line-height: 1; color: #eaeef5; font-weight: 400; }
+    .stx-hero-label { font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
+
+    .stx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    .stx-panel { background-color: #0b121e; border: 1px solid #1e2a3e; border-radius: 14px; padding: 18px; min-width: 0; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease; }
+    .stx-panel.-visible { opacity: 1; transform: translateY(0); }
+
+    .stx-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e2a3e; }
+    .stx-panel-title { margin: 0; font-size: 12.2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(234,238,245,0.55); }
+    .stx-panel-note { flex: none; font-size: 12px; color: #8490a4; text-align: right; }
+    .stx-panel-note strong { color: #4d8eff; font-weight: 700; }
+
+    /* Platform distribution — single stacked bar instead of a donut;
+       reads cleanly at any width, no wrapping/alignment issues. */
+    .stx-dist-bar { display: flex; width: 100%; height: 10px; border-radius: 999px; overflow: hidden; background-color: rgba(255,255,255,0.04); margin-bottom: 18px; }
+    .stx-dist-seg { height: 100%; flex-grow: 0; flex-shrink: 0; flex-basis: 0%; box-sizing: border-box; border-right: 1px solid #0b121e; transition: flex-basis 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .stx-dist-seg:last-child { border-right: none; }
+    .stx-dist-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .stx-dist-legend li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .stx-dist-dot { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+    .stx-dist-name { flex: 1; min-width: 0; color: #b3c2db; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-dist-value { flex: none; font-size: 12.5px; color: #eaeef5; font-variant-numeric: tabular-nums; }
+    .stx-dist-value .sub { color: #8490a4; font-size: 11px; margin-left: 3px; }
+
+    /* Ranked bar lists — genres / creators */
+    .stx-bar-list { display: flex; flex-direction: column; gap: 13px; }
+    .stx-bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .stx-bar-top { display: flex; align-items: baseline; gap: 8px; }
+    .stx-bar-rank { flex: none; width: 15px; font-family: var(--font-numbers); font-size: 10px; color: #505a6b; }
+    .stx-bar-label { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #b3c2db; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-bar-value { flex: none; font-size: 12px; color: #4d8eff; font-variant-numeric: tabular-nums; }
+    .stx-bar-value .sub { color: #8490a4; margin-left: 3px; }
+    .stx-bar-track { height: 6px; border-radius: 999px; background-color: rgba(255,255,255,0.04); overflow: hidden; margin-left: 23px; }
+    .stx-bar-fill { height: 100%; width: 0%; border-radius: 999px; background-color: #4d8eff; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+
+    /* Highlights — small poster-led rows */
+    .stx-highlight-list { display: flex; flex-direction: column; }
+    .stx-highlight { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #1e2a3e; }
+    .stx-highlight:first-child { padding-top: 0; }
+    .stx-highlight:last-child { border-bottom: none; padding-bottom: 0; }
+    .stx-highlight-media { flex: none; width: 32px; height: 46px; border-radius: 5px; overflow: hidden; background-color: #191f29; display: flex; align-items: center; justify-content: center; color: #505a6b; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+    .stx-highlight-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .stx-highlight-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .stx-highlight-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
+    .stx-highlight-title { font-size: 13.5px; color: #eaeef5; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-highlight-value { flex: none; font-size: 15px; color: #4d8eff; text-align: right; font-variant-numeric: tabular-nums; line-height: 1.15; }
+    .stx-highlight-value .unit { display: block; font-size: 9px; color: #8490a4; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 2px; font-family: var(--font-text); }
+
+    /* Origins — countries / languages as compact chips */
+    .stx-chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stx-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid #1e2a3e; border-radius: 999px; background-color: rgba(255,255,255,0.02); font-size: 12px; color: #a2acbe; }
+    .stx-chip .pct { font-variant-numeric: tabular-nums; color: #4d8eff; font-weight: 600; }
+
+    .stx-footnote { margin: 22px 2px 0; font-size: 11.5px; line-height: 1.6; color: #505a6b; }
+    .stx-footnote a { color: #8490a4; }
+    .stx-footnote a:hover { color: #29a6ff; }
+
+    @media (min-width: 640px) {
+      .stx-hero { grid-template-columns: repeat(4, 1fr); }
     }
-    .site-header {
-      position: relative;
-      height: 52px;
-      background-color: #0b121e;
-    }
+
     @media (min-width: 1024px) {
-      .site-header { height: 76px; }
+      .stx-page { margin-top: 10px; }
+      .stx-top-head { align-items: center; }
+      .stx-title { font-size: 2rem; }
+      .stx-meta { font-size: 13px; }
+      .stx-hero { grid-template-columns: repeat(4, 1fr); margin-bottom: 22px; }
+      .stx-hero-item { padding: 26px 18px; }
+      .stx-hero-value { font-size: 2.05rem; }
+      .stx-hero-label { font-size: 10.5px; }
+
+      .stx-grid { grid-template-columns: repeat(12, 1fr); gap: 18px; }
+      .stx-panel { padding: 22px; }
+      .stx-span-7 { grid-column: span 7; }
+      .stx-span-5 { grid-column: span 5; }
+      .stx-span-6 { grid-column: span 6; }
+
+      .stx-panel:hover { border-color: #263449; }
     }
-    .page-content {
-      padding-top: 0px;
+
+    @media (hover: hover) and (pointer: fine) {
+      .stx-bar-row:hover .stx-bar-label { color: #eaeef5; }
+      .stx-bar-row:hover .stx-bar-track { background-color: rgba(255,255,255,0.07); }
+      .stx-highlight:hover .stx-highlight-title { color: #4d8eff; }
     }
   </style>
 </head>
@@ -99,54 +195,96 @@
   </header>
 
   <div class="page-content">
+    <div class="stx-page">
 
-    <div class="stats-page-heading">
-      <h1><span class="numbers" id="stats-heading-year">–</span> Stats</h1>
-    </div>
-
-    <div class="year-pills" id="stats-year-pills"></div>
-
-    <div id="stats-status" class="stats-status"></div>
-
-    <div id="stats-content" hidden>
-      <section class="stats-section" id="section-hero">
-        <div class="stats-hero-row">
-          <div class="stats-hero-card">
-            <span class="value numbers" id="stat-hours">–</span>
-            <span class="definition">Hours Watched</span>
-          </div>
-          <div class="stats-hero-card">
-            <span class="value numbers" id="stat-episodes">–</span>
-            <span class="definition">Episodes Watched</span>
-          </div>
-          <div class="stats-hero-card">
-            <span class="value numbers" id="stat-seasons">–</span>
-            <span class="definition">Seasons Completed</span>
-          </div>
+      <div class="stx-top">
+        <div class="stx-top-head">
+          <h1 class="stx-title"><span class="numbers" id="stats-heading-year">–</span> <span class="stx-title-label">Stats</span></h1>
         </div>
-      </section>
-      <section class="stats-section" id="section-platforms">
-        <h2 class="section-heading">Platforms</h2>
-        <p class="stats-section-insight" id="platform-insight"></p>
-        <div class="stats-donut-panel">
-          <div id="platform-donut-mount"></div>
-          <ul class="stats-legend" id="platform-legend"></ul>
+        <p class="stx-meta" id="stx-meta">Loading your watch history…</p>
+        <div class="year-pills" id="stats-year-pills"></div>
+      </div>
+
+      <div id="stats-status" class="stx-status"></div>
+
+      <div id="stats-content" hidden>
+
+        <section class="stx-hero" id="section-hero">
+          <div class="stx-hero-item">
+            <span class="stx-hero-value numbers" id="stat-hours">–</span>
+            <span class="stx-hero-label">Hours Watched</span>
+          </div>
+          <div class="stx-hero-item">
+            <span class="stx-hero-value numbers" id="stat-episodes">–</span>
+            <span class="stx-hero-label">Episodes</span>
+          </div>
+          <div class="stx-hero-item">
+            <span class="stx-hero-value numbers" id="stat-seasons">–</span>
+            <span class="stx-hero-label">Seasons</span>
+          </div>
+          <div class="stx-hero-item">
+            <span class="stx-hero-value numbers" id="stat-shows">–</span>
+            <span class="stx-hero-label">Shows</span>
+          </div>
+        </section>
+
+        <div class="stx-grid">
+
+          <section class="stx-panel stx-span-7" id="section-platforms">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Platforms</h2>
+              <span class="stx-panel-note" id="platform-insight"></span>
+            </div>
+            <div class="stx-dist-bar" id="platform-bar"></div>
+            <ul class="stx-dist-legend" id="platform-legend"></ul>
+          </section>
+
+          <section class="stx-panel stx-span-5" id="section-highlights">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Highlights</h2>
+            </div>
+            <div class="stx-highlight-list" id="highlight-list"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-genres">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Genres</h2>
+              <span class="stx-panel-note" id="genre-insight"></span>
+            </div>
+            <div class="stx-bar-list" id="genre-bars"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-creators">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Creators</h2>
+              <span class="stx-panel-note" id="creator-insight"></span>
+            </div>
+            <div class="stx-bar-list" id="creator-bars"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-countries">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Countries</h2>
+            </div>
+            <div class="stx-chip-list" id="country-chips"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-languages">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Languages</h2>
+            </div>
+            <div class="stx-chip-list" id="language-chips"></div>
+          </section>
+
         </div>
-      </section>
-      <section class="stats-section" id="section-genres">
-        <h2 class="section-heading">Genres</h2>
-        <p class="stats-section-insight" id="genre-insight"></p>
-        <div class="stats-bar-list" id="genre-bars"></div>
-      </section>
-      <section class="stats-section" id="section-creators">
-        <h2 class="section-heading">Creators</h2>
-        <p class="stats-section-insight" id="creator-insight"></p>
-        <div class="stats-bar-list" id="creator-bars"></div>
-      </section>
+
+        <p class="stx-footnote">Hours are estimated from each show's average TMDB episode runtime. Platform, genre, country, and language totals are split evenly across every network, genre, production country, or language credited on a show. Data via <a href="https://www.themoviedb.org/">TMDB</a>.</p>
+
+      </div>
 
     </div>
-
   </div>
+
 <footer class="site-footer">
 <div class="footer-container">
 <p style="display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -245,7 +383,7 @@ showCopied();
   </script>
 
   <script src="/shows.js?v=1"></script>
-  <script src="/stats.js?v=2"></script>
+  <script src="/stats.js?v=3"></script>
   <script>
     (function () {
       var SPINNER_HTML =
@@ -264,22 +402,33 @@ showCopied();
         return div.innerHTML;
       }
 
-      function fmtPct(v) {
+      function fmt1(v) {
         return (Math.round(v * 10) / 10).toString();
       }
 
+      function initials(title) {
+        if (!title) return '';
+        var parts = title.trim().split(/\s+/).slice(0, 2);
+        return parts.map(function (p) { return p.charAt(0).toUpperCase(); }).join('');
+      }
+
       var headingYear = document.getElementById('stats-heading-year');
+      var metaLine = document.getElementById('stx-meta');
       var pillsMount = document.getElementById('stats-year-pills');
       var statusEl = document.getElementById('stats-status');
       var content = document.getElementById('stats-content');
 
+      var heroSection = document.getElementById('section-hero');
       var heroHours = document.getElementById('stat-hours');
       var heroEpisodes = document.getElementById('stat-episodes');
       var heroSeasons = document.getElementById('stat-seasons');
+      var heroShows = document.getElementById('stat-shows');
 
-      var platformMount = document.getElementById('platform-donut-mount');
+      var platformBar = document.getElementById('platform-bar');
       var platformLegend = document.getElementById('platform-legend');
       var platformInsight = document.getElementById('platform-insight');
+
+      var highlightList = document.getElementById('highlight-list');
 
       var genreBars = document.getElementById('genre-bars');
       var genreInsight = document.getElementById('genre-insight');
@@ -287,7 +436,10 @@ showCopied();
       var creatorBars = document.getElementById('creator-bars');
       var creatorInsight = document.getElementById('creator-insight');
 
-      var sections = Array.prototype.slice.call(document.querySelectorAll('.stats-section'));
+      var countryChips = document.getElementById('country-chips');
+      var languageChips = document.getElementById('language-chips');
+
+      var panels = Array.prototype.slice.call(document.querySelectorAll('.stx-panel'));
 
       var YEARS = Object.keys(STATS_YEARS).sort(function (a, b) { return b - a; });
       var DEFAULT_YEAR = YEARS[0] || null;
@@ -295,80 +447,127 @@ showCopied();
       var currentYear = null;
 
       function revealSections() {
-        sections.forEach(function (el, i) {
-          setTimeout(function () { el.classList.add('-visible'); }, i * 90);
+        setTimeout(function () { heroSection.classList.add('-visible'); }, 0);
+        panels.forEach(function (el, i) {
+          setTimeout(function () { el.classList.add('-visible'); }, 70 + i * 60);
         });
       }
       function hideSections() {
-        sections.forEach(function (el) { el.classList.remove('-visible'); });
+        heroSection.classList.remove('-visible');
+        panels.forEach(function (el) { el.classList.remove('-visible'); });
       }
 
-      function buildDonut(list, centerValue, centerLabel) {
-        var size = 168, cx = 84, cy = 84, r = 64, sw = 22;
-        var circumference = 2 * Math.PI * r;
-        var total = list.reduce(function (s, i) { return s + i.value; }, 0) || 1;
-        var offset = 0;
-
-        var segments = list.map(function (item, i) {
-          var frac = item.value / total;
-          var len = Math.max(frac * circumference, list.length > 1 ? 1.5 : circumference);
-          var gap = list.length > 1 ? 2 : 0;
-          var dasharray = Math.max(len - gap, 0) + ' ' + (circumference - len + gap);
-          var dashoffset = -offset;
-          offset += len;
-          return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
-            'stroke="' + colorFor(item, i) + '" stroke-width="' + sw + '" ' +
-            'stroke-dasharray="' + dasharray + '" stroke-dashoffset="' + dashoffset + '" ' +
-            'stroke-linecap="round" transform="rotate(-90 ' + cx + ' ' + cy + ')" />';
+      function renderDistBar(list, total) {
+        platformBar.innerHTML = list.map(function (item, i) {
+          return '<span class="stx-dist-seg" data-target="' + (total ? (item.value / total) * 100 : 0) + '" style="background:' + colorFor(item, i) + '"></span>';
         }).join('');
 
-        return (
-          '<svg viewBox="0 0 ' + size + ' ' + size + '" class="stats-donut" role="img" aria-label="Platform distribution">' +
-            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="' + sw + '"/>' +
-            segments +
-            '<text x="' + cx + '" y="' + (cy - 3) + '" text-anchor="middle" class="stats-donut-center-value numbers">' + escapeHtml(centerValue) + '</text>' +
-            '<text x="' + cx + '" y="' + (cy + 15) + '" text-anchor="middle" class="stats-donut-center-label">' + escapeHtml(centerLabel) + '</text>' +
-          '</svg>'
-        );
+        var segs = platformBar.querySelectorAll('.stx-dist-seg');
+        requestAnimationFrame(function () {
+          segs.forEach(function (el) {
+            el.style.flexBasis = el.dataset.target + '%';
+          });
+        });
       }
 
-      function renderPlatformLegend(list, total) {
-        platformLegend.innerHTML = list.map(function (item, i) {
-          var pct = total ? fmtPct((item.value / total) * 100) : '0';
+      function renderDistLegend(mount, list, total, unit) {
+        mount.innerHTML = list.map(function (item, i) {
+          var pct = total ? fmt1((item.value / total) * 100) : '0';
+          var abs = unit === 'h' ? (fmt1(item.value) + 'h') : (Math.round(item.value) + ' eps');
           return (
-            '<li class="stats-legend-item">' +
-              '<span class="stats-legend-dot" style="background:' + colorFor(item, i) + '"></span>' +
-              '<span class="stats-legend-name">' + escapeHtml(item.name) + '</span>' +
-              '<span class="stats-legend-value"><span class="numbers">' + pct + '%</span></span>' +
+            '<li>' +
+              '<span class="stx-dist-dot" style="background:' + colorFor(item, i) + '"></span>' +
+              '<span class="stx-dist-name">' + escapeHtml(item.name) + '</span>' +
+              '<span class="stx-dist-value">' + pct + '%<span class="sub">· ' + abs + '</span></span>' +
             '</li>'
           );
         }).join('');
       }
 
-      function renderBarList(mount, list, total) {
+      function renderBarList(mount, list, total, unit) {
         mount.innerHTML = list.map(function (item, i) {
           var pct = total ? (item.value / total) * 100 : 0;
+          var abs = unit === 'h' ? (fmt1(item.value) + 'h') : (Math.round(item.value) + ' eps');
           return (
-            '<div class="stats-bar-row">' +
-              '<div class="stats-bar-top">' +
-                '<span class="stats-bar-label"><span class="stats-bar-rank numbers">' + (i + 1) + '</span>' + escapeHtml(item.name) + '</span>' +
-                '<span class="stats-bar-value numbers">' + fmtPct(pct) + '%</span>' +
+            '<div class="stx-bar-row">' +
+              '<div class="stx-bar-top">' +
+                '<span class="stx-bar-rank numbers">' + (i + 1) + '</span>' +
+                '<span class="stx-bar-label">' + escapeHtml(item.name) + '</span>' +
+                '<span class="stx-bar-value numbers">' + fmt1(pct) + '%<span class="sub">' + abs + '</span></span>' +
               '</div>' +
-              '<div class="stats-bar-track">' +
-                '<div class="stats-bar-fill" data-target="' + pct + '" style="background:' + colorFor(item, i) + '"></div>' +
+              '<div class="stx-bar-track">' +
+                '<div class="stx-bar-fill" data-target="' + pct + '" style="background:' + colorFor(item, i) + '"></div>' +
               '</div>' +
             '</div>'
           );
         }).join('');
 
-        var fills = mount.querySelectorAll('.stats-bar-fill');
+        var fills = mount.querySelectorAll('.stx-bar-fill');
         requestAnimationFrame(function () {
           fills.forEach(function (el, i) {
-            setTimeout(function () {
-              el.style.width = el.dataset.target + '%';
-            }, i * 70);
+            setTimeout(function () { el.style.width = el.dataset.target + '%'; }, i * 60);
           });
         });
+      }
+
+      function renderChips(mount, list, total) {
+        if (!list.length) { mount.innerHTML = '<p class="stx-empty">Not enough data yet.</p>'; return; }
+        mount.innerHTML = list.map(function (item) {
+          var pct = total ? fmt1((item.value / total) * 100) : '0';
+          return '<span class="stx-chip">' + escapeHtml(item.name) + ' <span class="pct">' + pct + '%</span></span>';
+        }).join('');
+      }
+
+      function computeHighlights(details) {
+        var byRating = details.filter(function (d) { return d.rating > 0 && d.votes >= 15; })
+          .sort(function (a, b) { return b.rating - a.rating; });
+        var byHours = details.filter(function (d) { return d.hours > 0; })
+          .sort(function (a, b) { return b.hours - a.hours; });
+        var bySeasons = details.filter(function (d) { return d.seasons > 0; })
+          .sort(function (a, b) { return b.seasons - a.seasons; });
+        var withYear = details.filter(function (d) { return !!d.firstYear; });
+        var byOldest = withYear.slice().sort(function (a, b) { return a.firstYear - b.firstYear; });
+        var byNewest = withYear.slice().sort(function (a, b) { return b.firstYear - a.firstYear; });
+
+        var items = [];
+        if (byRating.length) {
+          items.push({ label: 'Top Rated', show: byRating[0], value: byRating[0].rating.toFixed(1), unit: 'out of 10' });
+        }
+        if (byHours.length) {
+          items.push({ label: 'Most Watched', show: byHours[0], value: fmt1(byHours[0].hours), unit: 'hours logged' });
+        }
+        if (bySeasons.length) {
+          items.push({ label: 'Longest Running', show: bySeasons[0], value: bySeasons[0].seasons, unit: bySeasons[0].seasons === 1 ? 'season' : 'seasons' });
+        }
+        if (byOldest.length) {
+          items.push({ label: 'Deepest Cut', show: byOldest[0], value: byOldest[0].firstYear, unit: 'premiere' });
+        }
+        if (byNewest.length && byNewest[0].imdb !== byOldest[0].imdb) {
+          items.push({ label: 'Freshest Pick', show: byNewest[0], value: byNewest[0].firstYear, unit: 'premiere' });
+        }
+        return items.slice(0, 5);
+      }
+
+      function renderHighlights(details) {
+        var items = computeHighlights(details);
+        if (!items.length) { highlightList.innerHTML = '<p class="stx-empty">Not enough data yet.</p>'; return; }
+
+        highlightList.innerHTML = items.map(function (item) {
+          var show = item.show;
+          var media = show.poster
+            ? '<img src="' + show.poster + '" alt="" loading="lazy">'
+            : escapeHtml(initials(show.title));
+          return (
+            '<div class="stx-highlight">' +
+              '<div class="stx-highlight-media">' + media + '</div>' +
+              '<div class="stx-highlight-body">' +
+                '<span class="stx-highlight-label">' + escapeHtml(item.label) + '</span>' +
+                '<span class="stx-highlight-title">' + escapeHtml(show.title) + '</span>' +
+              '</div>' +
+              '<span class="stx-highlight-value numbers">' + escapeHtml(String(item.value)) + '<span class="unit">' + escapeHtml(item.unit) + '</span></span>' +
+            '</div>'
+          );
+        }).join('');
       }
 
       function showLoading() {
@@ -399,41 +598,53 @@ showCopied();
           content.hidden = true;
           statusEl.hidden = false;
           statusEl.classList.remove('-error');
-          statusEl.innerHTML = '<p class="stats-empty">No shows logged for this year yet.</p>';
+          statusEl.innerHTML = '<p class="stx-empty">No shows logged for this year yet.</p>';
+          metaLine.textContent = '';
           return;
         }
 
-        heroHours.textContent = fmtPct(summary.hours);
+        var metaParts = [Math.round(summary.showCount) + (summary.showCount === 1 ? ' show' : ' shows')];
+        if (summary.ratedShowCount) metaParts.push('avg rating ' + fmt1(summary.avgRating) + ' / 10');
+        metaLine.innerHTML = metaParts.join(' &nbsp;·&nbsp; ');
+
+        heroHours.textContent = fmt1(summary.hours);
         heroEpisodes.textContent = Math.round(summary.episodes);
         heroSeasons.textContent = Math.round(summary.seasons);
+        heroShows.textContent = Math.round(summary.showCount);
 
         var platformList = TVStats.toRanked(summary.platforms, 6);
-        platformMount.innerHTML = buildDonut(platformList, fmtPct(summary.hours), 'HOURS');
-        renderPlatformLegend(platformList, summary.hours);
+        renderDistBar(platformList, summary.hours);
+        renderDistLegend(platformLegend, platformList, summary.hours, 'h');
         if (platformList.length) {
-          platformInsight.innerHTML = 'Most watched on <strong>' + escapeHtml(platformList[0].name) + '</strong>, ' +
-            fmtPct((platformList[0].value / summary.hours) * 100) + '% of hours logged.';
+          platformInsight.innerHTML = '<strong>' + escapeHtml(platformList[0].name) + '</strong> led, ' +
+            fmt1((platformList[0].value / summary.hours) * 100) + '%';
         } else {
           platformInsight.textContent = '';
         }
 
+        renderHighlights(summary.details);
+
         var genreList = TVStats.toRanked(summary.genres, 8);
-        renderBarList(genreBars, genreList, summary.hours);
+        renderBarList(genreBars, genreList, summary.hours, 'h');
         if (genreList.length) {
-          genreInsight.innerHTML = '<strong>' + escapeHtml(genreList[0].name) + '</strong> led the year, ' +
-            fmtPct((genreList[0].value / summary.hours) * 100) + '% of watch time.';
+          genreInsight.innerHTML = '<strong>' + escapeHtml(genreList[0].name) + '</strong> led the year';
         } else {
           genreInsight.textContent = '';
         }
 
         var creatorList = TVStats.toRanked(summary.creators, 8);
-        renderBarList(creatorBars, creatorList, summary.episodes);
+        renderBarList(creatorBars, creatorList, summary.episodes, 'eps');
         if (creatorList.length) {
-          creatorInsight.innerHTML = '<strong>' + escapeHtml(creatorList[0].name) + '</strong> behind the most episodes watched, ' +
-            fmtPct((creatorList[0].value / summary.episodes) * 100) + '%.';
+          creatorInsight.innerHTML = '<strong>' + escapeHtml(creatorList[0].name) + '</strong> most episodes';
         } else {
           creatorInsight.textContent = '';
         }
+
+        var countryList = TVStats.toRanked(summary.countries, 8);
+        renderChips(countryChips, countryList, summary.hours);
+
+        var languageList = TVStats.toRanked(summary.languages, 6);
+        renderChips(languageChips, languageList, summary.hours);
 
         revealSections();
       }
@@ -456,6 +667,7 @@ showCopied();
         }
 
         showLoading();
+        metaLine.textContent = '';
         var showList = STATS_YEARS[year] || [];
         var ids = showList.map(function (s) { return s.imdb; });
 
