@@ -163,18 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
     starsTrack.addEventListener('pointercancel', finishDrag);
   }
 
-  const watchdateToggle  = document.getElementById('watchdate-toggle');
-  const wdPopover         = document.getElementById('watchdate-popover');
-  const wdShowNameEl      = document.getElementById('wd-show-name');
-  const wdCalendarsWrap   = document.getElementById('wd-calendars');
-  const wdCalendars       = {
-    start: document.getElementById('wd-calendar-start'),
-    end:   document.getElementById('wd-calendar-end'),
-  };
-  const wdFields = {
-    start: document.getElementById('wd-field-start'),
-    end:   document.getElementById('wd-field-end'),
-  };
+  const watchdateToggle = document.getElementById('watchdate-toggle');
+  const wdPopover       = document.getElementById('watchdate-popover');
+  const wdShowNameEl    = document.getElementById('wd-show-name');
+  const wdCalendarEl    = document.getElementById('wd-calendar');
+  const wdHintEl        = document.getElementById('wd-hint');
+  const wdDurationEl    = document.getElementById('wd-duration');
   const wdValues = {
     start: document.getElementById('wd-value-start'),
     end:   document.getElementById('wd-value-end'),
@@ -183,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const wdCancelBtn = document.getElementById('wd-cancel-btn');
   const wdSaveBtn   = document.getElementById('wd-save-btn');
 
-  if (!watchdateToggle || !wdPopover || !wdCalendars.start || !wdCalendars.end) {
+  if (!watchdateToggle || !wdPopover || !wdCalendarEl) {
     return;
   }
 
@@ -195,12 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const WD_TODAY = todayMidnight();
 
-  const wd = {
-    start: { date: null, view: new Date(WD_TODAY), level: 'days' },
-    end:   { date: null, view: new Date(WD_TODAY), level: 'days' },
-  };
-
-  let wdActiveField = 'start';
+  let wdView  = new Date(WD_TODAY);
+  let wdLevel = 'days';
+  const wdRange = { start: null, end: null };
 
   function wdFloorDate() {
     const meta = window.tvboxShowMeta;
@@ -211,20 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Date(1900, 0, 1);
   }
 
-  function wdMinDateFor(field) {
-    const floor = wdFloorDate();
-    if (field === 'end' && wd.start.date) {
-      return wd.start.date > floor ? wd.start.date : floor;
-    }
-    return floor;
-  }
-
-  function wdMaxDateFor(field) {
-    if (field === 'start' && wd.end.date) {
-      return wd.end.date < WD_TODAY ? wd.end.date : WD_TODAY;
-    }
-    return WD_TODAY;
-  }
+  function wdMinDate() { return wdFloorDate(); }
+  function wdMaxDate() { return WD_TODAY; }
 
   function sameDay(a, b) {
     return !!a && !!b &&
@@ -248,17 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
       (disabled ? ' disabled' : '') + '>' + wdNavIcon(dir) + '</button>';
   }
 
-  function renderWdCalendar(field) {
-    const container = wdCalendars[field];
-    const state = wd[field];
-    if (!container) return;
+  function renderWdCalendar() {
+    const min = wdMinDate();
+    const max = wdMaxDate();
 
     let html = '<div class="wd-cal-head">';
 
-    if (state.level === 'days') {
-      const min = wdMinDateFor(field);
-      const max = wdMaxDateFor(field);
-      const viewYM = new Date(state.view.getFullYear(), state.view.getMonth(), 1);
+    if (wdLevel === 'days') {
+      const viewYM = new Date(wdView.getFullYear(), wdView.getMonth(), 1);
       const prevMonthLastDay = new Date(viewYM.getFullYear(), viewYM.getMonth(), 0);
       const nextMonthFirstDay = new Date(viewYM.getFullYear(), viewYM.getMonth() + 1, 1);
       const prevDisabled = prevMonthLastDay < min;
@@ -283,25 +259,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = new Date(viewYM.getFullYear(), viewYM.getMonth(), day);
         const disabled = d < min || d > max;
         const isToday = sameDay(d, WD_TODAY);
-        const isSelected = sameDay(d, state.date);
+        const isStart = sameDay(d, wdRange.start);
+        const isEnd   = sameDay(d, wdRange.end);
         let inRange = false;
-        if (wd.start.date && wd.end.date) {
-          inRange = d > wd.start.date && d < wd.end.date;
+        if (wdRange.start && wdRange.end) {
+          inRange = d > wdRange.start && d < wdRange.end;
         }
         const cls = ['wd-day'];
         if (disabled) cls.push('-disabled');
         if (isToday) cls.push('-today');
-        if (isSelected) cls.push('-selected');
+        if (isStart || isEnd) cls.push('-selected');
+        if (isStart && wdRange.end) cls.push('-range-start');
+        if (isEnd && wdRange.start && !sameDay(wdRange.start, wdRange.end)) cls.push('-range-end');
         if (inRange) cls.push('-inrange');
         html += '<button type="button" class="' + cls.join(' ') + '"' +
           (disabled ? ' disabled' : '') + ' data-day="' + d.getTime() + '">' + day + '</button>';
       }
       html += '</div>';
 
-    } else if (state.level === 'months') {
-      const min = wdMinDateFor(field);
-      const max = wdMaxDateFor(field);
-      const year = state.view.getFullYear();
+    } else if (wdLevel === 'months') {
+      const year = wdView.getFullYear();
       const prevDisabled = year <= min.getFullYear();
       const nextDisabled = year >= max.getFullYear();
 
@@ -321,9 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       html += '</div>';
 
     } else {
-      const min = wdMinDateFor(field);
-      const max = wdMaxDateFor(field);
-      const pageStart = Math.floor(state.view.getFullYear() / 12) * 12;
+      const pageStart = Math.floor(wdView.getFullYear() / 12) * 12;
       const prevDisabled = pageStart <= min.getFullYear();
       const nextDisabled = pageStart + 12 > max.getFullYear();
 
@@ -341,100 +316,78 @@ document.addEventListener('DOMContentLoaded', () => {
       html += '</div>';
     }
 
-    container.innerHTML = html;
+    wdCalendarEl.innerHTML = html;
   }
 
-  function wdNavigate(field, dir) {
-    const state = wd[field];
-    if (state.level === 'days') {
-      state.view = new Date(state.view.getFullYear(), state.view.getMonth() + dir, 1);
-    } else if (state.level === 'months') {
-      state.view = new Date(state.view.getFullYear() + dir, state.view.getMonth(), 1);
+  function wdNavigate(dir) {
+    if (wdLevel === 'days') {
+      wdView = new Date(wdView.getFullYear(), wdView.getMonth() + dir, 1);
+    } else if (wdLevel === 'months') {
+      wdView = new Date(wdView.getFullYear() + dir, wdView.getMonth(), 1);
     } else {
-      state.view = new Date(state.view.getFullYear() + dir * 12, state.view.getMonth(), 1);
+      wdView = new Date(wdView.getFullYear() + dir * 12, wdView.getMonth(), 1);
     }
-    renderWdCalendar(field);
+    renderWdCalendar();
   }
 
-  function isWdDesktop() {
-    return window.matchMedia('(min-width: 641px)').matches;
-  }
+  function updateWdStubs() {
+    wdValues.start.textContent = wdRange.start ? formatDate(wdRange.start) : '—';
+    wdValues.end.textContent   = wdRange.end   ? formatDate(wdRange.end)   : '—';
 
-  function setWdActiveField(field) {
-    wdActiveField = field;
-    Object.keys(wdFields).forEach((f) => {
-      wdFields[f].classList.toggle('-active', f === field);
-      wdCalendars[f].classList.toggle('-inactive', f !== field);
-    });
-  }
-
-  function wdSelectDate(field, date) {
-    wd[field].date = date;
-    wd[field].view = new Date(date.getFullYear(), date.getMonth(), 1);
-    wdValues[field].textContent = formatDate(date);
-
-    if (field === 'start' && wd.end.date && wd.end.date < date) {
-      wd.end.date = null;
-      wdValues.end.textContent = 'Select date';
-    }
-    if (field === 'end' && wd.start.date && wd.start.date > date) {
-      wd.start.date = null;
-      wdValues.start.textContent = 'Select date';
-    }
-
-    renderWdCalendar('start');
-    renderWdCalendar('end');
-
-    if (field === 'start' && !isWdDesktop()) {
-      setWdActiveField('end');
+    if (wdRange.start && wdRange.end) {
+      const days = Math.round((wdRange.end - wdRange.start) / 86400000) + 1;
+      wdDurationEl.textContent = days === 1 ? '1 day' : days + ' days';
+      wdDurationEl.hidden = false;
+      wdHintEl.textContent = 'Nice — tap a date to start over';
+    } else if (wdRange.start) {
+      wdDurationEl.hidden = true;
+      wdHintEl.textContent = 'Now tap the day you finished';
+    } else {
+      wdDurationEl.hidden = true;
+      wdHintEl.textContent = 'Tap the day you started watching';
     }
   }
 
-  Object.keys(wdCalendars).forEach((field) => {
-    const el = wdCalendars[field];
-    el.addEventListener('click', (e) => {
-      const dayBtn      = e.target.closest('[data-day]');
-      const monthBtn     = e.target.closest('[data-month]');
-      const yearBtn       = e.target.closest('[data-year]');
-      const navBtn         = e.target.closest('[data-nav]');
-      const levelUpBtn      = e.target.closest('[data-level-up]');
+  function wdSelectDate(date) {
+    if (!wdRange.start || (wdRange.start && wdRange.end)) {
+      wdRange.start = date;
+      wdRange.end = null;
+    } else if (date < wdRange.start) {
+      wdRange.start = date;
+    } else {
+      wdRange.end = date;
+    }
+    wdView = new Date(date.getFullYear(), date.getMonth(), 1);
+    updateWdStubs();
+    renderWdCalendar();
+  }
 
-      if (dayBtn) {
-        wdSelectDate(field, new Date(parseInt(dayBtn.getAttribute('data-day'), 10)));
-      } else if (monthBtn) {
-        const m = parseInt(monthBtn.getAttribute('data-month'), 10);
-        wd[field].view = new Date(wd[field].view.getFullYear(), m, 1);
-        wd[field].level = 'days';
-        renderWdCalendar(field);
-      } else if (yearBtn) {
-        const y = parseInt(yearBtn.getAttribute('data-year'), 10);
-        wd[field].view = new Date(y, wd[field].view.getMonth(), 1);
-        wd[field].level = 'months';
-        renderWdCalendar(field);
-      } else if (navBtn && !navBtn.disabled) {
-        wdNavigate(field, navBtn.getAttribute('data-nav') === 'next' ? 1 : -1);
-      } else if (levelUpBtn) {
-        wd[field].level = wd[field].level === 'days' ? 'months' : 'years';
-        renderWdCalendar(field);
-      }
-    });
+  wdCalendarEl.addEventListener('click', (e) => {
+    const dayBtn     = e.target.closest('[data-day]');
+    const monthBtn   = e.target.closest('[data-month]');
+    const yearBtn    = e.target.closest('[data-year]');
+    const navBtn     = e.target.closest('[data-nav]');
+    const levelUpBtn = e.target.closest('[data-level-up]');
+
+    if (dayBtn) {
+      wdSelectDate(new Date(parseInt(dayBtn.getAttribute('data-day'), 10)));
+    } else if (monthBtn) {
+      const m = parseInt(monthBtn.getAttribute('data-month'), 10);
+      wdView = new Date(wdView.getFullYear(), m, 1);
+      wdLevel = 'days';
+      renderWdCalendar();
+    } else if (yearBtn) {
+      const y = parseInt(yearBtn.getAttribute('data-year'), 10);
+      wdView = new Date(y, wdView.getMonth(), 1);
+      wdLevel = 'months';
+      renderWdCalendar();
+    } else if (navBtn && !navBtn.disabled) {
+      wdNavigate(navBtn.getAttribute('data-nav') === 'next' ? 1 : -1);
+    } else if (levelUpBtn) {
+      wdLevel = wdLevel === 'days' ? 'months' : 'years';
+      renderWdCalendar();
+    }
   });
-
-  wdFields.start.addEventListener('click', () => setWdActiveField('start'));
-  wdFields.end.addEventListener('click', () => setWdActiveField('end'));
-
-  if (wdQuickBtn) {
-    wdQuickBtn.addEventListener('click', () => {
-      wd.start.date = null;
-      wd.end.date = null;
-      wdValues.start.textContent = 'Select date';
-      wdValues.end.textContent = 'Select date';
-
-      if (watchedMarkasBtn) watchedMarkasBtn.classList.add('-selected');
-      closeWatchedPopover();
-      showAuthPrompt();
-    });
-  }
 
   function openWatchedPopover() {
     const titleEl = document.getElementById('show-title');
@@ -444,9 +397,12 @@ document.addEventListener('DOMContentLoaded', () => {
         (window.tvboxShowMeta && window.tvboxShowMeta.name) ||
         'this show';
     }
-    setWdActiveField('start');
-    renderWdCalendar('start');
-    renderWdCalendar('end');
+    wdLevel = 'days';
+    wdView = wdRange.start
+      ? new Date(wdRange.start.getFullYear(), wdRange.start.getMonth(), 1)
+      : new Date(WD_TODAY);
+    updateWdStubs();
+    renderWdCalendar();
     watchdateToggle.checked = true;
   }
 
@@ -460,6 +416,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (wdQuickBtn) {
+    wdQuickBtn.addEventListener('click', () => {
+      wdRange.start = null;
+      wdRange.end = null;
+      updateWdStubs();
+      if (watchedMarkasBtn) watchedMarkasBtn.classList.add('-selected');
+      closeWatchedPopover();
+      showAuthPrompt();
+    });
+  }
+
   if (wdSaveBtn) {
     wdSaveBtn.addEventListener('click', () => {
       if (watchedMarkasBtn) watchedMarkasBtn.classList.add('-selected');
@@ -468,12 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  window.addEventListener('resize', () => {
-    setWdActiveField(wdActiveField);
-  });
-
-  renderWdCalendar('start');
-  renderWdCalendar('end');
+  renderWdCalendar();
 
   window.addEventListener('scroll', () => {
     if (markasToggle && markasToggle.checked) markasToggle.checked = false;
