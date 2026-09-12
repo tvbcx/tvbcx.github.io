@@ -766,7 +766,9 @@ showCopied();
       yearCountEl.textContent = journaled.filter(function (s) { return s.journalYear === latestYear; }).length;
       yearTextEl.textContent = latestYear;
 
-      listEl.innerHTML = journaled.slice(0, 2).map(function (s) {
+      var journaledLatestYear = journaled.filter(function (s) { return s.journalYear === latestYear; });
+
+      listEl.innerHTML = journaledLatestYear.slice(0, 2).map(function (s) {
         return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
       }).join('');
 
