@@ -48,7 +48,6 @@ var SHOWS = [
   { title: "Dune: Prophecy",                     imdb: "tt10466872", src: "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358056.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 27 },
   { title: "Adolescence",                        imdb: "tt31806037", src: "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg",       rating: 4.5  , journalYear: 2025, journalOrder: 28 },
   { title: "Your Honor",                         imdb: "tt7440726",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/287/717558.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31 },
-  { title: "Task",                               imdb: "tt28013708", src: "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466647.jpg",       rating: 3    , journalYear: 2026, journalOrder: 33 },
 
   // DNF
   { title: "Succession",                         imdb: "tt7660850",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/453/1134275.jpg",       rating: null, list: "dnf" },
