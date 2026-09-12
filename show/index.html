@@ -184,6 +184,9 @@
 
           <div class="watchdate-popover" id="watchdate-popover">
             <div class="wd-header">
+              <div class="wd-clapper" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M20 8H4l.9-3.6c.14-.56.65-.96 1.22-1.02L20 2.5V8zM19.4 3.9l-3.9.42.7 2.68 3.9-.9-.7-2.2zM14.1 4.5l-3.9.42.7 2.68 3.9-.9-.7-2.2zM8.8 5.1l-3.9.42.6 2.28 3.9-.7-.6-2z"/><rect x="4" y="9" width="16" height="12" rx="2"/></svg>
+              </div>
               <div class="wd-header-text">
                 <span class="wd-title">Log your watch</span>
                 <span class="wd-subtitle" id="wd-show-name">this show</span>
@@ -193,29 +196,34 @@
               </label>
             </div>
 
-            <div class="wd-fields">
-              <button type="button" class="wd-field -active" id="wd-field-start" data-field="start">
-                <span class="wd-field-label">Started</span>
-                <span class="wd-field-value" id="wd-value-start">Select date</span>
-              </button>
-              <span class="wd-fields-arrow" aria-hidden="true">→</span>
-              <button type="button" class="wd-field" id="wd-field-end" data-field="end">
-                <span class="wd-field-label">Finished</span>
-                <span class="wd-field-value" id="wd-value-end">Select date</span>
-              </button>
+            <p class="wd-hint" id="wd-hint">Tap the day you started watching</p>
+
+            <div class="wd-stub-row">
+              <div class="wd-stub">
+                <span class="wd-stub-label">Started</span>
+                <span class="wd-stub-value" id="wd-value-start">—</span>
+              </div>
+              <span class="wd-duration" id="wd-duration" hidden></span>
+              <div class="wd-stub -end">
+                <span class="wd-stub-label">Finished</span>
+                <span class="wd-stub-value" id="wd-value-end">—</span>
+              </div>
             </div>
 
-            <div class="wd-calendars" id="wd-calendars">
-              <div class="wd-calendar" id="wd-calendar-start" data-field="start"></div>
-              <div class="wd-calendar -inactive" id="wd-calendar-end" data-field="end"></div>
+            <div class="wd-tear" aria-hidden="true">
+              <span class="wd-tear-line"></span>
+              <span class="wd-tear-icon">✂</span>
+              <span class="wd-tear-line"></span>
             </div>
 
-            <button type="button" class="wd-quick-btn" id="wd-quick-btn">Mark without date</button>
+            <div class="wd-calendar" id="wd-calendar"></div>
 
             <div class="wd-actions">
               <button type="button" class="wd-btn -ghost" id="wd-cancel-btn">Cancel</button>
               <button type="button" class="wd-btn -primary" id="wd-save-btn">Save</button>
             </div>
+
+            <button type="button" class="wd-skip-btn" id="wd-quick-btn">Skip the dates, just mark it watched</button>
           </div>
         </div>
 
