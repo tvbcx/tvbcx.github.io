@@ -115,5 +115,5 @@
 
 @media (max-width: 1023px) {
   .profile-stats { margin: 16px 0 16px; }
-  .profile-favorites .section-heading { font-size: 9px; }
+  .profile-favorites .section-heading { font-size: 11px; }
 }
