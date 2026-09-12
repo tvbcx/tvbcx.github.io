@@ -199,15 +199,15 @@
             <p class="wd-hint" id="wd-hint">Tap the day you started watching</p>
 
             <div class="wd-stub-row">
-              <div class="wd-stub">
+              <button type="button" class="wd-stub -active" id="wd-field-start" data-field="start">
                 <span class="wd-stub-label">Started</span>
                 <span class="wd-stub-value" id="wd-value-start">—</span>
-              </div>
+              </button>
               <span class="wd-duration" id="wd-duration" hidden></span>
-              <div class="wd-stub -end">
+              <button type="button" class="wd-stub -end" id="wd-field-end" data-field="end">
                 <span class="wd-stub-label">Finished</span>
                 <span class="wd-stub-value" id="wd-value-end">—</span>
-              </div>
+              </button>
             </div>
 
             <div class="wd-tear" aria-hidden="true">
@@ -223,7 +223,24 @@
               <button type="button" class="wd-btn -primary" id="wd-save-btn">Save</button>
             </div>
 
-            <button type="button" class="wd-skip-btn" id="wd-quick-btn">Skip the dates, just mark it watched</button>
+            <button type="button" class="wd-skip-btn" id="wd-quick-btn">Mark without dates</button>
+          </div>
+
+          <input type="checkbox" id="wd-jump-toggle" class="auth-checkbox">
+
+          <label for="wd-jump-toggle" class="wd-jump-backdrop" aria-hidden="true"></label>
+
+          <div class="wd-jump-popover" id="wd-jump-popover">
+            <div class="wd-jump-header">
+              <span class="wd-jump-title">Jump to</span>
+              <label for="wd-jump-toggle" class="wd-close" aria-label="Close">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </label>
+            </div>
+            <div class="wd-jump-cols">
+              <div class="wd-jump-col" id="wd-jump-months"></div>
+              <div class="wd-jump-col" id="wd-jump-years"></div>
+            </div>
           </div>
         </div>
 
