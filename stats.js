@@ -1,27 +1,4 @@
-// stats.js — data + engine behind 2026stats.html
-//
-// STATS_YEARS is now built live from SHOWS (shows.js) — same pattern as
-// journal.html's JOURNAL object. Add, edit, or remove a show's
-// journalYear/journalOrder in shows.js and it's reflected here
-// automatically. Nothing to maintain in this file.
-//
-// Everything past that — hours watched, episodes, seasons, ratings, and
-// the platform / genre / creator / country / language breakdowns — is
-// computed live from TMDB, the same client-side pattern sort.js already
-// uses for rating/popularity (find-by-imdb -> fetch /tv/{id} -> cache in
-// localStorage).
-//
-// NOTE: the summary object returned by aggregate() is a superset of the
-// old shape — hours/episodes/seasons/showCount/platforms/genres/creators
-// are all still present and unchanged, so the compact stats widget on
-// the profile page (index.html) keeps working untouched. Everything new
-// (ratings, countries, languages, per-show detail rows) is additive and
-// only consumed by the full stats page.
-
 var STATS_YEARS = (function () {
-  // Built live from SHOWS (shows.js) — same journalYear/journalOrder
-  // fields journal.html already uses. Nothing to maintain here: add,
-  // edit, or remove shows in shows.js only, and this stays in sync.
   var byYear = {};
   SHOWS.filter(function (s) { return !!s.journalYear; })
     .sort(function (a, b) { return a.journalOrder - b.journalOrder; })
@@ -34,16 +11,14 @@ var STATS_YEARS = (function () {
 (function (global) {
   'use strict';
 
-  // Same v3 TMDB key already used across the rest of the site (search.js,
-  // sort.js, postershow.html, home.html) — client-side, fine for personal use.
   var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
   var TMDB_BASE = 'https://api.themoviedb.org/3';
   var TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w154';
   var CACHE_PREFIX = 'tvbox:stats:';
-  var CACHE_VERSION = 2; // bump invalidates old cached records missing the new fields
-  var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days — show metadata barely changes
+  var CACHE_VERSION = 2;
+  var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
-  var DEFAULT_RUNTIME_MIN = 45; // fallback when TMDB has no episode_run_time on file
+  var DEFAULT_RUNTIME_MIN = 45;
 
   var EMPTY_RECORD = Object.freeze({
     episodes: 0,
@@ -64,10 +39,6 @@ var STATS_YEARS = (function () {
     name: null
   });
 
-  // ------------------------------------------------------------------
-  // Cache
-  // ------------------------------------------------------------------
-
   function readCache(imdbId) {
     try {
       var raw = localStorage.getItem(CACHE_PREFIX + imdbId);
@@ -83,14 +54,8 @@ var STATS_YEARS = (function () {
   function writeCache(imdbId, data) {
     try {
       localStorage.setItem(CACHE_PREFIX + imdbId, JSON.stringify({ data: data, ts: Date.now(), v: CACHE_VERSION }));
-    } catch (e) {
-      // storage full / private browsing — just skip caching
-    }
+    } catch (e) {}
   }
-
-  // ------------------------------------------------------------------
-  // TMDB fetch + normalize
-  // ------------------------------------------------------------------
 
   function yearFromDate(str) {
     if (!str || str.length < 4) return null;
@@ -112,8 +77,6 @@ var STATS_YEARS = (function () {
     var networks = (show.networks || []).map(function (n) { return n.name; });
     var creators = (show.created_by || []).map(function (c) { return c.name; });
 
-    // Prefer TMDB's own readable names (production_countries / spoken_languages)
-    // over raw ISO codes — more accurate and needs no local lookup table.
     var countries = (show.production_countries || []).map(function (c) { return c.name; });
     if (!countries.length) countries = (show.origin_country || []).slice();
 
@@ -165,8 +128,6 @@ var STATS_YEARS = (function () {
       });
   }
 
-  // Small concurrency cap so a year with 7-8 shows doesn't fire everything
-  // at once — same shape as sort.js's fetchAllTmdbInfo.
   function fetchAll(imdbIds) {
     var CONCURRENCY = 5;
     var queue = imdbIds.slice();
@@ -188,10 +149,6 @@ var STATS_YEARS = (function () {
     return Promise.all(workers).then(function () { return results; });
   }
 
-  // ------------------------------------------------------------------
-  // Aggregation
-  // ------------------------------------------------------------------
-
   function aggregate(showList, records) {
     var summary = {
       hours: 0,
@@ -201,8 +158,6 @@ var STATS_YEARS = (function () {
       platforms: {},
       genres: {},
       creators: {},
-      // Additive, new fields below — old consumers (profile embed) never
-      // touch these, so they're safe to add to.
       countries: {},
       languages: {},
       ratingSum: 0,
@@ -219,30 +174,21 @@ var STATS_YEARS = (function () {
       summary.episodes += r.episodes;
       summary.seasons += r.seasons;
 
-      // Platforms — a show's watched hours are split evenly across every
-      // network credited on it (almost always just one).
       var platformShare = hours / r.networks.length;
       r.networks.forEach(function (name) {
         summary.platforms[name] = (summary.platforms[name] || 0) + platformShare;
       });
 
-      // Genres — likewise, hours split evenly across the show's genres.
       var genreShare = hours / r.genres.length;
       r.genres.forEach(function (name) {
         summary.genres[name] = (summary.genres[name] || 0) + genreShare;
       });
 
-      // Creators — the show's *episode count* split evenly across every
-      // credited creator (TMDB doesn't expose a per-episode director
-      // without an extra call per season, so the show's creator(s) is
-      // the closest reliable signal of "whose work you watched").
       var creatorShare = r.episodes / r.creators.length;
       r.creators.forEach(function (name) {
         summary.creators[name] = (summary.creators[name] || 0) + creatorShare;
       });
 
-      // Countries / languages — hours split evenly across each, same
-      // pattern as platforms/genres.
       var countryShare = hours / r.countries.length;
       r.countries.forEach(function (name) {
         summary.countries[name] = (summary.countries[name] || 0) + countryShare;
@@ -281,8 +227,6 @@ var STATS_YEARS = (function () {
     return summary;
   }
 
-  // Turns a { name: value } bucket into a sorted array, folding anything
-  // past `cap` entries into a single trailing "Other" bucket.
   function toRanked(bucket, cap) {
     var list = Object.keys(bucket)
       .map(function (name) { return { name: name, value: bucket[name] }; })
