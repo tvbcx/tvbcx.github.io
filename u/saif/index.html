@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Figtree:wght@300..700&family=Stack+Sans+Headline:wght@300..700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/p.webp">
   <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/b.webp">
+  <link rel="preload" as="script" href="/bio.js?v=1">
   <link rel="preload" as="script" href="/shows.js?v=1">
   <link rel="preload" as="script" href="/stats.js?v=1">
   <style>
@@ -446,6 +447,7 @@
 
       </div>
     </div>
+    <div class="bio" id="profile-bio"></div>
   </div>
 
     <div class="profile-stats js-profile-stats">
@@ -668,6 +670,47 @@ showCopied();
       <div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
   </div>
+
+  <script src="/bio.js?v=1"></script>
+  <script>
+    (function () {
+      var el = document.getElementById('profile-bio');
+      if (!el || typeof window.PROFILE_BIO !== 'string' || !window.PROFILE_BIO.trim()) return;
+
+      // Only these tags/attributes survive; everything else is stripped down
+      // to plain text so bio.js can never inject scripts or unknown markup.
+      var ALLOWED_TAGS = { A: ['HREF'], STRONG: [], B: [], I: [] };
+
+      function sanitize(root) {
+        Array.prototype.slice.call(root.childNodes).forEach(function (node) {
+          if (node.nodeType !== 1) return; // leave text nodes alone
+          var tag = node.tagName;
+          if (!ALLOWED_TAGS.hasOwnProperty(tag)) {
+            root.replaceChild(document.createTextNode(node.textContent), node);
+            return;
+          }
+          Array.prototype.slice.call(node.attributes).forEach(function (attr) {
+            if (ALLOWED_TAGS[tag].indexOf(attr.name.toUpperCase()) === -1) {
+              node.removeAttribute(attr.name);
+            }
+          });
+          if (tag === 'A') {
+            var href = node.getAttribute('href') || '';
+            if (!/^https?:\/\//i.test(href) && !/^mailto:/i.test(href) && href.charAt(0) !== '/') {
+              node.removeAttribute('href');
+            }
+            node.setAttribute('target', '_blank');
+            node.setAttribute('rel', 'noopener noreferrer');
+          }
+          sanitize(node);
+        });
+      }
+
+      var doc = new DOMParser().parseFromString(window.PROFILE_BIO, 'text/html');
+      sanitize(doc.body);
+      el.innerHTML = doc.body.innerHTML;
+    })();
+  </script>
 
   <script src="/shows.js?v=1"></script>
   <script src="/stats.js?v=1"></script>
