@@ -5,10 +5,18 @@
 // journalYear/journalOrder in shows.js and it's reflected here
 // automatically. Nothing to maintain in this file.
 //
-// Everything past that — hours watched, episodes, seasons, and the
-// platform / genre / creator breakdowns — is computed live from TMDB,
-// the same client-side pattern sort.js already uses for rating/popularity
-// (find-by-imdb -> fetch /tv/{id} -> cache in localStorage).
+// Everything past that — hours watched, episodes, seasons, ratings, and
+// the platform / genre / creator / country / language breakdowns — is
+// computed live from TMDB, the same client-side pattern sort.js already
+// uses for rating/popularity (find-by-imdb -> fetch /tv/{id} -> cache in
+// localStorage).
+//
+// NOTE: the summary object returned by aggregate() is a superset of the
+// old shape — hours/episodes/seasons/showCount/platforms/genres/creators
+// are all still present and unchanged, so the compact stats widget on
+// the profile page (index.html) keeps working untouched. Everything new
+// (ratings, countries, languages, per-show detail rows) is additive and
+// only consumed by the full stats page.
 
 var STATS_YEARS = (function () {
   // Built live from SHOWS (shows.js) — same journalYear/journalOrder
@@ -30,7 +38,9 @@ var STATS_YEARS = (function () {
   // sort.js, postershow.html, home.html) — client-side, fine for personal use.
   var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
   var TMDB_BASE = 'https://api.themoviedb.org/3';
+  var TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w154';
   var CACHE_PREFIX = 'tvbox:stats:';
+  var CACHE_VERSION = 2; // bump invalidates old cached records missing the new fields
   var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days — show metadata barely changes
 
   var DEFAULT_RUNTIME_MIN = 45; // fallback when TMDB has no episode_run_time on file
@@ -41,7 +51,17 @@ var STATS_YEARS = (function () {
     minutes: 0,
     genres: [],
     networks: [],
-    creators: []
+    creators: [],
+    countries: [],
+    languages: [],
+    rating: 0,
+    votes: 0,
+    popularity: 0,
+    firstYear: null,
+    lastYear: null,
+    status: null,
+    poster: null,
+    name: null
   });
 
   // ------------------------------------------------------------------
@@ -53,7 +73,7 @@ var STATS_YEARS = (function () {
       var raw = localStorage.getItem(CACHE_PREFIX + imdbId);
       if (!raw) return null;
       var parsed = JSON.parse(raw);
-      if (!parsed || (Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
+      if (!parsed || parsed.v !== CACHE_VERSION || (Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
       return parsed.data;
     } catch (e) {
       return null;
@@ -62,7 +82,7 @@ var STATS_YEARS = (function () {
 
   function writeCache(imdbId, data) {
     try {
-      localStorage.setItem(CACHE_PREFIX + imdbId, JSON.stringify({ data: data, ts: Date.now() }));
+      localStorage.setItem(CACHE_PREFIX + imdbId, JSON.stringify({ data: data, ts: Date.now(), v: CACHE_VERSION }));
     } catch (e) {
       // storage full / private browsing — just skip caching
     }
@@ -71,6 +91,12 @@ var STATS_YEARS = (function () {
   // ------------------------------------------------------------------
   // TMDB fetch + normalize
   // ------------------------------------------------------------------
+
+  function yearFromDate(str) {
+    if (!str || str.length < 4) return null;
+    var y = parseInt(str.slice(0, 4), 10);
+    return isNaN(y) ? null : y;
+  }
 
   function normalizeShow(show) {
     if (!show) return EMPTY_RECORD;
@@ -86,13 +112,31 @@ var STATS_YEARS = (function () {
     var networks = (show.networks || []).map(function (n) { return n.name; });
     var creators = (show.created_by || []).map(function (c) { return c.name; });
 
+    // Prefer TMDB's own readable names (production_countries / spoken_languages)
+    // over raw ISO codes — more accurate and needs no local lookup table.
+    var countries = (show.production_countries || []).map(function (c) { return c.name; });
+    if (!countries.length) countries = (show.origin_country || []).slice();
+
+    var languages = (show.spoken_languages || []).map(function (l) { return l.english_name || l.name; });
+    if (!languages.length && show.original_language) languages = [show.original_language.toUpperCase()];
+
     return {
       episodes: episodes,
       seasons: seasons,
       minutes: episodes * avgRuntime,
       genres: genres.length ? genres : ['Unspecified'],
       networks: networks.length ? networks : ['Independent / Other'],
-      creators: creators.length ? creators : ['Unattributed']
+      creators: creators.length ? creators : ['Unattributed'],
+      countries: countries.length ? countries : ['Unspecified'],
+      languages: languages.length ? languages : ['Unspecified'],
+      rating: typeof show.vote_average === 'number' ? show.vote_average : 0,
+      votes: show.vote_count || 0,
+      popularity: show.popularity || 0,
+      firstYear: yearFromDate(show.first_air_date),
+      lastYear: yearFromDate(show.last_air_date),
+      status: show.status || null,
+      poster: show.poster_path ? (TMDB_POSTER_BASE + show.poster_path) : null,
+      name: show.name || null
     };
   }
 
@@ -156,7 +200,15 @@ var STATS_YEARS = (function () {
       showCount: showList.length,
       platforms: {},
       genres: {},
-      creators: {}
+      creators: {},
+      // Additive, new fields below — old consumers (profile embed) never
+      // touch these, so they're safe to add to.
+      countries: {},
+      languages: {},
+      ratingSum: 0,
+      ratedShowCount: 0,
+      avgRating: 0,
+      details: []
     };
 
     showList.forEach(function (entry) {
@@ -188,7 +240,43 @@ var STATS_YEARS = (function () {
       r.creators.forEach(function (name) {
         summary.creators[name] = (summary.creators[name] || 0) + creatorShare;
       });
+
+      // Countries / languages — hours split evenly across each, same
+      // pattern as platforms/genres.
+      var countryShare = hours / r.countries.length;
+      r.countries.forEach(function (name) {
+        summary.countries[name] = (summary.countries[name] || 0) + countryShare;
+      });
+
+      var languageShare = hours / r.languages.length;
+      r.languages.forEach(function (name) {
+        summary.languages[name] = (summary.languages[name] || 0) + languageShare;
+      });
+
+      if (r.rating > 0) {
+        summary.ratingSum += r.rating;
+        summary.ratedShowCount += 1;
+      }
+
+      summary.details.push({
+        title: entry.title,
+        imdb: entry.imdb,
+        hours: hours,
+        episodes: r.episodes,
+        seasons: r.seasons,
+        rating: r.rating,
+        votes: r.votes,
+        popularity: r.popularity,
+        firstYear: r.firstYear,
+        lastYear: r.lastYear,
+        status: r.status,
+        poster: r.poster,
+        networks: r.networks,
+        genres: r.genres
+      });
     });
+
+    summary.avgRating = summary.ratedShowCount ? (summary.ratingSum / summary.ratedShowCount) : 0;
 
     return summary;
   }
