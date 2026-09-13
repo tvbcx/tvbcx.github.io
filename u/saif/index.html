@@ -809,8 +809,7 @@ showCopied();
       function playTrailer(key) {
         if (!mediaEl || !trailerEl || !key) return;
         reverted = false;
-        // Hard cap: revert to the poster after 9s no matter how long the trailer actually is.
-        autoRevertTimer = setTimeout(revertToPoster, 9000);
+        var hasStartedRevertTimer = false;
         var iframe = document.createElement('iframe');
         iframe.id = 'last-watched-trailer-iframe';
         iframe.src = 'https://www.youtube.com/embed/' + key +
@@ -914,7 +913,15 @@ showCopied();
               onReady: applyUnmuteIfWanted,
               onStateChange: function (e) {
                 if (e.data === YT.PlayerState.ENDED) revertToPoster();
-                else if (e.data === YT.PlayerState.PLAYING) toggleBtn.classList.remove('-paused');
+                else if (e.data === YT.PlayerState.PLAYING) {
+                  toggleBtn.classList.remove('-paused');
+                  // Hard cap: revert to the poster 9s after the trailer actually starts
+                  // playing (not from when we first tried to load it).
+                  if (!hasStartedRevertTimer) {
+                    hasStartedRevertTimer = true;
+                    autoRevertTimer = setTimeout(revertToPoster, 9000);
+                  }
+                }
                 else if (e.data === YT.PlayerState.PAUSED) toggleBtn.classList.add('-paused');
               }
             }
