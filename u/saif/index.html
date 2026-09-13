@@ -785,12 +785,20 @@ showCopied();
       }
 
       function revertToPoster() {
+        // Hide the iframe immediately (no transition) so YouTube's own end-of-video
+        // "more videos" screen never has a chance to flash before we fade to the poster.
+        trailerEl.style.transition = 'none';
+        trailerEl.style.opacity = '0';
         mediaEl.classList.remove('-trailer-active');
         section.classList.remove('-trailer-active');
         var labelEl = document.getElementById('last-watched-label');
         if (labelEl) labelEl.textContent = 'Last Watch';
-        // wait for the fade/aspect-ratio transition to finish before actually removing the player
-        setTimeout(function () { trailerEl.innerHTML = ''; }, 900);
+        // wait a beat before actually removing the player and resetting the inline styles
+        setTimeout(function () {
+          trailerEl.innerHTML = '';
+          trailerEl.style.transition = '';
+          trailerEl.style.opacity = '';
+        }, 900);
       }
 
       function playTrailer(key) {
@@ -820,7 +828,7 @@ showCopied();
           '</span>';
         trailerEl.appendChild(toggleBtn);
 
-        // "Tap to unmute" pill - mobile only, shown while the trailer is muted.
+        // "Tap to unmute" pill - shown on both mobile and desktop while muted.
         var unmuteHint = document.createElement('button');
         unmuteHint.type = 'button';
         unmuteHint.className = 'last-watched-trailer-unmute';
@@ -833,10 +841,6 @@ showCopied();
         var player = null;
         var wantsUnmute = false;
 
-        function isMobileViewport() {
-          return window.matchMedia('(max-width: 600px)').matches;
-        }
-
         function applyUnmuteIfWanted() {
           if (!wantsUnmute || !player || typeof player.unMute !== 'function') return;
           try { player.unMute(); player.setVolume(100); } catch (err) {}
@@ -848,9 +852,7 @@ showCopied();
           applyUnmuteIfWanted();
         }
 
-        if (isMobileViewport()) {
-          unmuteHint.classList.add('-visible');
-        }
+        unmuteHint.classList.add('-visible');
 
         unmuteHint.addEventListener('click', function (e) {
           e.stopPropagation();
