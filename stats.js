@@ -1,317 +1,877 @@
-var STATS_YEARS = (function () {
-  var byYear = {};
-  SHOWS.filter(function (s) { return !!s.journalYear; })
-    .sort(function (a, b) { return a.journalOrder - b.journalOrder; })
-    .forEach(function (s) {
-      (byYear[s.journalYear] = byYear[s.journalYear] || []).push({ title: s.title, imdb: s.imdb, seasons: s.seasons || null });
-    });
-  return byYear;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saif's stats</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link rel="preload" as="script" href="/stats.js?v=3">
+  <style>
+    .site-header { position: relative; height: 52px; background-color: #0b121e; }
+    @media (min-width: 1024px) { .site-header { height: 76px; } }
+    .page-content { padding-top: 0px; }
+
+    .stx-page { margin-top: 6px; }
+
+    .stx-top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+    .stx-top-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .stx-title { margin: 0; font-size: 1.5rem; line-height: 1.15; color: #fff; display: flex; align-items: baseline; gap: 9px; }
+    .stx-title .numbers { color: #5b8ecb; font-weight: 500; }
+    .stx-title-label { color: #eaeef5; }
+    .stx-meta { margin: 0; font-size: 12.5px; color: #8490a4; min-height: 1.4em; }
+    .stx-meta strong { color: #b3c2db; font-weight: 600; }
+    .stx-meta .numbers { color: #b3c2db; }
+
+    .year-pills { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none; }
+    .year-pills::-webkit-scrollbar { display: none; }
+    .year-pill { flex: 0 0 auto; padding: 6px 15px; border: 1px solid #1e2a3e; border-radius: 8px; background-color: rgba(255,255,255,0.02); color: #8490a4; font-family: var(--font-numbers); font-size: 13px; letter-spacing: 0.02em; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease; }
+    .year-pill:hover { border-color: #30405a; color: #b3c2db; }
+    .year-pill.-active { background-color: #4d8eff; border-color: #4d8eff; color: #071019; font-weight: 700; }
+
+    .stx-status { display: flex; align-items: center; justify-content: center; gap: 10px; color: #8490a4; font-size: 13px; padding: 60px 0; }
+    .stx-status.-error { color: #29a6ff; }
+    .stx-status[hidden] { display: none; }
+    .stx-empty { color: rgba(234,238,245,0.5); font-size: 13px; padding: 8px 0; }
+
+    .stx-hero { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 10px; margin-bottom: 26px; }
+    .stx-hero-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 11px; text-align: center; opacity: 0; transform: scale(0.6) translateY(6px); transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1); }
+    .stx-hero-item.-visible { opacity: 1; transform: scale(1) translateY(0); }
+
+    .stx-hero-circle { position: relative; width: 92px; height: 92px; border-radius: 50%; flex: none; background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.05), rgba(255,255,255,0) 62%),
+        #0e1626;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 10px 26px rgba(0,0,0,0.4);
+      transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .stx-hero-item.-visible .stx-hero-circle { animation: stx-pop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes stx-pop { 0% { transform: scale(0.75); } 55% { transform: scale(1.035); } 100% { transform: scale(1); } }
+
+    .stx-hero-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+    .stx-hero-ring-track { fill: none; stroke: rgba(208,222,235,0.14); stroke-width: 6; }
+    .stx-hero-ring-fill { fill: none; stroke: var(--stat-color, #4E81B3); stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 327; stroke-dashoffset: 327;
+      transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1) 0.05s; }
+    .stx-hero-item.-visible .stx-hero-ring-fill { stroke-dashoffset: var(--ring-offset, 90); }
+
+    .stx-hero-circle-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .stx-hero-value { font-size: 1.28rem; line-height: 1; color: #eaeef5; font-weight: 600; letter-spacing: -0.01em; }
+    .stx-hero-label { font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .stx-hero-item:hover .stx-hero-circle { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset, 0 14px 32px rgba(0,0,0,0.5); }
+    }
+
+    .stx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    .stx-panel { position: relative; background-color: #0b121e; border: 1px solid #1e2a3e; border-radius: 14px; padding: 18px; min-width: 0; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease; overflow: hidden; }
+    .stx-panel.-visible { opacity: 1; transform: translateY(0); }
+    .stx-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--panel-accent, #4d8eff); }
+
+    .stx-panel-head { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e2a3e; }
+    .stx-panel-title { margin: 0; font-size: 12.2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(234,238,245,0.55); }
+    .stx-panel-note { flex: none; font-size: 12px; color: #8490a4; text-align: right; }
+    .stx-panel-note strong { color: var(--panel-tint, #4d8eff); font-weight: 700; }
+
+    .stx-dist-bar { display: flex; width: 100%; height: 10px; border-radius: 999px; overflow: hidden; background-color: rgba(255,255,255,0.04); margin-bottom: 18px; }
+    .stx-dist-seg { height: 100%; flex-grow: 0; flex-shrink: 0; flex-basis: 0%; box-sizing: border-box; border-right: 1px solid #0b121e; transition: flex-basis 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .stx-dist-seg:last-child { border-right: none; }
+    .stx-dist-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .stx-dist-legend li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .stx-dist-dot { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+    .stx-dist-name { flex: 1; min-width: 0; color: #b3c2db; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-dist-value { flex: none; font-size: 12.5px; color: #eaeef5; font-variant-numeric: tabular-nums; }
+    .stx-dist-value .sub { color: #8490a4; font-size: 11px; margin-left: 3px; }
+
+    .stx-bar-list { display: flex; flex-direction: column; gap: 13px; }
+    .stx-bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .stx-bar-top { display: flex; align-items: baseline; gap: 8px; }
+    .stx-bar-rank { flex: none; width: 15px; font-family: var(--font-numbers); font-size: 10px; color: #505a6b; }
+    .stx-bar-label { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #b3c2db; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-bar-value { flex: none; font-size: 12px; color: #4d8eff; font-variant-numeric: tabular-nums; }
+    .stx-bar-value .sub { color: #8490a4; margin-left: 3px; }
+    .stx-bar-track { height: 6px; border-radius: 999px; background-color: rgba(255,255,255,0.04); overflow: hidden; margin-left: 23px; }
+    .stx-bar-fill { height: 100%; width: 0%; border-radius: 999px; background-color: #4d8eff; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+
+    .stx-highlight-list { display: flex; flex-direction: column; }
+    .stx-highlight { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #1e2a3e; }
+    .stx-highlight:first-child { padding-top: 0; }
+    .stx-highlight:last-child { border-bottom: none; padding-bottom: 0; }
+    .stx-highlight-media { flex: none; width: 32px; height: 46px; border-radius: 5px; overflow: hidden; background-color: #191f29; display: flex; align-items: center; justify-content: center; color: #505a6b; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+    .stx-highlight-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .stx-highlight-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .stx-highlight-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
+    .stx-highlight-title { font-size: 13.5px; color: #eaeef5; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stx-highlight-value { flex: none; font-size: 15px; color: var(--panel-tint, #4d8eff); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.15; }
+    .stx-highlight-value .unit { display: block; font-size: 9px; color: #8490a4; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 2px; font-family: var(--font-text); }
+
+    .stx-chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stx-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid #1e2a3e; border-radius: 999px; background-color: rgba(255,255,255,0.02); font-size: 12px; color: #a2acbe; }
+    .stx-chip .pct { font-variant-numeric: tabular-nums; color: var(--panel-tint, #4d8eff); font-weight: 600; }
+
+    .stx-page .numbers { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+    .stx-hero-value { font-weight: 700; letter-spacing: -0.02em; }
+
+    .stx-trend-bars { display: flex; align-items: flex-end; gap: 14px; height: 148px; padding: 0 2px; }
+    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; }
+    .stx-trend-delta { font-size: 11px; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap; }
+    .stx-trend-delta.-up { color: #6bb3a0; }
+    .stx-trend-delta.-down { color: #c97b7b; }
+    .stx-trend-delta.-flat { color: #8490a4; }
+    .stx-trend-value { font-size: 13px; color: #eaeef5; font-weight: 600; }
+    .stx-trend-bar-track { width: 100%; max-width: 56px; flex: 1; display: flex; align-items: flex-end; }
+    .stx-trend-bar { width: 100%; border-radius: 6px 6px 2px 2px; background-color: #5b8ecb; min-height: 3px; transition: height 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .stx-trend-year { font-size: 12px; color: #8490a4; }
+    .stx-trend-year.-current { color: #eaeef5; font-weight: 600; }
+
+    @media (min-width: 640px) {
+      .stx-hero { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (min-width: 1024px) {
+      .stx-page { margin-top: 10px; }
+      .stx-top-head { align-items: center; }
+      .stx-title { font-size: 2rem; }
+      .stx-meta { font-size: 13px; }
+      .stx-hero { grid-template-columns: repeat(4, 1fr); gap: 26px 18px; margin-bottom: 30px; }
+      .stx-hero-circle { width: 122px; height: 122px; }
+      .stx-hero-value { font-size: 1.7rem; }
+      .stx-hero-label { font-size: 10.5px; }
+
+      .stx-grid { grid-template-columns: repeat(12, 1fr); gap: 18px; }
+      .stx-panel { padding: 22px; }
+      .stx-span-7 { grid-column: span 7; }
+      .stx-span-5 { grid-column: span 5; }
+      .stx-span-6 { grid-column: span 6; }
+      .stx-span-12 { grid-column: span 12; }
+
+      .stx-panel:hover { border-color: #263449; }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .stx-bar-row:hover .stx-bar-label { color: #eaeef5; }
+      .stx-bar-row:hover .stx-bar-track { background-color: rgba(255,255,255,0.07); }
+      .stx-highlight:hover .stx-highlight-title { color: #4d8eff; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-container">
+    <a href="/about/" class="floating-tvbox" aria-label="TV Box">
+      <svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+        <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+      </svg>
+    </a>
+
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="stx-page">
+
+      <div class="stx-top">
+        <div class="stx-top-head">
+          <h1 class="stx-title"><span class="numbers" id="stats-heading-year">–</span> <span class="stx-title-label">Stats</span></h1>
+        </div>
+        <p class="stx-meta" id="stx-meta">Loading your watch history…</p>
+        <div class="year-pills" id="stats-year-pills"></div>
+      </div>
+
+      <div id="stats-status" class="stx-status"></div>
+
+      <div id="stats-content" hidden>
+
+        <section class="stx-hero" id="section-hero">
+          <div class="stx-hero-item" style="--stat-color:#5b8ecb; --ring-offset:59;">
+            <div class="stx-hero-circle">
+              <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
+              </svg>
+              <div class="stx-hero-circle-inner">
+                <span class="stx-hero-value numbers" id="stat-hours">0</span>
+              </div>
+            </div>
+            <span class="stx-hero-label">Hours Watched</span>
+          </div>
+          <div class="stx-hero-item" style="--stat-color:#9b8bc4; --ring-offset:98;">
+            <div class="stx-hero-circle">
+              <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
+              </svg>
+              <div class="stx-hero-circle-inner">
+                <span class="stx-hero-value numbers" id="stat-episodes">0</span>
+              </div>
+            </div>
+            <span class="stx-hero-label">Episodes</span>
+          </div>
+          <div class="stx-hero-item" style="--stat-color:#c9a06b; --ring-offset:147;">
+            <div class="stx-hero-circle">
+              <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
+              </svg>
+              <div class="stx-hero-circle-inner">
+                <span class="stx-hero-value numbers" id="stat-seasons">0</span>
+              </div>
+            </div>
+            <span class="stx-hero-label">Seasons</span>
+          </div>
+          <div class="stx-hero-item" style="--stat-color:#6bb3a0; --ring-offset:114;">
+            <div class="stx-hero-circle">
+              <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
+              </svg>
+              <div class="stx-hero-circle-inner">
+                <span class="stx-hero-value numbers" id="stat-shows">0</span>
+              </div>
+            </div>
+            <span class="stx-hero-label">Shows</span>
+          </div>
+        </section>
+
+        <div class="stx-grid">
+
+          <section class="stx-panel stx-span-12" id="section-trend" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Watching Trend</h2>
+              <span class="stx-panel-note" id="trend-insight"></span>
+            </div>
+            <div id="trend-chart-mount"></div>
+          </section>
+
+          <section class="stx-panel stx-span-7" id="section-platforms" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Platforms</h2>
+              <span class="stx-panel-note" id="platform-insight"></span>
+            </div>
+            <div class="stx-dist-bar" id="platform-bar"></div>
+            <ul class="stx-dist-legend" id="platform-legend"></ul>
+          </section>
+
+          <section class="stx-panel stx-span-5" id="section-highlights" style="--panel-accent: #c9a06b; --panel-tint: #c9a06b;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Highlights</h2>
+            </div>
+            <div class="stx-highlight-list" id="highlight-list"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-genres" style="--panel-accent: #9b8bc4; --panel-tint: #9b8bc4;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Genres</h2>
+              <span class="stx-panel-note" id="genre-insight"></span>
+            </div>
+            <div class="stx-bar-list" id="genre-bars"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-creators" style="--panel-accent: #6bb3a0; --panel-tint: #6bb3a0;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Creators</h2>
+              <span class="stx-panel-note" id="creator-insight"></span>
+            </div>
+            <div class="stx-bar-list" id="creator-bars"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-countries" style="--panel-accent: #93b378; --panel-tint: #93b378;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Countries</h2>
+            </div>
+            <div class="stx-chip-list" id="country-chips"></div>
+          </section>
+
+          <section class="stx-panel stx-span-6" id="section-languages" style="--panel-accent: #c9b26b; --panel-tint: #c9b26b;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Languages</h2>
+            </div>
+            <div class="stx-chip-list" id="language-chips"></div>
+          </section>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+<footer class="site-footer">
+<div class="footer-container">
+<p style="display: inline-flex; align-items: center; gap: 0.35rem;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+<circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+<text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+</svg><a href="/about/"><strong>tvbox.</strong></a> Data from <a href="https://www.themoviedb.org/">TMDB</a> |
+
+<button type="button" class="footer-email-btn" data-email="gsaif@proton.me" aria-label="Copy email address">
+<svg class="footer-email-icon" style="width: 1.01rem; height: 1.01rem;" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 7L10.1649 12.7154C10.8261 13.1783 11.1567 13.4097 11.5163 13.4993C11.8339 13.5785 12.1661 13.5785 12.4837 13.4993C12.8433 13.4097 13.1739 13.1783 13.8351 12.7154L22 7M6.8 20H17.2C18.8802 20 19.7202 20 20.362 19.673C20.9265 19.3854 21.3854 18.9265 21.673 18.362C22 17.7202 22 16.8802 22 15.2V8.8C22 7.11984 22 6.27976 21.673 5.63803C21.3854 5.07354 20.9265 4.6146 20.362 4.32698C19.7202 4 18.8802 4 17.2 4H6.8C5.11984 4 4.27976 4 3.63803 4.32698C3.07354 4.6146 2.6146 5.07354 2.32698 5.63803C2 6.27976 2 7.11984 2 8.8V15.2C2 16.8802 2 17.7202 2.32698 18.362C2.6146 18.9265 3.07354 19.3854 3.63803 19.673C4.27976 20 5.11984 20 6.8 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="footer-email-tooltip" role="status" aria-live="polite">Copied!</span>
+</button>
+</p>
+</div>
+</footer>
+<script>
+(function () {
+var btn = document.querySelector('.footer-email-btn');
+if (!btn) return;
+
+function fallbackCopy(text) {
+var ta = document.createElement('textarea');
+ta.value = text;
+ta.style.position = 'fixed';
+ta.style.opacity = '0';
+document.body.appendChild(ta);
+ta.focus();
+ta.select();
+try { document.execCommand('copy'); } catch (e) {}
+document.body.removeChild(ta);
+}
+
+function showCopied() {
+btn.classList.remove('-copied');
+void btn.offsetWidth;
+btn.classList.add('-copied');
+clearTimeout(btn._copiedTimeout);
+btn._copiedTimeout = setTimeout(function () {
+btn.classList.remove('-copied');
+}, 1400);
+}
+
+btn.addEventListener('click', function () {
+var email = btn.getAttribute('data-email');
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(email).then(showCopied).catch(function () {
+fallbackCopy(email);
+showCopied();
+});
+} else {
+fallbackCopy(email);
+showCopied();
+}
+});
 })();
+</script>
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="spinner">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
 
-(function (global) {
-  'use strict';
+  <script>
+    (function () {
+      var form = document.getElementById('home-search-form');
+      var input = document.getElementById('home-search-input');
+      var overlay = document.getElementById('page-loading-overlay');
 
-  var TMDB_API_KEY = '6cb6e1dc603bc65ffb6198489d5bc5b7';
-  var TMDB_BASE = 'https://api.themoviedb.org/3';
-  var TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w154';
-  var CACHE_PREFIX = 'tvbox:stats:';
-  var CACHE_VERSION = 2;
-  var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-
-  var DEFAULT_RUNTIME_MIN = 45;
-
-  var EMPTY_RECORD = Object.freeze({
-    episodes: 0,
-    seasons: 0,
-    minutes: 0,
-    genres: [],
-    networks: [],
-    creators: [],
-    countries: [],
-    languages: [],
-    rating: 0,
-    votes: 0,
-    popularity: 0,
-    firstYear: null,
-    lastYear: null,
-    status: null,
-    poster: null,
-    name: null
-  });
-
-  function cacheKeyFor(imdbId, seasons) {
-    if (!seasons || !seasons.length) return imdbId;
-    return imdbId + ':s' + seasons.slice().sort(function (a, b) { return a - b; }).join(',');
-  }
-
-  function readCache(cacheKey) {
-    try {
-      var raw = localStorage.getItem(CACHE_PREFIX + cacheKey);
-      if (!raw) return null;
-      var parsed = JSON.parse(raw);
-      if (!parsed || parsed.v !== CACHE_VERSION || (Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
-      return parsed.data;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function writeCache(cacheKey, data) {
-    try {
-      localStorage.setItem(CACHE_PREFIX + cacheKey, JSON.stringify({ data: data, ts: Date.now(), v: CACHE_VERSION }));
-    } catch (e) {}
-  }
-
-  function yearFromDate(str) {
-    if (!str || str.length < 4) return null;
-    var y = parseInt(str.slice(0, 4), 10);
-    return isNaN(y) ? null : y;
-  }
-
-  function sharedFields(show) {
-    var genres = (show.genres || []).map(function (g) { return g.name; });
-    var networks = (show.networks || []).map(function (n) { return n.name; });
-    var creators = (show.created_by || []).map(function (c) { return c.name; });
-
-    var countries = (show.production_countries || []).map(function (c) { return c.name; });
-    if (!countries.length) countries = (show.origin_country || []).slice();
-
-    var languages = (show.spoken_languages || []).map(function (l) { return l.english_name || l.name; });
-    if (!languages.length && show.original_language) languages = [show.original_language.toUpperCase()];
-
-    return {
-      genres: genres.length ? genres : ['Unspecified'],
-      networks: networks.length ? networks : ['Independent / Other'],
-      creators: creators.length ? creators : ['Unattributed'],
-      countries: countries.length ? countries : ['Unspecified'],
-      languages: languages.length ? languages : ['Unspecified'],
-      rating: typeof show.vote_average === 'number' ? show.vote_average : 0,
-      votes: show.vote_count || 0,
-      popularity: show.popularity || 0,
-      status: show.status || null,
-      poster: show.poster_path ? (TMDB_POSTER_BASE + show.poster_path) : null,
-      name: show.name || null
-    };
-  }
-
-  // Whole-show record (no seasons filter): matches original behavior.
-  function normalizeShow(show) {
-    if (!show) return EMPTY_RECORD;
-
-    var episodes = show.number_of_episodes || 0;
-    var seasons = show.number_of_seasons || 0;
-    var runtimes = show.episode_run_time || [];
-    var avgRuntime = runtimes.length
-      ? runtimes.reduce(function (a, b) { return a + b; }, 0) / runtimes.length
-      : DEFAULT_RUNTIME_MIN;
-
-    var base = sharedFields(show);
-    base.episodes = episodes;
-    base.seasons = seasons;
-    base.minutes = episodes * avgRuntime;
-    base.firstYear = yearFromDate(show.first_air_date);
-    base.lastYear = yearFromDate(show.last_air_date);
-    return base;
-  }
-
-  // Season-restricted record: only counts the specific season(s) actually watched.
-  function normalizeShowSeasons(show, seasonsData) {
-    if (!show) return EMPTY_RECORD;
-
-    var showRuntimes = show.episode_run_time || [];
-    var fallbackRuntime = showRuntimes.length
-      ? showRuntimes.reduce(function (a, b) { return a + b; }, 0) / showRuntimes.length
-      : DEFAULT_RUNTIME_MIN;
-
-    var allEpisodes = [];
-    seasonsData.forEach(function (season) {
-      (season.episodes || []).forEach(function (ep) { allEpisodes.push(ep); });
-    });
-
-    var minutes = allEpisodes.reduce(function (sum, ep) {
-      return sum + (typeof ep.runtime === 'number' && ep.runtime > 0 ? ep.runtime : fallbackRuntime);
-    }, 0);
-
-    var years = [];
-    allEpisodes.forEach(function (ep) {
-      var y = yearFromDate(ep.air_date);
-      if (y) years.push(y);
-    });
-    seasonsData.forEach(function (season) {
-      var y = yearFromDate(season.air_date);
-      if (y) years.push(y);
-    });
-
-    var base = sharedFields(show);
-    base.episodes = allEpisodes.length;
-    base.seasons = seasonsData.length;
-    base.minutes = minutes;
-    base.firstYear = years.length ? Math.min.apply(null, years) : yearFromDate(show.first_air_date);
-    base.lastYear = years.length ? Math.max.apply(null, years) : yearFromDate(show.last_air_date);
-    return base;
-  }
-
-  function fetchShowRecord(imdbId, seasonNumbers) {
-    var hasSeasons = !!(seasonNumbers && seasonNumbers.length);
-    var cacheKey = cacheKeyFor(imdbId, seasonNumbers);
-
-    var cached = readCache(cacheKey);
-    if (cached) return Promise.resolve(cached);
-
-    var findUrl = TMDB_BASE + '/find/' + encodeURIComponent(imdbId) +
-      '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id';
-
-    return fetch(findUrl)
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (found) {
-        var match = found && found.tv_results && found.tv_results[0];
-        if (!match) return null;
-        return fetch(TMDB_BASE + '/tv/' + match.id + '?api_key=' + TMDB_API_KEY)
-          .then(function (res) { return res.ok ? res.json() : null; })
-          .then(function (show) {
-            if (!show) return null;
-            if (!hasSeasons) return { show: show, seasonsData: null };
-            return Promise.all(seasonNumbers.map(function (sn) {
-              return fetch(TMDB_BASE + '/tv/' + match.id + '/season/' + sn + '?api_key=' + TMDB_API_KEY)
-                .then(function (res) { return res.ok ? res.json() : null; });
-            })).then(function (seasonsData) {
-              return { show: show, seasonsData: seasonsData.filter(Boolean) };
-            });
-          });
-      })
-      .then(function (result) {
-        var record;
-        if (!result) {
-          record = EMPTY_RECORD;
-        } else if (hasSeasons) {
-          record = result.seasonsData.length ? normalizeShowSeasons(result.show, result.seasonsData) : normalizeShow(result.show);
-        } else {
-          record = normalizeShow(result.show);
-        }
-        writeCache(cacheKey, record);
-        return record;
-      })
-      .catch(function () {
-        return EMPTY_RECORD;
-      });
-  }
-
-  function fetchAll(showList) {
-    var CONCURRENCY = 5;
-    var queue = showList.slice();
-    var results = {};
-
-    function worker() {
-      var item = queue.shift();
-      if (!item) return Promise.resolve();
-      return fetchShowRecord(item.imdb, item.seasons).then(function (record) {
-        results[item.imdb] = record;
-        return worker();
-      });
-    }
-
-    var workers = [];
-    for (var i = 0; i < Math.min(CONCURRENCY, queue.length); i++) {
-      workers.push(worker());
-    }
-    return Promise.all(workers).then(function () { return results; });
-  }
-
-  function aggregate(showList, records) {
-    var summary = {
-      hours: 0,
-      episodes: 0,
-      seasons: 0,
-      showCount: showList.length,
-      platforms: {},
-      genres: {},
-      creators: {},
-      countries: {},
-      languages: {},
-      ratingSum: 0,
-      ratedShowCount: 0,
-      avgRating: 0,
-      details: []
-    };
-
-    showList.forEach(function (entry) {
-      var r = records[entry.imdb] || EMPTY_RECORD;
-      var hours = r.minutes / 60;
-
-      summary.hours += hours;
-      summary.episodes += r.episodes;
-      summary.seasons += r.seasons;
-
-      var platformShare = hours / r.networks.length;
-      r.networks.forEach(function (name) {
-        summary.platforms[name] = (summary.platforms[name] || 0) + platformShare;
-      });
-
-      var genreShare = hours / r.genres.length;
-      r.genres.forEach(function (name) {
-        summary.genres[name] = (summary.genres[name] || 0) + genreShare;
-      });
-
-      var creatorShare = r.episodes / r.creators.length;
-      r.creators.forEach(function (name) {
-        summary.creators[name] = (summary.creators[name] || 0) + creatorShare;
-      });
-
-      var countryShare = hours / r.countries.length;
-      r.countries.forEach(function (name) {
-        summary.countries[name] = (summary.countries[name] || 0) + countryShare;
-      });
-
-      var languageShare = hours / r.languages.length;
-      r.languages.forEach(function (name) {
-        summary.languages[name] = (summary.languages[name] || 0) + languageShare;
-      });
-
-      if (r.rating > 0) {
-        summary.ratingSum += r.rating;
-        summary.ratedShowCount += 1;
+      function goToResults() {
+        var value = input.value.trim();
+        if (!value) return;
+        overlay.classList.add('-visible');
+        window.location.href = '/search/?q=' + encodeURIComponent(value);
       }
 
-      summary.details.push({
-        title: entry.title,
-        imdb: entry.imdb,
-        hours: hours,
-        episodes: r.episodes,
-        seasons: r.seasons,
-        rating: r.rating,
-        votes: r.votes,
-        popularity: r.popularity,
-        firstYear: r.firstYear,
-        lastYear: r.lastYear,
-        status: r.status,
-        poster: r.poster,
-        networks: r.networks,
-        genres: r.genres
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        goToResults();
       });
-    });
 
-    summary.avgRating = summary.ratedShowCount ? (summary.ratingSum / summary.ratedShowCount) : 0;
+      input.addEventListener('search', function () {
+        goToResults();
+      });
 
-    return summary;
-  }
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          goToResults();
+        }
+      });
 
-  function toRanked(bucket, cap) {
-    var list = Object.keys(bucket)
-      .map(function (name) { return { name: name, value: bucket[name] }; })
-      .sort(function (a, b) { return b.value - a.value; });
+      window.addEventListener('pageshow', function () {
+        overlay.classList.remove('-visible');
+      });
+    })();
+  </script>
 
-    if (!cap || list.length <= cap) return list;
+  <script src="/shows.js?v=1"></script>
+  <script src="/stats.js?v=3"></script>
+  <script>
+    (function () {
+      var SPINNER_HTML =
+        '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
 
-    var head = list.slice(0, cap - 1);
-    var tail = list.slice(cap - 1);
-    var otherTotal = tail.reduce(function (sum, item) { return sum + item.value; }, 0);
-    head.push({ name: 'Other', value: otherTotal });
-    return head;
-  }
+      var PALETTE = ['#5b8ecb', '#c97b7b', '#c9a06b', '#6bb3a0', '#9b8bc4', '#6bafc9', '#c98bab', '#93b378', '#c9b26b'];
+      var OTHER_COLOR = '#3a4a63';
 
-  global.TVStats = {
-    fetchAll: fetchAll,
-    aggregate: aggregate,
-    toRanked: toRanked
-  };
-})(window);
+      function colorFor(item, i) {
+        return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function fmt1(v) {
+        return (Math.round(v * 10) / 10).toString();
+      }
+
+      function initials(title) {
+        if (!title) return '';
+        var parts = title.trim().split(/\s+/).slice(0, 2);
+        return parts.map(function (p) { return p.charAt(0).toUpperCase(); }).join('');
+      }
+
+      var headingYear = document.getElementById('stats-heading-year');
+      var metaLine = document.getElementById('stx-meta');
+      var pillsMount = document.getElementById('stats-year-pills');
+      var statusEl = document.getElementById('stats-status');
+      var content = document.getElementById('stats-content');
+
+      var heroSection = document.getElementById('section-hero');
+      var heroHours = document.getElementById('stat-hours');
+      var heroEpisodes = document.getElementById('stat-episodes');
+      var heroSeasons = document.getElementById('stat-seasons');
+      var heroShows = document.getElementById('stat-shows');
+
+      var platformBar = document.getElementById('platform-bar');
+      var platformLegend = document.getElementById('platform-legend');
+      var platformInsight = document.getElementById('platform-insight');
+
+      var highlightList = document.getElementById('highlight-list');
+
+      var genreBars = document.getElementById('genre-bars');
+      var genreInsight = document.getElementById('genre-insight');
+
+      var creatorBars = document.getElementById('creator-bars');
+      var creatorInsight = document.getElementById('creator-insight');
+
+      var countryChips = document.getElementById('country-chips');
+      var languageChips = document.getElementById('language-chips');
+
+      var panels = Array.prototype.slice.call(document.querySelectorAll('.stx-panel'));
+
+      var YEARS = Object.keys(STATS_YEARS).sort(function (a, b) { return b - a; });
+      var DEFAULT_YEAR = YEARS[0] || null;
+      var summaryCache = {};
+      var currentYear = null;
+
+      var heroItems = Array.prototype.slice.call(heroSection.querySelectorAll('.stx-hero-item'));
+
+      function animateCount(el) {
+        var target = parseFloat(el.dataset.target || '0');
+        var decimals = el.dataset.decimals === '1';
+        var duration = 950;
+        var start = null;
+        cancelAnimationFrame(el._countRaf);
+        function step(ts) {
+          if (!start) start = ts;
+          var p = Math.min((ts - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          var current = target * eased;
+          el.textContent = decimals ? current.toFixed(1) : Math.round(current).toString();
+          if (p < 1) {
+            el._countRaf = requestAnimationFrame(step);
+          } else {
+            el.textContent = decimals ? target.toFixed(1) : Math.round(target).toString();
+          }
+        }
+        el._countRaf = requestAnimationFrame(step);
+      }
+
+      function revealSections() {
+        setTimeout(function () { heroSection.classList.add('-visible'); }, 0);
+        heroItems.forEach(function (el, i) {
+          setTimeout(function () {
+            el.classList.add('-visible');
+            var valueEl = el.querySelector('.stx-hero-value');
+            if (valueEl) animateCount(valueEl);
+          }, 60 + i * 90);
+        });
+        panels.forEach(function (el, i) {
+          setTimeout(function () { el.classList.add('-visible'); }, 60 + heroItems.length * 90 + 40 + i * 60);
+        });
+      }
+      function hideSections() {
+        heroSection.classList.remove('-visible');
+        heroItems.forEach(function (el) { el.classList.remove('-visible'); });
+        panels.forEach(function (el) { el.classList.remove('-visible'); });
+      }
+
+      function renderDistBar(list, total) {
+        platformBar.innerHTML = list.map(function (item, i) {
+          return '<span class="stx-dist-seg" data-target="' + (total ? (item.value / total) * 100 : 0) + '" style="background:' + colorFor(item, i) + '"></span>';
+        }).join('');
+
+        var segs = platformBar.querySelectorAll('.stx-dist-seg');
+        requestAnimationFrame(function () {
+          segs.forEach(function (el) {
+            el.style.flexBasis = el.dataset.target + '%';
+          });
+        });
+      }
+
+      function renderDistLegend(mount, list, total, unit) {
+        mount.innerHTML = list.map(function (item, i) {
+          var pct = total ? fmt1((item.value / total) * 100) : '0';
+          var abs = unit === 'h' ? (fmt1(item.value) + 'h') : (Math.round(item.value) + ' eps');
+          return (
+            '<li>' +
+              '<span class="stx-dist-dot" style="background:' + colorFor(item, i) + '"></span>' +
+              '<span class="stx-dist-name">' + escapeHtml(item.name) + '</span>' +
+              '<span class="stx-dist-value">' + pct + '%<span class="sub">· ' + abs + '</span></span>' +
+            '</li>'
+          );
+        }).join('');
+      }
+
+      function renderBarList(mount, list, total, unit) {
+        mount.innerHTML = list.map(function (item, i) {
+          var pct = total ? (item.value / total) * 100 : 0;
+          var abs = unit === 'h' ? (fmt1(item.value) + 'h') : (Math.round(item.value) + ' eps');
+          return (
+            '<div class="stx-bar-row">' +
+              '<div class="stx-bar-top">' +
+                '<span class="stx-bar-rank numbers">' + (i + 1) + '</span>' +
+                '<span class="stx-bar-label">' + escapeHtml(item.name) + '</span>' +
+                '<span class="stx-bar-value numbers">' + fmt1(pct) + '%<span class="sub">' + abs + '</span></span>' +
+              '</div>' +
+              '<div class="stx-bar-track">' +
+                '<div class="stx-bar-fill" data-target="' + pct + '" style="background:' + colorFor(item, i) + '"></div>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+
+        var fills = mount.querySelectorAll('.stx-bar-fill');
+        requestAnimationFrame(function () {
+          fills.forEach(function (el, i) {
+            setTimeout(function () { el.style.width = el.dataset.target + '%'; }, i * 60);
+          });
+        });
+      }
+
+      function renderChips(mount, list, total) {
+        if (!list.length) { mount.innerHTML = '<p class="stx-empty">Not enough data yet.</p>'; return; }
+        mount.innerHTML = list.map(function (item) {
+          var pct = total ? fmt1((item.value / total) * 100) : '0';
+          return '<span class="stx-chip">' + escapeHtml(item.name) + ' <span class="pct">' + pct + '%</span></span>';
+        }).join('');
+      }
+
+      function computeHighlights(details) {
+        var byRating = details.filter(function (d) { return d.rating > 0 && d.votes >= 15; })
+          .sort(function (a, b) { return b.rating - a.rating; });
+        var byHours = details.filter(function (d) { return d.hours > 0; })
+          .sort(function (a, b) { return b.hours - a.hours; });
+        var bySeasons = details.filter(function (d) { return d.seasons > 0; })
+          .sort(function (a, b) { return b.seasons - a.seasons; });
+        var withYear = details.filter(function (d) { return !!d.firstYear; });
+        var byOldest = withYear.slice().sort(function (a, b) { return a.firstYear - b.firstYear; });
+        var byNewest = withYear.slice().sort(function (a, b) { return b.firstYear - a.firstYear; });
+
+        var items = [];
+        if (byRating.length) {
+          items.push({ label: 'Top Rated', show: byRating[0], value: byRating[0].rating.toFixed(1), unit: 'out of 10' });
+        }
+        if (byHours.length) {
+          items.push({ label: 'Most Watched', show: byHours[0], value: fmt1(byHours[0].hours), unit: 'hours logged' });
+        }
+        if (bySeasons.length) {
+          items.push({ label: 'Longest Running', show: bySeasons[0], value: bySeasons[0].seasons, unit: bySeasons[0].seasons === 1 ? 'season' : 'seasons' });
+        }
+        if (byOldest.length) {
+          items.push({ label: 'Deepest Cut', show: byOldest[0], value: byOldest[0].firstYear, unit: 'premiere' });
+        }
+        if (byNewest.length && byNewest[0].imdb !== byOldest[0].imdb) {
+          items.push({ label: 'Freshest Pick', show: byNewest[0], value: byNewest[0].firstYear, unit: 'premiere' });
+        }
+        return items.slice(0, 5);
+      }
+
+      function renderHighlights(details) {
+        var items = computeHighlights(details);
+        if (!items.length) { highlightList.innerHTML = '<p class="stx-empty">Not enough data yet.</p>'; return; }
+
+        highlightList.innerHTML = items.map(function (item) {
+          var show = item.show;
+          var media = show.poster
+            ? '<img src="' + show.poster + '" alt="" loading="lazy">'
+            : escapeHtml(initials(show.title));
+          return (
+            '<div class="stx-highlight">' +
+              '<div class="stx-highlight-media">' + media + '</div>' +
+              '<div class="stx-highlight-body">' +
+                '<span class="stx-highlight-label">' + escapeHtml(item.label) + '</span>' +
+                '<span class="stx-highlight-title">' + escapeHtml(show.title) + '</span>' +
+              '</div>' +
+              '<span class="stx-highlight-value numbers">' + escapeHtml(String(item.value)) + '<span class="unit">' + escapeHtml(item.unit) + '</span></span>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function showLoading() {
+        content.hidden = true;
+        statusEl.hidden = false;
+        statusEl.classList.remove('-error');
+        statusEl.innerHTML = SPINNER_HTML + '<span>Crunching the numbers…</span>';
+      }
+
+      function showError(message) {
+        content.hidden = true;
+        statusEl.hidden = false;
+        statusEl.classList.add('-error');
+        statusEl.textContent = message;
+      }
+
+      function hideStatus() {
+        statusEl.hidden = true;
+        statusEl.innerHTML = '';
+      }
+
+      function displaySummary(summary) {
+        hideStatus();
+        content.hidden = false;
+        hideSections();
+
+        if (!summary.showCount) {
+          content.hidden = true;
+          statusEl.hidden = false;
+          statusEl.classList.remove('-error');
+          statusEl.innerHTML = '<p class="stx-empty">No shows logged for this year yet.</p>';
+          metaLine.textContent = '';
+          return;
+        }
+
+        var metaParts = [Math.round(summary.showCount) + (summary.showCount === 1 ? ' show' : ' shows')];
+        if (summary.ratedShowCount) metaParts.push('avg rating ' + fmt1(summary.avgRating) + ' / 10');
+        metaLine.innerHTML = metaParts.join(' &nbsp;·&nbsp; ');
+
+        heroHours.dataset.target = fmt1(summary.hours);
+        heroHours.dataset.decimals = '1';
+        heroHours.textContent = '0';
+
+        heroEpisodes.dataset.target = Math.round(summary.episodes);
+        heroEpisodes.textContent = '0';
+
+        heroSeasons.dataset.target = Math.round(summary.seasons);
+        heroSeasons.textContent = '0';
+
+        heroShows.dataset.target = Math.round(summary.showCount);
+        heroShows.textContent = '0';
+
+        var platformList = TVStats.toRanked(summary.platforms, 6);
+        renderDistBar(platformList, summary.hours);
+        renderDistLegend(platformLegend, platformList, summary.hours, 'h');
+        if (platformList.length) {
+          platformInsight.innerHTML = '<strong>' + escapeHtml(platformList[0].name) + '</strong> led, ' +
+            fmt1((platformList[0].value / summary.hours) * 100) + '%';
+        } else {
+          platformInsight.textContent = '';
+        }
+
+        renderHighlights(summary.details);
+
+        var genreList = TVStats.toRanked(summary.genres, 8);
+        renderBarList(genreBars, genreList, summary.hours, 'h');
+        if (genreList.length) {
+          genreInsight.innerHTML = '<strong>' + escapeHtml(genreList[0].name) + '</strong> led the year';
+        } else {
+          genreInsight.textContent = '';
+        }
+
+        var creatorList = TVStats.toRanked(summary.creators, 8);
+        renderBarList(creatorBars, creatorList, summary.episodes, 'eps');
+        if (creatorList.length) {
+          creatorInsight.innerHTML = '<strong>' + escapeHtml(creatorList[0].name) + '</strong> most episodes';
+        } else {
+          creatorInsight.textContent = '';
+        }
+
+        var countryList = TVStats.toRanked(summary.countries, 8);
+        renderChips(countryChips, countryList, summary.hours);
+
+        var languageList = TVStats.toRanked(summary.languages, 6);
+        renderChips(languageChips, languageList, summary.hours);
+
+        revealSections();
+      }
+
+      function setActivePill(year) {
+        var pills = pillsMount.querySelectorAll('.year-pill');
+        pills.forEach(function (pill) {
+          pill.classList.toggle('-active', pill.dataset.year === String(year));
+        });
+        headingYear.textContent = year;
+      }
+
+      function renderYear(year) {
+        currentYear = year;
+        setActivePill(year);
+
+        if (summaryCache[year]) {
+          displaySummary(summaryCache[year]);
+          return;
+        }
+
+        showLoading();
+        metaLine.textContent = '';
+        var showList = STATS_YEARS[year] || [];
+        var ids = showList.map(function (s) { return s.imdb; });
+
+        TVStats.fetchAll(ids).then(function (records) {
+          if (currentYear !== year) return;
+          var summary = TVStats.aggregate(showList, records);
+          summaryCache[year] = summary;
+          displaySummary(summary);
+        }).catch(function () {
+          if (currentYear !== year) return;
+          showError('Something went wrong pulling stats for ' + year + '. Try again in a moment.');
+        });
+      }
+
+      function loadTrend() {
+        var mount = document.getElementById('trend-chart-mount');
+        var insight = document.getElementById('trend-insight');
+        if (!mount) return;
+
+        var allIds = [];
+        var seen = {};
+        YEARS.forEach(function (year) {
+          (STATS_YEARS[year] || []).forEach(function (s) {
+            if (!seen[s.imdb]) { seen[s.imdb] = true; allIds.push(s.imdb); }
+          });
+        });
+        if (!allIds.length) return;
+
+        TVStats.fetchAll(allIds).then(function (records) {
+          var points = YEARS.slice().sort(function (a, b) { return a - b; }).map(function (year) {
+            var summary = TVStats.aggregate(STATS_YEARS[year] || [], records);
+            return { year: year, hours: summary.hours };
+          });
+
+          if (points.length < 2) {
+            mount.innerHTML = '<p class="stx-empty">Not enough years logged yet to show a trend.</p>';
+            return;
+          }
+
+          var maxHours = Math.max.apply(null, points.map(function (p) { return p.hours; })) || 1;
+
+          mount.innerHTML = '<div class="stx-trend-bars">' + points.map(function (p, i) {
+            var pct = Math.max((p.hours / maxHours) * 100, 2);
+            var deltaHtml = '';
+            if (i > 0) {
+              var prev = points[i - 1].hours;
+              if (prev > 0) {
+                var change = ((p.hours - prev) / prev) * 100;
+                var dir = change > 1 ? '-up' : (change < -1 ? '-down' : '-flat');
+                var sign = change > 0 ? '+' : '';
+                deltaHtml = '<span class="stx-trend-delta ' + dir + '">' + sign + fmt1(change) + '%</span>';
+              } else if (p.hours > 0) {
+                deltaHtml = '<span class="stx-trend-delta -up">New</span>';
+              }
+            }
+            var isCurrent = String(p.year) === String(YEARS[0]);
+            return (
+              '<div class="stx-trend-col">' +
+                deltaHtml +
+                '<span class="stx-trend-value numbers">' + fmt1(p.hours) + 'h</span>' +
+                '<div class="stx-trend-bar-track"><div class="stx-trend-bar" data-target="' + pct + '" style="height:0%"></div></div>' +
+                '<span class="stx-trend-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
+              '</div>'
+            );
+          }).join('') + '</div>';
+
+          requestAnimationFrame(function () {
+            mount.querySelectorAll('.stx-trend-bar').forEach(function (el) {
+              el.style.height = el.dataset.target + '%';
+            });
+          });
+
+          if (insight) {
+            var last = points[points.length - 1];
+            var prev = points[points.length - 2];
+            if (prev.hours > 0) {
+              var overallChange = ((last.hours - prev.hours) / prev.hours) * 100;
+              var word = overallChange > 1 ? 'up' : (overallChange < -1 ? 'down' : 'flat');
+              insight.innerHTML = '<strong>' + (overallChange > 0 ? '+' : '') + fmt1(overallChange) + '%</strong> ' + word + ' vs ' + prev.year;
+            }
+          }
+        }).catch(function () {
+          mount.innerHTML = '<p class="stx-empty">Could not load the trend right now.</p>';
+        });
+      }
+
+      YEARS.forEach(function (year) {
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'year-pill numbers';
+        pill.textContent = year;
+        pill.dataset.year = year;
+        pill.addEventListener('click', function () {
+          renderYear(year);
+        });
+        pillsMount.appendChild(pill);
+      });
+
+      loadTrend();
+
+      if (DEFAULT_YEAR) {
+        renderYear(DEFAULT_YEAR);
+      } else {
+        showError('No past years to show yet.');
+      }
+    })();
+  </script>
+<script src="/auth.js?v=1"></script>
+</body>
+</html>
