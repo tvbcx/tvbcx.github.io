@@ -60,7 +60,7 @@
     .stx-hero-item.-visible .stx-hero-ring-fill { stroke-dashoffset: var(--ring-offset, 90); }
 
     .stx-hero-circle-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-    .stx-hero-value { font-size: 1.28rem; line-height: 1; color: #eaeef5; font-weight: 700; letter-spacing: -0.02em; }
+    .stx-hero-value { font-size: 1.28rem; line-height: 1; color: #eaeef5; font-weight: 600; letter-spacing: -0.01em; }
     .stx-hero-label { font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
 
     @media (hover: hover) and (pointer: fine) {
@@ -115,18 +115,36 @@
     .stx-chip .pct { font-variant-numeric: tabular-nums; color: var(--panel-tint, #4d8eff); font-weight: 600; }
 
     .stx-page .numbers { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+    .stx-hero-value { font-weight: 700; letter-spacing: -0.02em; }
 
-    .stx-trend-bars { display: flex; align-items: flex-end; gap: 14px; height: 148px; padding: 0 2px; }
-    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; }
-    .stx-trend-delta { font-size: 11px; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap; }
-    .stx-trend-delta.-up { color: #6bb3a0; }
-    .stx-trend-delta.-down { color: #c97b7b; }
-    .stx-trend-delta.-flat { color: #8490a4; }
-    .stx-trend-value { font-size: 13px; color: #eaeef5; font-weight: 600; }
-    .stx-trend-bar-track { width: 100%; max-width: 56px; flex: 1; display: flex; align-items: flex-end; }
-    .stx-trend-bar { width: 100%; border-radius: 6px 6px 2px 2px; background-color: #5b8ecb; min-height: 3px; transition: height 0.8s cubic-bezier(0.22,1,0.36,1); }
-    .stx-trend-year { font-size: 12px; color: #8490a4; }
-    .stx-trend-year.-current { color: #eaeef5; font-weight: 600; }
+    .stx-trend { display: flex; flex-direction: column; gap: 2px; }
+    .stx-trend-chart { position: relative; height: 96px; margin-bottom: 6px; }
+    .stx-trend-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .stx-trend-line { stroke: #4d8eff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--line-len, 1); stroke-dashoffset: var(--line-len, 1); transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1); }
+    .stx-trend-chart.-visible .stx-trend-line { stroke-dashoffset: 0; }
+    .stx-trend-area { opacity: 0; transition: opacity 0.9s ease 0.35s; }
+    .stx-trend-chart.-visible .stx-trend-area { opacity: 1; }
+    .stx-trend-dot { fill: #0b121e; stroke: #4d8eff; stroke-width: 1.75; opacity: 0; transition: opacity 0.4s ease 0.2s; }
+    .stx-trend-chart.-visible .stx-trend-dot { opacity: 1; }
+    .stx-trend-dot.-current { fill: #4d8eff; }
+
+    .stx-trend-cols { display: flex; align-items: flex-start; gap: 14px; padding: 0 2px; }
+    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+    .stx-trend-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 9px; border-radius: 999px; font-family: var(--font-numbers); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; background-color: rgba(255,255,255,0.03); color: #8490a4; white-space: nowrap; }
+    .stx-trend-badge .arrow { font-size: 8px; line-height: 1; }
+    .stx-trend-badge.-up { color: #6bb3a0; background-color: rgba(107,179,160,0.1); }
+    .stx-trend-badge.-down { color: #c97b7b; background-color: rgba(201,123,123,0.1); }
+    .stx-trend-badge.-flat { color: #8490a4; }
+    .stx-trend-badge.-empty { color: #505a6b; background: none; }
+    .stx-trend-value { font-size: 13.5px; color: #eaeef5; font-weight: 600; }
+    .stx-trend-year { font-size: 11.5px; color: #8490a4; }
+    .stx-trend-year.-current { color: #4d8eff; font-weight: 700; }
+
+    @media (min-width: 1024px) {
+      .stx-trend-chart { height: 128px; }
+      .stx-trend-value { font-size: 15px; }
+      .stx-trend-badge { font-size: 11.5px; }
+    }
 
     @media (min-width: 640px) {
       .stx-hero { grid-template-columns: repeat(4, 1fr); }
@@ -803,36 +821,87 @@ showCopied();
             return;
           }
 
+          var W = 600, H = 110, padX = 3, padTop = 12, padBottom = 12;
+          var n = points.length;
           var maxHours = Math.max.apply(null, points.map(function (p) { return p.hours; })) || 1;
+          var range = maxHours || 1;
 
-          mount.innerHTML = '<div class="stx-trend-bars">' + points.map(function (p, i) {
-            var pct = Math.max((p.hours / maxHours) * 100, 2);
-            var deltaHtml = '';
-            if (i > 0) {
+          function xFor(i) {
+            return n === 1 ? W / 2 : padX + (i / (n - 1)) * (W - padX * 2);
+          }
+          function yFor(hours) {
+            var t = hours / range;
+            return H - padBottom - t * (H - padTop - padBottom);
+          }
+
+          var coords = points.map(function (p, i) { return { x: xFor(i), y: yFor(p.hours) }; });
+
+          var linePath = coords.map(function (c, i) {
+            return (i === 0 ? 'M' : 'L') + c.x.toFixed(1) + ' ' + c.y.toFixed(1);
+          }).join(' ');
+          var lastX = coords[coords.length - 1].x.toFixed(1);
+          var firstX = coords[0].x.toFixed(1);
+          var areaPath = linePath + ' L' + lastX + ' ' + H + ' L' + firstX + ' ' + H + ' Z';
+
+          var dotsSvg = coords.map(function (c, i) {
+            var isCurrent = i === coords.length - 1;
+            return '<circle class="stx-trend-dot' + (isCurrent ? ' -current' : '') + '" cx="' + c.x.toFixed(1) + '" cy="' + c.y.toFixed(1) + '" r="' + (isCurrent ? 4 : 3) + '"></circle>';
+          }).join('');
+
+          var svg =
+            '<svg class="stx-trend-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+              '<defs><linearGradient id="stxTrendFill" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="#4d8eff" stop-opacity="0.3"></stop>' +
+                '<stop offset="100%" stop-color="#4d8eff" stop-opacity="0"></stop>' +
+              '</linearGradient></defs>' +
+              '<path class="stx-trend-area" d="' + areaPath + '" fill="url(#stxTrendFill)"></path>' +
+              '<path class="stx-trend-line" d="' + linePath + '" fill="none"></path>' +
+              dotsSvg +
+            '</svg>';
+
+          var colsHtml = points.map(function (p, i) {
+            var badgeHtml;
+            if (i === 0) {
+              badgeHtml = '<span class="stx-trend-badge -empty">–</span>';
+            } else {
               var prev = points[i - 1].hours;
               if (prev > 0) {
                 var change = ((p.hours - prev) / prev) * 100;
                 var dir = change > 1 ? '-up' : (change < -1 ? '-down' : '-flat');
+                var arrow = change > 1 ? '&#9650;' : (change < -1 ? '&#9660;' : '');
                 var sign = change > 0 ? '+' : '';
-                deltaHtml = '<span class="stx-trend-delta ' + dir + '">' + sign + fmt1(change) + '%</span>';
+                badgeHtml = '<span class="stx-trend-badge ' + dir + '">' + (arrow ? '<span class="arrow">' + arrow + '</span>' : '') + sign + fmt1(change) + '%</span>';
               } else if (p.hours > 0) {
-                deltaHtml = '<span class="stx-trend-delta -up">New</span>';
+                badgeHtml = '<span class="stx-trend-badge -up"><span class="arrow">&#9650;</span>New</span>';
+              } else {
+                badgeHtml = '<span class="stx-trend-badge -empty">–</span>';
               }
             }
             var isCurrent = String(p.year) === String(YEARS[0]);
             return (
               '<div class="stx-trend-col">' +
-                deltaHtml +
+                badgeHtml +
                 '<span class="stx-trend-value numbers">' + fmt1(p.hours) + 'h</span>' +
-                '<div class="stx-trend-bar-track"><div class="stx-trend-bar" data-target="' + pct + '" style="height:0%"></div></div>' +
                 '<span class="stx-trend-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
               '</div>'
             );
-          }).join('') + '</div>';
+          }).join('');
+
+          mount.innerHTML =
+            '<div class="stx-trend">' +
+              '<div class="stx-trend-chart" id="stx-trend-chart">' + svg + '</div>' +
+              '<div class="stx-trend-cols">' + colsHtml + '</div>' +
+            '</div>';
 
           requestAnimationFrame(function () {
-            mount.querySelectorAll('.stx-trend-bar').forEach(function (el) {
-              el.style.height = el.dataset.target + '%';
+            var lineEl = mount.querySelector('.stx-trend-line');
+            if (lineEl) {
+              var len = lineEl.getTotalLength();
+              lineEl.style.setProperty('--line-len', len);
+            }
+            requestAnimationFrame(function () {
+              var chartEl = document.getElementById('stx-trend-chart');
+              if (chartEl) chartEl.classList.add('-visible');
             });
           });
 
