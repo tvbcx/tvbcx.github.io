@@ -757,9 +757,8 @@ showCopied();
         showLoading();
         metaLine.textContent = '';
         var showList = STATS_YEARS[year] || [];
-        var ids = showList.map(function (s) { return s.imdb; });
 
-        TVStats.fetchAll(ids).then(function (records) {
+        TVStats.fetchAll(showList).then(function (records) {
           if (currentYear !== year) return;
           var summary = TVStats.aggregate(showList, records);
           summaryCache[year] = summary;
