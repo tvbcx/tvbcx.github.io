@@ -504,7 +504,7 @@
     </a>
 
     <div class="last-watched" id="last-watched-section" hidden>
-      <span class="last-watched-label">Last Watch</span>
+      <span class="last-watched-label" id="last-watched-label">Last Watch</span>
       <div class="last-watched-line" aria-hidden="true"></div>
       <div class="card last-watched-poster">
         <div class="last-watched-media" id="last-watched-media">
@@ -769,12 +769,37 @@ showCopied();
       var mediaEl = document.getElementById('last-watched-media');
       var trailerEl = document.getElementById('last-watched-trailer');
 
+      function loadYouTubeAPI(callback) {
+        if (window.YT && window.YT.Player) { callback(); return; }
+        var existing = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+          if (existing) existing();
+          callback();
+        };
+        if (!document.getElementById('youtube-iframe-api')) {
+          var tag = document.createElement('script');
+          tag.id = 'youtube-iframe-api';
+          tag.src = 'https://www.youtube.com/iframe_api';
+          document.head.appendChild(tag);
+        }
+      }
+
+      function revertToPoster() {
+        mediaEl.classList.remove('-trailer-active');
+        section.classList.remove('-trailer-active');
+        var labelEl = document.getElementById('last-watched-label');
+        if (labelEl) labelEl.textContent = 'Last Watch';
+        // wait for the fade/aspect-ratio transition to finish before actually removing the player
+        setTimeout(function () { trailerEl.innerHTML = ''; }, 900);
+      }
+
       function playTrailer(key) {
         if (!mediaEl || !trailerEl || !key) return;
         var iframe = document.createElement('iframe');
+        iframe.id = 'last-watched-trailer-iframe';
         iframe.src = 'https://www.youtube.com/embed/' + key +
-          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=' + key +
-          '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0';
+          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1' +
+          '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0&enablejsapi=1&origin=' + window.location.origin;
         iframe.title = 'Trailer';
         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
@@ -794,6 +819,38 @@ showCopied();
         requestAnimationFrame(function () {
           mediaEl.classList.add('-trailer-active');
           section.classList.add('-trailer-active');
+          var labelEl = document.getElementById('last-watched-label');
+          if (labelEl && lastWatched.title) {
+            labelEl.textContent = 'Last Watch: ' + lastWatched.title;
+          }
+        });
+
+        // watch for the trailer actually ending, then fade back to the poster;
+        // also try to get sound on as early as possible (browsers block unmuted
+        // autoplay outright, so we attempt it immediately, then guarantee it on
+        // the visitor's very first interaction with the page)
+        loadYouTubeAPI(function () {
+          if (!document.getElementById('last-watched-trailer-iframe')) return;
+          var player = new YT.Player('last-watched-trailer-iframe', {
+            events: {
+              onReady: function (e) {
+                try { e.target.unMute(); e.target.setVolume(100); } catch (err) {}
+              },
+              onStateChange: function (e) {
+                if (e.data === YT.PlayerState.ENDED) revertToPoster();
+              }
+            }
+          });
+
+          var unmuteOnInteraction = function () {
+            try { player.unMute(); player.setVolume(100); } catch (err) {}
+            ['click', 'touchstart', 'keydown', 'scroll'].forEach(function (evt) {
+              document.removeEventListener(evt, unmuteOnInteraction);
+            });
+          };
+          ['click', 'touchstart', 'keydown', 'scroll'].forEach(function (evt) {
+            document.addEventListener(evt, unmuteOnInteraction, { once: true, passive: true });
+          });
         });
       }
 
