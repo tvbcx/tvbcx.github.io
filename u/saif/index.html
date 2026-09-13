@@ -143,22 +143,24 @@
       }
 
       .profile-stats-embed .stats-hero-card::before {
+        display: none;
         background: none;
       }
       .profile-stats-embed .stats-hero-card::after {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 2px;
+        display: none;
       }
-      .profile-stats-embed .stats-hero-card:nth-child(1)::after { background: #5b8ecb; }
-      .profile-stats-embed .stats-hero-card:nth-child(1) .value { color: #5b8ecb; }
-
-      .profile-stats-embed .stats-hero-card:nth-child(2)::after { background: #9b8bc4; }
-      .profile-stats-embed .stats-hero-card:nth-child(2) .value { color: #9b8bc4; }
-
-      .profile-stats-embed .stats-hero-card:nth-child(3)::after { background: #c9a06b; }
-      .profile-stats-embed .stats-hero-card:nth-child(3) .value { color: #c9a06b; }
+      .profile-stats-embed .stats-hero-card .value {
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: initial;
+        color: #fff;
+      }
+      .profile-stats-embed .stats-hero-card:nth-child(1) .value,
+      .profile-stats-embed .stats-hero-card:nth-child(2) .value,
+      .profile-stats-embed .stats-hero-card:nth-child(3) .value {
+        color: #fff;
+      }
 
       .profile-favorites {
         margin-bottom: 12px !important;
@@ -907,7 +909,7 @@ showCopied();
                   toggleBtn.classList.remove('-paused');
                   if (!hasStartedRevertTimer) {
                     hasStartedRevertTimer = true;
-                    autoRevertTimer = setTimeout(revertToPoster, 12000);
+                    autoRevertTimer = setTimeout(revertToPoster, 17000);
                   }
                 }
                 else if (e.data === YT.PlayerState.PAUSED) toggleBtn.classList.add('-paused');
