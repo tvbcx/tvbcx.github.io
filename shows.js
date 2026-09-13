@@ -46,7 +46,7 @@ var SHOWS = [
   { title: "The Last of Us",                     imdb: "tt3581920",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 26 },
   { title: "Dune: Prophecy",                     imdb: "tt10466872", src: "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358056.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 27 },
   { title: "Adolescence",                        imdb: "tt31806037", src: "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg",       rating: 4.5  , journalYear: 2025, journalOrder: 28 },
-  { title: "Silo",                         imdb: "tt14688458",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31 },
+  { title: "Silo",                         imdb: "tt14688458",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31, seasons: [3] },
 
   // DNF
   { title: "Succession",                         imdb: "tt7660850",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/453/1134275.jpg",       rating: null, list: "dnf" },
