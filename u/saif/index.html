@@ -507,9 +507,12 @@
       <span class="last-watched-label">Last Watch</span>
       <div class="last-watched-line" aria-hidden="true"></div>
       <div class="card last-watched-poster">
-        <a href="#" id="last-watched-link">
-          <img id="last-watched-img" src="" alt="" width="150" height="225" decoding="async">
-        </a>
+        <div class="last-watched-media" id="last-watched-media">
+          <a href="#" id="last-watched-link" class="last-watched-poster-link">
+            <img id="last-watched-img" src="" alt="" width="150" height="225" decoding="async" class="last-watched-poster-img">
+          </a>
+          <div class="last-watched-trailer" id="last-watched-trailer" aria-hidden="true"></div>
+        </div>
         <p class="rating" id="last-watched-rating"></p>
       </div>
     </div>
@@ -719,6 +722,12 @@ showCopied();
   </script>
 
   <script>
+    // Paste your free TMDB API key (v3 auth) here to turn on the "Last Watch" trailer.
+    // Get one at https://www.themoviedb.org/settings/api — leave blank to just show the poster.
+    window.TMDB_API_KEY = "6cb6e1dc603bc65ffb6198489d5bc5b7";
+  </script>
+
+  <script>
     (function () {
       function starGlyph(v) {
         var full = Math.floor(v);
@@ -754,6 +763,57 @@ showCopied();
       }
 
       section.hidden = false;
+
+      // --- Trailer: fetched from TMDB, swapped in exactly 2s after the page opens ---
+      var TMDB_API_KEY = window.TMDB_API_KEY || '';
+      var mediaEl = document.getElementById('last-watched-media');
+      var trailerEl = document.getElementById('last-watched-trailer');
+
+      function playTrailer(key) {
+        if (!mediaEl || !trailerEl || !key) return;
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + key +
+          '?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=' + key;
+        iframe.title = 'Trailer';
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.frameBorder = '0';
+        trailerEl.appendChild(iframe);
+        // next frame so the aspect-ratio/opacity transition actually animates
+        requestAnimationFrame(function () {
+          mediaEl.classList.add('-trailer-active');
+        });
+      }
+
+      function fetchTrailerKey(imdbId) {
+        return fetch('https://api.themoviedb.org/3/find/' + imdbId + '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id')
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var hit = (data.tv_results && data.tv_results[0])
+              ? { id: data.tv_results[0].id, type: 'tv' }
+              : (data.movie_results && data.movie_results[0])
+                ? { id: data.movie_results[0].id, type: 'movie' }
+                : null;
+            if (!hit) return null;
+            return fetch('https://api.themoviedb.org/3/' + hit.type + '/' + hit.id + '/videos?api_key=' + TMDB_API_KEY)
+              .then(function (r) { return r.json(); })
+              .then(function (vdata) {
+                var vids = (vdata.results || []).filter(function (v) { return v.site === 'YouTube'; });
+                var pick = vids.find(function (v) { return v.type === 'Trailer' && v.official; })
+                  || vids.find(function (v) { return v.type === 'Trailer'; })
+                  || vids.find(function (v) { return v.type === 'Teaser'; })
+                  || vids[0];
+                return pick ? pick.key : null;
+              });
+          });
+      }
+
+      if (TMDB_API_KEY && lastWatched.imdb) {
+        var twoSecondTimer = new Promise(function (resolve) { setTimeout(resolve, 2000); });
+        Promise.all([fetchTrailerKey(lastWatched.imdb), twoSecondTimer])
+          .then(function (results) { playTrailer(results[0]); })
+          .catch(function () { /* no trailer found - poster just stays put */ });
+      }
     })();
   </script>
 
