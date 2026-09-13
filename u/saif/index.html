@@ -453,7 +453,7 @@
     <div class="profile-stats js-profile-stats">
       <h4 class="profile-statistic statistic">
         <a href="/u/saif/watched/">
-          <span class="value numbers" id="shows-count">85</span>
+          <span class="value numbers" id="shows-count">–</span>
           <span class="definition title-all-caps -small">Shows</span>
         </a>
       </h4>
@@ -764,10 +764,12 @@ showCopied();
 
       section.hidden = false;
 
-      // --- Trailer: fetched from TMDB, swapped in exactly 2s after the page opens ---
+      // --- Trailer: fetched from TMDB, swapped in exactly 3.5s after the page opens ---
       var TMDB_API_KEY = window.TMDB_API_KEY || '';
       var mediaEl = document.getElementById('last-watched-media');
       var trailerEl = document.getElementById('last-watched-trailer');
+      var reverted = true; // becomes false once a trailer actually starts playing
+      var autoRevertTimer = null;
 
       function loadYouTubeAPI(callback) {
         if (window.YT && window.YT.Player) { callback(); return; }
@@ -785,6 +787,9 @@ showCopied();
       }
 
       function revertToPoster() {
+        if (reverted) return;
+        reverted = true;
+        if (autoRevertTimer) { clearTimeout(autoRevertTimer); autoRevertTimer = null; }
         // Hide the iframe immediately (no transition) so YouTube's own end-of-video
         // "more videos" screen never has a chance to flash before we fade to the poster.
         trailerEl.style.transition = 'none';
@@ -803,10 +808,13 @@ showCopied();
 
       function playTrailer(key) {
         if (!mediaEl || !trailerEl || !key) return;
+        reverted = false;
+        // Hard cap: revert to the poster after 9s no matter how long the trailer actually is.
+        autoRevertTimer = setTimeout(revertToPoster, 9000);
         var iframe = document.createElement('iframe');
         iframe.id = 'last-watched-trailer-iframe';
         iframe.src = 'https://www.youtube.com/embed/' + key +
-          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1' +
+          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&playsinline=1' +
           '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0&enablejsapi=1&origin=' + window.location.origin;
         iframe.title = 'Trailer';
         // No "picture-in-picture" here on purpose: granting that permission is what lets
@@ -859,6 +867,19 @@ showCopied();
           requestUnmute();
         });
 
+        // "Open in YouTube" pill - same row as the unmute pill, right-aligned.
+        var youtubeLink = document.createElement('a');
+        youtubeLink.className = 'last-watched-trailer-youtube';
+        youtubeLink.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(key);
+        youtubeLink.target = '_blank';
+        youtubeLink.rel = 'noopener noreferrer';
+        youtubeLink.setAttribute('aria-label', 'Open trailer in YouTube');
+        youtubeLink.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>' +
+          '<span>Open in YouTube</span>';
+        youtubeLink.addEventListener('click', function (e) { e.stopPropagation(); });
+        trailerEl.appendChild(youtubeLink);
+
         toggleBtn.addEventListener('click', function () {
           if (!player || typeof player.getPlayerState !== 'function') return;
           var state;
@@ -876,7 +897,12 @@ showCopied();
           section.classList.add('-trailer-active');
           var labelEl = document.getElementById('last-watched-label');
           if (labelEl && lastWatched.title) {
-            labelEl.textContent = 'Last Watch: ' + lastWatched.title;
+            var titleLink = document.createElement('a');
+            titleLink.className = 'last-watched-title-link';
+            titleLink.href = '/show/?imdb=' + encodeURIComponent(lastWatched.imdb);
+            titleLink.textContent = lastWatched.title;
+            labelEl.textContent = 'Last Watch: ';
+            labelEl.appendChild(titleLink);
           }
         });
 
@@ -921,8 +947,8 @@ showCopied();
       }
 
       if (TMDB_API_KEY && lastWatched.imdb) {
-        var twoSecondTimer = new Promise(function (resolve) { setTimeout(resolve, 2000); });
-        Promise.all([fetchTrailerKey(lastWatched.imdb), twoSecondTimer])
+        var startDelayTimer = new Promise(function (resolve) { setTimeout(resolve, 3500); });
+        Promise.all([fetchTrailerKey(lastWatched.imdb), startDelayTimer])
           .then(function (results) { playTrailer(results[0]); })
           .catch(function () { /* no trailer found - poster just stays put */ });
       }
