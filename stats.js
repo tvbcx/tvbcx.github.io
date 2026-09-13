@@ -3,7 +3,7 @@ var STATS_YEARS = (function () {
   SHOWS.filter(function (s) { return !!s.journalYear; })
     .sort(function (a, b) { return a.journalOrder - b.journalOrder; })
     .forEach(function (s) {
-      (byYear[s.journalYear] = byYear[s.journalYear] || []).push({ title: s.title, imdb: s.imdb });
+      (byYear[s.journalYear] = byYear[s.journalYear] || []).push({ title: s.title, imdb: s.imdb, seasons: s.seasons || null });
     });
   return byYear;
 })();
@@ -39,9 +39,14 @@ var STATS_YEARS = (function () {
     name: null
   });
 
-  function readCache(imdbId) {
+  function cacheKeyFor(imdbId, seasons) {
+    if (!seasons || !seasons.length) return imdbId;
+    return imdbId + ':s' + seasons.slice().sort(function (a, b) { return a - b; }).join(',');
+  }
+
+  function readCache(cacheKey) {
     try {
-      var raw = localStorage.getItem(CACHE_PREFIX + imdbId);
+      var raw = localStorage.getItem(CACHE_PREFIX + cacheKey);
       if (!raw) return null;
       var parsed = JSON.parse(raw);
       if (!parsed || parsed.v !== CACHE_VERSION || (Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
@@ -51,9 +56,9 @@ var STATS_YEARS = (function () {
     }
   }
 
-  function writeCache(imdbId, data) {
+  function writeCache(cacheKey, data) {
     try {
-      localStorage.setItem(CACHE_PREFIX + imdbId, JSON.stringify({ data: data, ts: Date.now(), v: CACHE_VERSION }));
+      localStorage.setItem(CACHE_PREFIX + cacheKey, JSON.stringify({ data: data, ts: Date.now(), v: CACHE_VERSION }));
     } catch (e) {}
   }
 
@@ -63,16 +68,7 @@ var STATS_YEARS = (function () {
     return isNaN(y) ? null : y;
   }
 
-  function normalizeShow(show) {
-    if (!show) return EMPTY_RECORD;
-
-    var episodes = show.number_of_episodes || 0;
-    var seasons = show.number_of_seasons || 0;
-    var runtimes = show.episode_run_time || [];
-    var avgRuntime = runtimes.length
-      ? runtimes.reduce(function (a, b) { return a + b; }, 0) / runtimes.length
-      : DEFAULT_RUNTIME_MIN;
-
+  function sharedFields(show) {
     var genres = (show.genres || []).map(function (g) { return g.name; });
     var networks = (show.networks || []).map(function (n) { return n.name; });
     var creators = (show.created_by || []).map(function (c) { return c.name; });
@@ -84,9 +80,6 @@ var STATS_YEARS = (function () {
     if (!languages.length && show.original_language) languages = [show.original_language.toUpperCase()];
 
     return {
-      episodes: episodes,
-      seasons: seasons,
-      minutes: episodes * avgRuntime,
       genres: genres.length ? genres : ['Unspecified'],
       networks: networks.length ? networks : ['Independent / Other'],
       creators: creators.length ? creators : ['Unattributed'],
@@ -95,16 +88,74 @@ var STATS_YEARS = (function () {
       rating: typeof show.vote_average === 'number' ? show.vote_average : 0,
       votes: show.vote_count || 0,
       popularity: show.popularity || 0,
-      firstYear: yearFromDate(show.first_air_date),
-      lastYear: yearFromDate(show.last_air_date),
       status: show.status || null,
       poster: show.poster_path ? (TMDB_POSTER_BASE + show.poster_path) : null,
       name: show.name || null
     };
   }
 
-  function fetchShowRecord(imdbId) {
-    var cached = readCache(imdbId);
+  // Whole-show record (no seasons filter): matches original behavior.
+  function normalizeShow(show) {
+    if (!show) return EMPTY_RECORD;
+
+    var episodes = show.number_of_episodes || 0;
+    var seasons = show.number_of_seasons || 0;
+    var runtimes = show.episode_run_time || [];
+    var avgRuntime = runtimes.length
+      ? runtimes.reduce(function (a, b) { return a + b; }, 0) / runtimes.length
+      : DEFAULT_RUNTIME_MIN;
+
+    var base = sharedFields(show);
+    base.episodes = episodes;
+    base.seasons = seasons;
+    base.minutes = episodes * avgRuntime;
+    base.firstYear = yearFromDate(show.first_air_date);
+    base.lastYear = yearFromDate(show.last_air_date);
+    return base;
+  }
+
+  // Season-restricted record: only counts the specific season(s) actually watched.
+  function normalizeShowSeasons(show, seasonsData) {
+    if (!show) return EMPTY_RECORD;
+
+    var showRuntimes = show.episode_run_time || [];
+    var fallbackRuntime = showRuntimes.length
+      ? showRuntimes.reduce(function (a, b) { return a + b; }, 0) / showRuntimes.length
+      : DEFAULT_RUNTIME_MIN;
+
+    var allEpisodes = [];
+    seasonsData.forEach(function (season) {
+      (season.episodes || []).forEach(function (ep) { allEpisodes.push(ep); });
+    });
+
+    var minutes = allEpisodes.reduce(function (sum, ep) {
+      return sum + (typeof ep.runtime === 'number' && ep.runtime > 0 ? ep.runtime : fallbackRuntime);
+    }, 0);
+
+    var years = [];
+    allEpisodes.forEach(function (ep) {
+      var y = yearFromDate(ep.air_date);
+      if (y) years.push(y);
+    });
+    seasonsData.forEach(function (season) {
+      var y = yearFromDate(season.air_date);
+      if (y) years.push(y);
+    });
+
+    var base = sharedFields(show);
+    base.episodes = allEpisodes.length;
+    base.seasons = seasonsData.length;
+    base.minutes = minutes;
+    base.firstYear = years.length ? Math.min.apply(null, years) : yearFromDate(show.first_air_date);
+    base.lastYear = years.length ? Math.max.apply(null, years) : yearFromDate(show.last_air_date);
+    return base;
+  }
+
+  function fetchShowRecord(imdbId, seasonNumbers) {
+    var hasSeasons = !!(seasonNumbers && seasonNumbers.length);
+    var cacheKey = cacheKeyFor(imdbId, seasonNumbers);
+
+    var cached = readCache(cacheKey);
     if (cached) return Promise.resolve(cached);
 
     var findUrl = TMDB_BASE + '/find/' + encodeURIComponent(imdbId) +
@@ -116,11 +167,28 @@ var STATS_YEARS = (function () {
         var match = found && found.tv_results && found.tv_results[0];
         if (!match) return null;
         return fetch(TMDB_BASE + '/tv/' + match.id + '?api_key=' + TMDB_API_KEY)
-          .then(function (res) { return res.ok ? res.json() : null; });
+          .then(function (res) { return res.ok ? res.json() : null; })
+          .then(function (show) {
+            if (!show) return null;
+            if (!hasSeasons) return { show: show, seasonsData: null };
+            return Promise.all(seasonNumbers.map(function (sn) {
+              return fetch(TMDB_BASE + '/tv/' + match.id + '/season/' + sn + '?api_key=' + TMDB_API_KEY)
+                .then(function (res) { return res.ok ? res.json() : null; });
+            })).then(function (seasonsData) {
+              return { show: show, seasonsData: seasonsData.filter(Boolean) };
+            });
+          });
       })
-      .then(function (show) {
-        var record = normalizeShow(show);
-        writeCache(imdbId, record);
+      .then(function (result) {
+        var record;
+        if (!result) {
+          record = EMPTY_RECORD;
+        } else if (hasSeasons) {
+          record = result.seasonsData.length ? normalizeShowSeasons(result.show, result.seasonsData) : normalizeShow(result.show);
+        } else {
+          record = normalizeShow(result.show);
+        }
+        writeCache(cacheKey, record);
         return record;
       })
       .catch(function () {
@@ -128,16 +196,16 @@ var STATS_YEARS = (function () {
       });
   }
 
-  function fetchAll(imdbIds) {
+  function fetchAll(showList) {
     var CONCURRENCY = 5;
-    var queue = imdbIds.slice();
+    var queue = showList.slice();
     var results = {};
 
     function worker() {
-      var id = queue.shift();
-      if (!id) return Promise.resolve();
-      return fetchShowRecord(id).then(function (record) {
-        results[id] = record;
+      var item = queue.shift();
+      if (!item) return Promise.resolve();
+      return fetchShowRecord(item.imdb, item.seasons).then(function (record) {
+        results[item.imdb] = record;
         return worker();
       });
     }
