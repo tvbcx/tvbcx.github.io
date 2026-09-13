@@ -142,6 +142,66 @@
         max-width: 110px;
       }
 
+      /* Give the sidebar stats card the same vivid, distinct-per-metric look as /stats/ */
+      .profile-stats-embed .section-heading {
+        background: linear-gradient(120deg, #fff, #b3c2db);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 8px;
+      }
+      .profile-stats-embed .stats-hero-card {
+        background: linear-gradient(165deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 45%), #0c1420;
+        overflow: hidden;
+      }
+      .profile-stats-embed .stats-hero-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        opacity: 0.9;
+      }
+      .profile-stats-embed .stats-hero-card:nth-child(1)::before { background: radial-gradient(circle, rgba(77,212,255,0.18) 0%, rgba(77,212,255,0) 65%); }
+      .profile-stats-embed .stats-hero-card:nth-child(1)::after { background: linear-gradient(90deg, #4dd4ff, #4d8eff); }
+      .profile-stats-embed .stats-hero-card:nth-child(1) .value { background: linear-gradient(180deg, #eaf8ff 0%, #4dd4ff 65%, #4d8eff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+      .profile-stats-embed .stats-hero-card:nth-child(2)::before { background: radial-gradient(circle, rgba(199,146,234,0.18) 0%, rgba(199,146,234,0) 65%); }
+      .profile-stats-embed .stats-hero-card:nth-child(2)::after { background: linear-gradient(90deg, #c792ea, #8f6bff); }
+      .profile-stats-embed .stats-hero-card:nth-child(2) .value { background: linear-gradient(180deg, #f2e8ff 0%, #c792ea 65%, #8f6bff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+      .profile-stats-embed .stats-hero-card:nth-child(3)::before { background: radial-gradient(circle, rgba(255,184,77,0.18) 0%, rgba(255,184,77,0) 65%); }
+      .profile-stats-embed .stats-hero-card:nth-child(3)::after { background: linear-gradient(90deg, #ffb84d, #ff6b6b); }
+      .profile-stats-embed .stats-hero-card:nth-child(3) .value { background: linear-gradient(180deg, #fff3e0 0%, #ffb84d 65%, #ff6b6b 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+      .profile-stats-embed .stats-donut-panel {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(165deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 45%), #0c1420;
+      }
+      .profile-stats-embed .stats-donut-panel::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #5eead4, #4d8eff, #c792ea);
+        opacity: 0.9;
+      }
+      .profile-stats-embed .stats-donut-panel::after {
+        content: '';
+        position: absolute;
+        top: -40%; right: -20%;
+        width: 60%;
+        aspect-ratio: 1;
+        background: radial-gradient(circle, rgba(94,234,212,0.12), rgba(94,234,212,0) 70%);
+        pointer-events: none;
+      }
+
+      .profile-stats-embed .stats-legend-value .numbers {
+        color: #dde2eb;
+      }
+
       .profile-favorites {
         margin-bottom: 12px !important;
       }
@@ -1034,8 +1094,8 @@ showCopied();
 
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
-      var PALETTE = ['#4d8eff', '#29a6ff', '#8cb2f2', '#4b84e8', '#b3c2db', '#a2acbe', '#8490a4', '#4a628c', '#405585'];
-      var OTHER_COLOR = '#30405a';
+      var PALETTE = ['#4d8eff', '#ff6b6b', '#ffb84d', '#5eead4', '#c792ea', '#4dd4ff', '#ff8fb1', '#a8e063', '#ffd166'];
+      var OTHER_COLOR = '#3a4a63';
 
       function colorFor(item, i) {
         return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
