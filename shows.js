@@ -31,7 +31,6 @@ var SHOWS = [
   { title: "Breaking Bad",                       imdb: "tt0903747",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/35/87912.jpg",         rating: 5    },
   { title: "The Boys",                           imdb: "tt1190634",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/619/1547768.jpg",       rating: 4    , journalYear: 2022, journalOrder: 7 },
   { title: "The Last Kingdom",                   imdb: "tt4179452",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/110/275998.jpg",       rating: 3.5  , journalYear: 2022, journalOrder: 4 },
-  { title: "Silo",                               imdb: "tt14688458", src: "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg",       rating: 3    },
   { title: "Banshee",                            imdb: "tt2017109",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/504/1260183.jpg",       rating: 4    },
   { title: "From",                               imdb: "tt9813792",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/621/1554646.jpg",       rating: 3.5  , journalYear: 2023, journalOrder: 15 },
   { title: "The Night Of",                       imdb: "tt2401256",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/62/156270.jpg",         rating: 3    },
@@ -47,7 +46,7 @@ var SHOWS = [
   { title: "The Last of Us",                     imdb: "tt3581920",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 26 },
   { title: "Dune: Prophecy",                     imdb: "tt10466872", src: "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358056.jpg",       rating: 3.5  , journalYear: 2025, journalOrder: 27 },
   { title: "Adolescence",                        imdb: "tt31806037", src: "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg",       rating: 4.5  , journalYear: 2025, journalOrder: 28 },
-  { title: "Your Honor",                         imdb: "tt7440726",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/287/717558.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31 },
+  { title: "Silo",                         imdb: "tt14688458",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg",       rating: 3.5  , journalYear: 2026, journalOrder: 31 },
 
   // DNF
   { title: "Succession",                         imdb: "tt7660850",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/453/1134275.jpg",       rating: null, list: "dnf" },
