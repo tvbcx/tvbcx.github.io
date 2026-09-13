@@ -22,9 +22,9 @@
 
     .stx-top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
     .stx-top-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .stx-title { margin: 0; font-size: 1.5rem; line-height: 1.15; display: flex; align-items: baseline; gap: 9px; }
-    .stx-title .numbers { font-weight: 500; background: linear-gradient(120deg, #4dd4ff, #4d8eff 55%, #c792ea); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .stx-title-label { background: linear-gradient(120deg, #fff, #b3c2db); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stx-title { margin: 0; font-size: 1.5rem; line-height: 1.15; color: #fff; display: flex; align-items: baseline; gap: 9px; }
+    .stx-title .numbers { color: #5b8ecb; font-weight: 500; }
+    .stx-title-label { color: #eaeef5; }
     .stx-meta { margin: 0; font-size: 12.5px; color: #8490a4; min-height: 1.4em; }
     .stx-meta strong { color: #b3c2db; font-weight: 600; }
     .stx-meta .numbers { color: #b3c2db; }
@@ -45,8 +45,7 @@
     .stx-hero-item.-visible { opacity: 1; transform: scale(1) translateY(0); }
 
     .stx-hero-circle { position: relative; width: 92px; height: 92px; border-radius: 50%; flex: none; background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.07), rgba(255,255,255,0) 62%),
-        radial-gradient(circle at 60% 70%, var(--stat-glow, transparent), rgba(0,0,0,0) 70%),
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.05), rgba(255,255,255,0) 62%),
         #0e1626;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 10px 26px rgba(0,0,0,0.4);
       transition: transform 0.25s ease, box-shadow 0.25s ease; }
@@ -57,7 +56,6 @@
     .stx-hero-ring-track { fill: none; stroke: rgba(208,222,235,0.14); stroke-width: 6; }
     .stx-hero-ring-fill { fill: none; stroke: var(--stat-color, #4E81B3); stroke-width: 6; stroke-linecap: round;
       stroke-dasharray: 327; stroke-dashoffset: 327;
-      filter: drop-shadow(0 0 7px var(--stat-glow, rgba(78,129,179,0.5)));
       transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1) 0.05s; }
     .stx-hero-item.-visible .stx-hero-ring-fill { stroke-dashoffset: var(--ring-offset, 90); }
 
@@ -71,10 +69,9 @@
 
     .stx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
 
-    .stx-panel { position: relative; background: linear-gradient(165deg, rgba(255,255,255,0.025), rgba(255,255,255,0) 40%), #0c1420; border: 1px solid #1e2a3e; border-radius: 14px; padding: 18px; min-width: 0; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease; overflow: hidden; }
+    .stx-panel { position: relative; background-color: #0b121e; border: 1px solid #1e2a3e; border-radius: 14px; padding: 18px; min-width: 0; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease; overflow: hidden; }
     .stx-panel.-visible { opacity: 1; transform: translateY(0); }
-    .stx-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--panel-accent, linear-gradient(90deg, #4d8eff, #4dd4ff)); opacity: 0.85; }
-    .stx-panel::after { content: ''; position: absolute; top: -40%; right: -20%; width: 60%; aspect-ratio: 1; background: var(--panel-glow, radial-gradient(circle, rgba(77,142,255,0.10), rgba(77,142,255,0) 70%)); pointer-events: none; }
+    .stx-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--panel-accent, #4d8eff); }
 
     .stx-panel-head { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e2a3e; }
     .stx-panel-title { margin: 0; font-size: 12.2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(234,238,245,0.55); }
@@ -117,6 +114,21 @@
     .stx-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid #1e2a3e; border-radius: 999px; background-color: rgba(255,255,255,0.02); font-size: 12px; color: #a2acbe; }
     .stx-chip .pct { font-variant-numeric: tabular-nums; color: var(--panel-tint, #4d8eff); font-weight: 600; }
 
+    .stx-page .numbers { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+    .stx-hero-value { font-weight: 700; letter-spacing: -0.02em; }
+
+    .stx-trend-bars { display: flex; align-items: flex-end; gap: 14px; height: 148px; padding: 0 2px; }
+    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; }
+    .stx-trend-delta { font-size: 11px; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap; }
+    .stx-trend-delta.-up { color: #6bb3a0; }
+    .stx-trend-delta.-down { color: #c97b7b; }
+    .stx-trend-delta.-flat { color: #8490a4; }
+    .stx-trend-value { font-size: 13px; color: #eaeef5; font-weight: 600; }
+    .stx-trend-bar-track { width: 100%; max-width: 56px; flex: 1; display: flex; align-items: flex-end; }
+    .stx-trend-bar { width: 100%; border-radius: 6px 6px 2px 2px; background-color: #5b8ecb; min-height: 3px; transition: height 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .stx-trend-year { font-size: 12px; color: #8490a4; }
+    .stx-trend-year.-current { color: #eaeef5; font-weight: 600; }
+
     @media (min-width: 640px) {
       .stx-hero { grid-template-columns: repeat(4, 1fr); }
     }
@@ -136,6 +148,7 @@
       .stx-span-7 { grid-column: span 7; }
       .stx-span-5 { grid-column: span 5; }
       .stx-span-6 { grid-column: span 6; }
+      .stx-span-12 { grid-column: span 12; }
 
       .stx-panel:hover { border-color: #263449; }
     }
@@ -217,14 +230,11 @@
       <div id="stats-content" hidden>
 
         <section class="stx-hero" id="section-hero">
-          <div class="stx-hero-item" style="--stat-color:#4dd4ff; --stat-color-2:#4d8eff; --stat-glow:rgba(77,212,255,0.55); --ring-offset:59;">
+          <div class="stx-hero-item" style="--stat-color:#5b8ecb; --ring-offset:59;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
-                <defs><linearGradient id="grad-hours" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--stat-color)"/><stop offset="100%" stop-color="var(--stat-color-2)"/>
-                </linearGradient></defs>
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
-                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52" stroke="url(#grad-hours)"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
               </svg>
               <div class="stx-hero-circle-inner">
                 <span class="stx-hero-value numbers" id="stat-hours">0</span>
@@ -232,14 +242,11 @@
             </div>
             <span class="stx-hero-label">Hours Watched</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#c792ea; --stat-color-2:#8f6bff; --stat-glow:rgba(199,146,234,0.55); --ring-offset:98;">
+          <div class="stx-hero-item" style="--stat-color:#9b8bc4; --ring-offset:98;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
-                <defs><linearGradient id="grad-episodes" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--stat-color)"/><stop offset="100%" stop-color="var(--stat-color-2)"/>
-                </linearGradient></defs>
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
-                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52" stroke="url(#grad-episodes)"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
               </svg>
               <div class="stx-hero-circle-inner">
                 <span class="stx-hero-value numbers" id="stat-episodes">0</span>
@@ -247,14 +254,11 @@
             </div>
             <span class="stx-hero-label">Episodes</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#ffb84d; --stat-color-2:#ff6b6b; --stat-glow:rgba(255,184,77,0.5); --ring-offset:147;">
+          <div class="stx-hero-item" style="--stat-color:#c9a06b; --ring-offset:147;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
-                <defs><linearGradient id="grad-seasons" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--stat-color)"/><stop offset="100%" stop-color="var(--stat-color-2)"/>
-                </linearGradient></defs>
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
-                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52" stroke="url(#grad-seasons)"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
               </svg>
               <div class="stx-hero-circle-inner">
                 <span class="stx-hero-value numbers" id="stat-seasons">0</span>
@@ -262,14 +266,11 @@
             </div>
             <span class="stx-hero-label">Seasons</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#5eead4; --stat-color-2:#4d8eff; --stat-glow:rgba(94,234,212,0.45); --ring-offset:114;">
+          <div class="stx-hero-item" style="--stat-color:#6bb3a0; --ring-offset:114;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
-                <defs><linearGradient id="grad-shows" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--stat-color)"/><stop offset="100%" stop-color="var(--stat-color-2)"/>
-                </linearGradient></defs>
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
-                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52" stroke="url(#grad-shows)"></circle>
+                <circle class="stx-hero-ring-fill" cx="60" cy="60" r="52"></circle>
               </svg>
               <div class="stx-hero-circle-inner">
                 <span class="stx-hero-value numbers" id="stat-shows">0</span>
@@ -281,7 +282,15 @@
 
         <div class="stx-grid">
 
-          <section class="stx-panel stx-span-7" id="section-platforms" style="--panel-accent: linear-gradient(90deg, #4d8eff, #4dd4ff); --panel-glow: radial-gradient(circle, rgba(77,142,255,0.14), rgba(77,142,255,0) 70%); --panel-tint: #4dd4ff;">
+          <section class="stx-panel stx-span-12" id="section-trend" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
+            <div class="stx-panel-head">
+              <h2 class="stx-panel-title">Watching Trend</h2>
+              <span class="stx-panel-note" id="trend-insight"></span>
+            </div>
+            <div id="trend-chart-mount"></div>
+          </section>
+
+          <section class="stx-panel stx-span-7" id="section-platforms" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Platforms</h2>
               <span class="stx-panel-note" id="platform-insight"></span>
@@ -290,14 +299,14 @@
             <ul class="stx-dist-legend" id="platform-legend"></ul>
           </section>
 
-          <section class="stx-panel stx-span-5" id="section-highlights" style="--panel-accent: linear-gradient(90deg, #ffb84d, #ff6b6b); --panel-glow: radial-gradient(circle, rgba(255,184,77,0.14), rgba(255,184,77,0) 70%); --panel-tint: #ffb84d;">
+          <section class="stx-panel stx-span-5" id="section-highlights" style="--panel-accent: #c9a06b; --panel-tint: #c9a06b;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Highlights</h2>
             </div>
             <div class="stx-highlight-list" id="highlight-list"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-genres" style="--panel-accent: linear-gradient(90deg, #c792ea, #ff8fb1); --panel-glow: radial-gradient(circle, rgba(199,146,234,0.14), rgba(199,146,234,0) 70%); --panel-tint: #c792ea;">
+          <section class="stx-panel stx-span-6" id="section-genres" style="--panel-accent: #9b8bc4; --panel-tint: #9b8bc4;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Genres</h2>
               <span class="stx-panel-note" id="genre-insight"></span>
@@ -305,7 +314,7 @@
             <div class="stx-bar-list" id="genre-bars"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-creators" style="--panel-accent: linear-gradient(90deg, #5eead4, #4d8eff); --panel-glow: radial-gradient(circle, rgba(94,234,212,0.14), rgba(94,234,212,0) 70%); --panel-tint: #5eead4;">
+          <section class="stx-panel stx-span-6" id="section-creators" style="--panel-accent: #6bb3a0; --panel-tint: #6bb3a0;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Creators</h2>
               <span class="stx-panel-note" id="creator-insight"></span>
@@ -313,14 +322,14 @@
             <div class="stx-bar-list" id="creator-bars"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-countries" style="--panel-accent: linear-gradient(90deg, #a8e063, #5eead4); --panel-glow: radial-gradient(circle, rgba(168,224,99,0.14), rgba(168,224,99,0) 70%); --panel-tint: #a8e063;">
+          <section class="stx-panel stx-span-6" id="section-countries" style="--panel-accent: #93b378; --panel-tint: #93b378;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Countries</h2>
             </div>
             <div class="stx-chip-list" id="country-chips"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-languages" style="--panel-accent: linear-gradient(90deg, #ffd166, #ff6b6b); --panel-glow: radial-gradient(circle, rgba(255,209,102,0.14), rgba(255,209,102,0) 70%); --panel-tint: #ffd166;">
+          <section class="stx-panel stx-span-6" id="section-languages" style="--panel-accent: #c9b26b; --panel-tint: #c9b26b;">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Languages</h2>
             </div>
@@ -438,7 +447,7 @@ showCopied();
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
 
-      var PALETTE = ['#4d8eff', '#ff6b6b', '#ffb84d', '#5eead4', '#c792ea', '#4dd4ff', '#ff8fb1', '#a8e063', '#ffd166'];
+      var PALETTE = ['#5b8ecb', '#c97b7b', '#c9a06b', '#6bb3a0', '#9b8bc4', '#6bafc9', '#c98bab', '#93b378', '#c9b26b'];
       var OTHER_COLOR = '#3a4a63';
 
       function colorFor(item, i) {
@@ -757,8 +766,9 @@ showCopied();
         showLoading();
         metaLine.textContent = '';
         var showList = STATS_YEARS[year] || [];
+        var ids = showList.map(function (s) { return s.imdb; });
 
-        TVStats.fetchAll(showList).then(function (records) {
+        TVStats.fetchAll(ids).then(function (records) {
           if (currentYear !== year) return;
           var summary = TVStats.aggregate(showList, records);
           summaryCache[year] = summary;
@@ -766,6 +776,78 @@ showCopied();
         }).catch(function () {
           if (currentYear !== year) return;
           showError('Something went wrong pulling stats for ' + year + '. Try again in a moment.');
+        });
+      }
+
+      function loadTrend() {
+        var mount = document.getElementById('trend-chart-mount');
+        var insight = document.getElementById('trend-insight');
+        if (!mount) return;
+
+        var allIds = [];
+        var seen = {};
+        YEARS.forEach(function (year) {
+          (STATS_YEARS[year] || []).forEach(function (s) {
+            if (!seen[s.imdb]) { seen[s.imdb] = true; allIds.push(s.imdb); }
+          });
+        });
+        if (!allIds.length) return;
+
+        TVStats.fetchAll(allIds).then(function (records) {
+          var points = YEARS.slice().sort(function (a, b) { return a - b; }).map(function (year) {
+            var summary = TVStats.aggregate(STATS_YEARS[year] || [], records);
+            return { year: year, hours: summary.hours };
+          });
+
+          if (points.length < 2) {
+            mount.innerHTML = '<p class="stx-empty">Not enough years logged yet to show a trend.</p>';
+            return;
+          }
+
+          var maxHours = Math.max.apply(null, points.map(function (p) { return p.hours; })) || 1;
+
+          mount.innerHTML = '<div class="stx-trend-bars">' + points.map(function (p, i) {
+            var pct = Math.max((p.hours / maxHours) * 100, 2);
+            var deltaHtml = '';
+            if (i > 0) {
+              var prev = points[i - 1].hours;
+              if (prev > 0) {
+                var change = ((p.hours - prev) / prev) * 100;
+                var dir = change > 1 ? '-up' : (change < -1 ? '-down' : '-flat');
+                var sign = change > 0 ? '+' : '';
+                deltaHtml = '<span class="stx-trend-delta ' + dir + '">' + sign + fmt1(change) + '%</span>';
+              } else if (p.hours > 0) {
+                deltaHtml = '<span class="stx-trend-delta -up">New</span>';
+              }
+            }
+            var isCurrent = String(p.year) === String(YEARS[0]);
+            return (
+              '<div class="stx-trend-col">' +
+                deltaHtml +
+                '<span class="stx-trend-value numbers">' + fmt1(p.hours) + 'h</span>' +
+                '<div class="stx-trend-bar-track"><div class="stx-trend-bar" data-target="' + pct + '" style="height:0%"></div></div>' +
+                '<span class="stx-trend-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
+              '</div>'
+            );
+          }).join('') + '</div>';
+
+          requestAnimationFrame(function () {
+            mount.querySelectorAll('.stx-trend-bar').forEach(function (el) {
+              el.style.height = el.dataset.target + '%';
+            });
+          });
+
+          if (insight) {
+            var last = points[points.length - 1];
+            var prev = points[points.length - 2];
+            if (prev.hours > 0) {
+              var overallChange = ((last.hours - prev.hours) / prev.hours) * 100;
+              var word = overallChange > 1 ? 'up' : (overallChange < -1 ? 'down' : 'flat');
+              insight.innerHTML = '<strong>' + (overallChange > 0 ? '+' : '') + fmt1(overallChange) + '%</strong> ' + word + ' vs ' + prev.year;
+            }
+          }
+        }).catch(function () {
+          mount.innerHTML = '<p class="stx-empty">Could not load the trend right now.</p>';
         });
       }
 
@@ -780,6 +862,8 @@ showCopied();
         });
         pillsMount.appendChild(pill);
       });
+
+      loadTrend();
 
       if (DEFAULT_YEAR) {
         renderYear(DEFAULT_YEAR);
