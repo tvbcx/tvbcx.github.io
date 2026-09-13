@@ -915,11 +915,11 @@ showCopied();
                 if (e.data === YT.PlayerState.ENDED) revertToPoster();
                 else if (e.data === YT.PlayerState.PLAYING) {
                   toggleBtn.classList.remove('-paused');
-                  // Hard cap: revert to the poster 9s after the trailer actually starts
+                  // Hard cap: revert to the poster 12s after the trailer actually starts
                   // playing (not from when we first tried to load it).
                   if (!hasStartedRevertTimer) {
                     hasStartedRevertTimer = true;
-                    autoRevertTimer = setTimeout(revertToPoster, 9000);
+                    autoRevertTimer = setTimeout(revertToPoster, 12000);
                   }
                 }
                 else if (e.data === YT.PlayerState.PAUSED) toggleBtn.classList.add('-paused');
