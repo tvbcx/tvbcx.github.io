@@ -773,15 +773,27 @@ showCopied();
         if (!mediaEl || !trailerEl || !key) return;
         var iframe = document.createElement('iframe');
         iframe.src = 'https://www.youtube.com/embed/' + key +
-          '?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=' + key;
+          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=' + key +
+          '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0';
         iframe.title = 'Trailer';
         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.frameBorder = '0';
+        iframe.tabIndex = -1;
         trailerEl.appendChild(iframe);
-        // next frame so the aspect-ratio/opacity transition actually animates
+
+        var watchLink = document.createElement('a');
+        watchLink.href = 'https://www.youtube.com/watch?v=' + key;
+        watchLink.target = '_blank';
+        watchLink.rel = 'noopener noreferrer';
+        watchLink.className = 'last-watched-trailer-link';
+        watchLink.setAttribute('aria-label', 'Watch trailer on YouTube');
+        trailerEl.appendChild(watchLink);
+
+        // next frame so the aspect-ratio/opacity/width transitions actually animate
         requestAnimationFrame(function () {
           mediaEl.classList.add('-trailer-active');
+          section.classList.add('-trailer-active');
         });
       }
 
