@@ -801,11 +801,72 @@ showCopied();
           '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1' +
           '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0&enablejsapi=1&origin=' + window.location.origin;
         iframe.title = 'Trailer';
-        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        // No "picture-in-picture" here on purpose: granting that permission is what lets
+        // mobile browsers auto-pop the video into a little floating window on their own.
+        iframe.allow = 'autoplay; encrypted-media';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.frameBorder = '0';
         iframe.tabIndex = -1;
         trailerEl.appendChild(iframe);
+
+        // Click-to-toggle play/pause overlay (no link, no navigating to YouTube).
+        var toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'last-watched-trailer-toggle';
+        toggleBtn.setAttribute('aria-label', 'Play or pause trailer');
+        toggleBtn.innerHTML =
+          '<span class="icon">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' +
+          '</span>';
+        trailerEl.appendChild(toggleBtn);
+
+        // "Tap to unmute" pill - mobile only, shown while the trailer is muted.
+        var unmuteHint = document.createElement('button');
+        unmuteHint.type = 'button';
+        unmuteHint.className = 'last-watched-trailer-unmute';
+        unmuteHint.setAttribute('aria-label', 'Tap to unmute trailer');
+        unmuteHint.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.8L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>' +
+          '<span>Tap to unmute</span>';
+        trailerEl.appendChild(unmuteHint);
+
+        var player = null;
+        var wantsUnmute = false;
+
+        function isMobileViewport() {
+          return window.matchMedia('(max-width: 600px)').matches;
+        }
+
+        function applyUnmuteIfWanted() {
+          if (!wantsUnmute || !player || typeof player.unMute !== 'function') return;
+          try { player.unMute(); player.setVolume(100); } catch (err) {}
+        }
+
+        function requestUnmute() {
+          wantsUnmute = true;
+          unmuteHint.classList.remove('-visible');
+          applyUnmuteIfWanted();
+        }
+
+        if (isMobileViewport()) {
+          unmuteHint.classList.add('-visible');
+        }
+
+        unmuteHint.addEventListener('click', function (e) {
+          e.stopPropagation();
+          requestUnmute();
+        });
+
+        toggleBtn.addEventListener('click', function () {
+          if (!player || typeof player.getPlayerState !== 'function') return;
+          var state;
+          try { state = player.getPlayerState(); } catch (err) { return; }
+          if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+          } else {
+            player.playVideo();
+          }
+        });
 
         // next frame so the aspect-ratio/opacity/width transitions actually animate
         requestAnimationFrame(function () {
@@ -817,29 +878,20 @@ showCopied();
           }
         });
 
-        // watch for the trailer actually ending, then fade back to the poster;
-        // also try to get sound on as early as possible (browsers block unmuted
-        // autoplay outright, so we attempt it immediately, then guarantee it on
-        // the visitor's very first interaction with the page)
+        // watch for the trailer actually ending, then fade back to the poster
         loadYouTubeAPI(function () {
           if (!document.getElementById('last-watched-trailer-iframe')) return;
-          var player = new YT.Player('last-watched-trailer-iframe', {
+          player = new YT.Player('last-watched-trailer-iframe', {
             events: {
+              onReady: applyUnmuteIfWanted,
               onStateChange: function (e) {
                 if (e.data === YT.PlayerState.ENDED) revertToPoster();
+                else if (e.data === YT.PlayerState.PLAYING) toggleBtn.classList.remove('-paused');
+                else if (e.data === YT.PlayerState.PAUSED) toggleBtn.classList.add('-paused');
               }
             }
           });
-
-          var unmuteOnInteraction = function () {
-            try { player.unMute(); player.setVolume(100); } catch (err) {}
-            ['click', 'touchstart', 'keydown', 'scroll'].forEach(function (evt) {
-              document.removeEventListener(evt, unmuteOnInteraction);
-            });
-          };
-          ['click', 'touchstart', 'keydown', 'scroll'].forEach(function (evt) {
-            document.addEventListener(evt, unmuteOnInteraction, { once: true, passive: true });
-          });
+          applyUnmuteIfWanted();
         });
       }
 
