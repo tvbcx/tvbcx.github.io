@@ -518,6 +518,7 @@ showCopied();
       var DEFAULT_YEAR = YEARS[0] || null;
       var summaryCache = {};
       var currentYear = null;
+      var recordActiveYear = null;
 
       var heroItems = Array.prototype.slice.call(heroSection.querySelectorAll('.stx-hero-item'));
 
@@ -761,12 +762,27 @@ showCopied();
         revealSections();
       }
 
+      function applyRecordActiveYear(year) {
+        recordActiveYear = year;
+        var recordMount = document.getElementById('record-chart-mount');
+        if (!recordMount) return;
+        var cols = recordMount.querySelectorAll('.stx-record-col[data-year]');
+        var yearLabels = recordMount.querySelectorAll('.stx-record-year[data-year]');
+        cols.forEach(function (col) {
+          col.classList.toggle('-current', col.dataset.year === String(year));
+        });
+        yearLabels.forEach(function (label) {
+          label.classList.toggle('-current', label.dataset.year === String(year));
+        });
+      }
+
       function setActivePill(year) {
         var pills = pillsMount.querySelectorAll('.year-pill');
         pills.forEach(function (pill) {
           pill.classList.toggle('-active', pill.dataset.year === String(year));
         });
         headingYear.textContent = year;
+        applyRecordActiveYear(year);
       }
 
       function renderYear(year) {
@@ -822,10 +838,10 @@ showCopied();
           var maxHours = Math.max.apply(null, points.map(function (p) { return p.hours; })) || 1;
 
           var barsHtml = points.map(function (p, i) {
-            var isCurrent = String(p.year) === String(YEARS[0]);
+            var isCurrent = String(p.year) === String(recordActiveYear);
             var pct = maxHours ? (p.hours / maxHours) * 100 : 0;
             return (
-              '<div class="stx-record-col' + (isCurrent ? ' -current' : '') + '">' +
+              '<div class="stx-record-col' + (isCurrent ? ' -current' : '') + '" data-year="' + p.year + '">' +
                 '<div class="stx-record-track">' +
                   '<div class="stx-record-fill" data-target="' + pct + '"></div>' +
                 '</div>' +
@@ -851,11 +867,11 @@ showCopied();
                 deltaHtml = '<span class="stx-record-delta -empty">–</span>';
               }
             }
-            var isCurrent = String(p.year) === String(YEARS[0]);
+            var isCurrent = String(p.year) === String(recordActiveYear);
             return (
               '<div class="stx-record-meta">' +
                 '<span class="stx-record-value numbers">' + fmt1(p.hours) + 'h</span>' +
-                '<span class="stx-record-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
+                '<span class="stx-record-year numbers' + (isCurrent ? ' -current' : '') + '" data-year="' + p.year + '">' + p.year + '</span>' +
                 deltaHtml +
               '</div>'
             );
