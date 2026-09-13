@@ -142,7 +142,6 @@
         max-width: 110px;
       }
 
-      /* Clean, flat per-metric color coding — no glow, no gradient text */
       .profile-stats-embed .stats-hero-card::before {
         background: none;
       }
@@ -169,15 +168,6 @@
       }
     }
 
-    /* Squarish 4:3-ish screens (classic iPad landscape, old tablets/monitors,
-       resized windows) sit in an awkward gap: often ≥1024px wide so they'd
-       otherwise get the full desktop two-column layout, but with much less
-       vertical room to show it in. This keeps the two-column layout (it's
-       still wide enough to earn it) but tightens everything vertically so
-       more content fits without excess scrolling, and narrows the sidebar
-       a bit since the main column has less width to spare than on a real
-       desktop monitor. Range covers ~4:3 up to ~5:4 so it isn't limited to
-       one exact ratio. */
     @media (min-aspect-ratio: 5/4) and (max-aspect-ratio: 4/3) and (min-width: 700px) {
       .profile-favorites .section-heading,
       .profile-stats-embed .section-heading {
@@ -238,7 +228,6 @@
         margin-bottom: 18px;
       }
 
-      /* Compact stats card so the narrower sidebar doesn't force wrapping */
       .profile-stats-embed .stats-hero-card {
         padding: 12px 4px 10px;
       }
@@ -270,8 +259,6 @@
         max-width: 85px;
       }
 
-      /* Trim the hero backdrop fade — a squarer viewport has less height
-         to spare, so a full-height desktop-style fade eats too much of it. */
       body::before {
         -webkit-mask-image: linear-gradient(to bottom,
           transparent 0px, transparent 55px,
@@ -294,9 +281,6 @@
       }
     }
 
-    /* Hide the grain texture over the backdrop image/fade area so that
-       region reads as a plain color (matching .backdropmask's own fade),
-       then smoothly bring the grain back in once the fade completes. */
     body::before {
       -webkit-mask-image: linear-gradient(to bottom,
         transparent 0px, transparent 60px,
@@ -741,8 +725,6 @@ showCopied();
   </script>
 
   <script>
-    // Paste your free TMDB API key (v3 auth) here to turn on the "Last Watch" trailer.
-    // Get one at https://www.themoviedb.org/settings/api — leave blank to just show the poster.
     window.TMDB_API_KEY = "6cb6e1dc603bc65ffb6198489d5bc5b7";
   </script>
 
@@ -783,11 +765,10 @@ showCopied();
 
       section.hidden = false;
 
-      // --- Trailer: fetched from TMDB, swapped in exactly 3.5s after the page opens ---
       var TMDB_API_KEY = window.TMDB_API_KEY || '';
       var mediaEl = document.getElementById('last-watched-media');
       var trailerEl = document.getElementById('last-watched-trailer');
-      var reverted = true; // becomes false once a trailer actually starts playing
+      var reverted = true;
       var autoRevertTimer = null;
 
       function loadYouTubeAPI(callback) {
@@ -809,15 +790,12 @@ showCopied();
         if (reverted) return;
         reverted = true;
         if (autoRevertTimer) { clearTimeout(autoRevertTimer); autoRevertTimer = null; }
-        // Hide the iframe immediately (no transition) so YouTube's own end-of-video
-        // "more videos" screen never has a chance to flash before we fade to the poster.
         trailerEl.style.transition = 'none';
         trailerEl.style.opacity = '0';
         mediaEl.classList.remove('-trailer-active');
         section.classList.remove('-trailer-active');
         var labelEl = document.getElementById('last-watched-label');
         if (labelEl) labelEl.textContent = 'Last Watch';
-        // wait a beat before actually removing the player and resetting the inline styles
         setTimeout(function () {
           trailerEl.innerHTML = '';
           trailerEl.style.transition = '';
@@ -835,15 +813,12 @@ showCopied();
           '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&playsinline=1' +
           '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0&enablejsapi=1&origin=' + window.location.origin;
         iframe.title = 'Trailer';
-        // No "picture-in-picture" here on purpose: granting that permission is what lets
-        // mobile browsers auto-pop the video into a little floating window on their own.
         iframe.allow = 'autoplay; encrypted-media';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.frameBorder = '0';
         iframe.tabIndex = -1;
         trailerEl.appendChild(iframe);
 
-        // Click-to-toggle play/pause overlay (no link, no navigating to YouTube).
         var toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'last-watched-trailer-toggle';
@@ -854,7 +829,6 @@ showCopied();
           '</span>';
         trailerEl.appendChild(toggleBtn);
 
-        // "Tap to unmute" pill - shown on both mobile and desktop while muted.
         var unmuteHint = document.createElement('button');
         unmuteHint.type = 'button';
         unmuteHint.className = 'last-watched-trailer-unmute';
@@ -885,7 +859,6 @@ showCopied();
           requestUnmute();
         });
 
-        // "Open in YouTube" pill - same row as the unmute pill, right-aligned.
         var youtubeLink = document.createElement('a');
         youtubeLink.className = 'last-watched-trailer-youtube';
         youtubeLink.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(key);
@@ -909,7 +882,6 @@ showCopied();
           }
         });
 
-        // next frame so the aspect-ratio/opacity/width transitions actually animate
         requestAnimationFrame(function () {
           mediaEl.classList.add('-trailer-active');
           section.classList.add('-trailer-active');
@@ -924,7 +896,6 @@ showCopied();
           }
         });
 
-        // watch for the trailer actually ending, then fade back to the poster
         loadYouTubeAPI(function () {
           if (!document.getElementById('last-watched-trailer-iframe')) return;
           player = new YT.Player('last-watched-trailer-iframe', {
@@ -934,8 +905,6 @@ showCopied();
                 if (e.data === YT.PlayerState.ENDED) revertToPoster();
                 else if (e.data === YT.PlayerState.PLAYING) {
                   toggleBtn.classList.remove('-paused');
-                  // Hard cap: revert to the poster 12s after the trailer actually starts
-                  // playing (not from when we first tried to load it).
                   if (!hasStartedRevertTimer) {
                     hasStartedRevertTimer = true;
                     autoRevertTimer = setTimeout(revertToPoster, 12000);
@@ -976,7 +945,7 @@ showCopied();
         var startDelayTimer = new Promise(function (resolve) { setTimeout(resolve, 3500); });
         Promise.all([fetchTrailerKey(lastWatched.imdb), startDelayTimer])
           .then(function (results) { playTrailer(results[0]); })
-          .catch(function () { /* no trailer found - poster just stays put */ });
+          .catch(function () {});
       }
     })();
   </script>
