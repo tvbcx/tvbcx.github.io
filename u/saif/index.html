@@ -1,1 +1,1423 @@
-a
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saif's profile</title>
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://www.themoviedb.org">
+  <link rel="preconnect" href="https://image.tmdb.org">
+  <link rel="preconnect" href="https://media.themoviedb.org" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Figtree:wght@300..700&family=Stack+Sans+Headline:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/p.webp">
+  <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/b.webp">
+  <link rel="preload" as="script" href="/shows.js?v=1">
+  <link rel="preload" as="script" href="/stats.js?v=1">
+  <link rel="preload" as="script" href="/bio.js?v=1">
+  <style>
+    .journal-year-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 16px;
+    }
+    @media (max-width: 1023px) {
+      .dashboard-row .dash-card:first-child {
+        margin-bottom: 32px;
+      }
+      .profile-ratings-journal {
+        margin-bottom: 24px;
+      }
+      .profile-dnf {
+        margin-bottom: 32px;
+      }
+    }
+    .profile-stats-embed {
+      display: none;
+    }
+    .last-watched-poster .rating {
+      display: block;
+      margin: 6px 2px 0;
+      font-size: 13px;
+      letter-spacing: -1px;
+      color: #4d8eff;
+      text-align: center;
+    }
+    @media (min-width: 1024px) {
+      .profile-favorites .section-heading,
+      .profile-stats-embed .section-heading {
+        color: #fff;
+        border-bottom-color: #000;
+        padding-bottom: 8px;
+      }
+      .profile-header .sgraph-link,
+      .profile-header .sgraph-link:hover {
+        font-size: 16px;
+      }
+      .profile-grid {
+        display: block;
+      }
+      .profile-grid::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-watchlist {
+        float: left;
+        clear: left;
+        width: calc(100% - 380px);
+      }
+      .profile-stats-embed,
+      .profile-ratings-journal {
+        float: right;
+        clear: right;
+        width: 340px;
+        display: block;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-stats-embed {
+        margin-bottom: 24px;
+      }
+      .profile-favorites .stats-box {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+      .profile-favorites,
+      .profile-dnf {
+        margin-top: 0 !important;
+        margin-bottom: 24px !important;
+      }
+      .profile-watchlist {
+        margin-top: 0 !important;
+        margin-bottom: 24px !important;
+      }
+      .profile-ratings-journal .dashboard-row {
+        display: block;
+      }
+      .profile-ratings-journal .dash-card:first-child {
+        margin-bottom: 24px;
+      }
+
+      .profile-stats-embed .stats-hero-card {
+        padding: 18px 6px 16px;
+      }
+      .profile-stats-embed .stats-hero-card .value {
+        font-size: 1.5rem;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .profile-stats-embed .stats-donut-panel {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+      }
+      .profile-stats-embed .stats-donut {
+        width: 108px;
+        height: 108px;
+      }
+      .profile-stats-embed .stats-legend {
+        width: auto;
+      }
+      .profile-stats-embed .stats-legend-item {
+        font-size: 11.5px;
+        gap: 6px;
+      }
+      .profile-stats-embed .stats-legend-name {
+        max-width: 110px;
+      }
+
+      /* Clean, flat per-metric color coding — no glow, no gradient text */
+      .profile-stats-embed .stats-hero-card::before {
+        background: none;
+      }
+      .profile-stats-embed .stats-hero-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+      }
+      .profile-stats-embed .stats-hero-card:nth-child(1)::after { background: #5b8ecb; }
+      .profile-stats-embed .stats-hero-card:nth-child(1) .value { color: #5b8ecb; }
+
+      .profile-stats-embed .stats-hero-card:nth-child(2)::after { background: #9b8bc4; }
+      .profile-stats-embed .stats-hero-card:nth-child(2) .value { color: #9b8bc4; }
+
+      .profile-stats-embed .stats-hero-card:nth-child(3)::after { background: #c9a06b; }
+      .profile-stats-embed .stats-hero-card:nth-child(3) .value { color: #c9a06b; }
+
+      .profile-favorites {
+        margin-bottom: 12px !important;
+      }
+      .profile-stats-embed {
+        margin-bottom: 12px !important;
+      }
+    }
+
+    /* Squarish 4:3-ish screens (classic iPad landscape, old tablets/monitors,
+       resized windows) sit in an awkward gap: often ≥1024px wide so they'd
+       otherwise get the full desktop two-column layout, but with much less
+       vertical room to show it in. This keeps the two-column layout (it's
+       still wide enough to earn it) but tightens everything vertically so
+       more content fits without excess scrolling, and narrows the sidebar
+       a bit since the main column has less width to spare than on a real
+       desktop monitor. Range covers ~4:3 up to ~5:4 so it isn't limited to
+       one exact ratio. */
+    @media (min-aspect-ratio: 5/4) and (max-aspect-ratio: 4/3) and (min-width: 700px) {
+      .profile-favorites .section-heading,
+      .profile-stats-embed .section-heading {
+        color: #fff;
+        border-bottom-color: #000;
+        padding-bottom: 6px;
+      }
+
+      .profile-grid {
+        display: block;
+      }
+      .profile-grid::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-watchlist {
+        float: left;
+        clear: left;
+        width: calc(100% - 300px);
+        box-sizing: border-box;
+        padding-right: 20px;
+      }
+      .profile-stats-embed,
+      .profile-ratings-journal {
+        float: right;
+        clear: right;
+        width: 280px;
+        display: block;
+      }
+      .profile-favorites .stats-box {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+      .profile-favorites,
+      .profile-dnf {
+        margin-top: 0 !important;
+        margin-bottom: 18px !important;
+      }
+      .profile-watchlist {
+        margin-top: 0 !important;
+        margin-bottom: 18px !important;
+      }
+      .profile-stats-embed {
+        margin-bottom: 18px !important;
+      }
+
+      .profile-ratings-journal .dashboard-row {
+        display: block;
+      }
+      .profile-ratings-journal .dash-card:first-child {
+        margin-bottom: 18px;
+      }
+
+      /* Compact stats card so the narrower sidebar doesn't force wrapping */
+      .profile-stats-embed .stats-hero-card {
+        padding: 12px 4px 10px;
+      }
+      .profile-stats-embed .stats-hero-card .value {
+        font-size: 1.25rem;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .profile-stats-embed .stats-donut-panel {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+      }
+      .profile-stats-embed .stats-donut {
+        width: 84px;
+        height: 84px;
+      }
+      .profile-stats-embed .stats-legend {
+        width: auto;
+      }
+      .profile-stats-embed .stats-legend-item {
+        font-size: 11px;
+        gap: 5px;
+      }
+      .profile-stats-embed .stats-legend-name {
+        max-width: 85px;
+      }
+
+      /* Trim the hero backdrop fade — a squarer viewport has less height
+         to spare, so a full-height desktop-style fade eats too much of it. */
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 55px,
+          rgba(0,0,0,0.06) 103px, rgba(0,0,0,0.13) 147px,
+          rgba(0,0,0,0.22) 184px, rgba(0,0,0,0.33) 214px,
+          rgba(0,0,0,0.45) 239px, rgba(0,0,0,0.58) 262px,
+          rgba(0,0,0,0.68) 280px, rgba(0,0,0,0.78) 299px,
+          rgba(0,0,0,0.86) 313px, rgba(0,0,0,0.91) 327px,
+          rgba(0,0,0,0.95) 342px, rgba(0,0,0,0.98) 354px,
+          #000 368px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 55px,
+          rgba(0,0,0,0.06) 103px, rgba(0,0,0,0.13) 147px,
+          rgba(0,0,0,0.22) 184px, rgba(0,0,0,0.33) 214px,
+          rgba(0,0,0,0.45) 239px, rgba(0,0,0,0.58) 262px,
+          rgba(0,0,0,0.68) 280px, rgba(0,0,0,0.78) 299px,
+          rgba(0,0,0,0.86) 313px, rgba(0,0,0,0.91) 327px,
+          rgba(0,0,0,0.95) 342px, rgba(0,0,0,0.98) 354px,
+          #000 368px, #000 100%);
+      }
+    }
+
+    /* Hide the grain texture over the backdrop image/fade area so that
+       region reads as a plain color (matching .backdropmask's own fade),
+       then smoothly bring the grain back in once the fade completes. */
+    body::before {
+      -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0px, transparent 60px,
+        rgba(0,0,0,0.06) 112px, rgba(0,0,0,0.13) 160px,
+        rgba(0,0,0,0.22) 200px, rgba(0,0,0,0.33) 232px,
+        rgba(0,0,0,0.45) 260px, rgba(0,0,0,0.58) 284px,
+        rgba(0,0,0,0.68) 304px, rgba(0,0,0,0.78) 324px,
+        rgba(0,0,0,0.86) 340px, rgba(0,0,0,0.91) 356px,
+        rgba(0,0,0,0.95) 372px, rgba(0,0,0,0.98) 384px,
+        #000 400px, #000 100%);
+      mask-image: linear-gradient(to bottom,
+        transparent 0px, transparent 60px,
+        rgba(0,0,0,0.06) 112px, rgba(0,0,0,0.13) 160px,
+        rgba(0,0,0,0.22) 200px, rgba(0,0,0,0.33) 232px,
+        rgba(0,0,0,0.45) 260px, rgba(0,0,0,0.58) 284px,
+        rgba(0,0,0,0.68) 304px, rgba(0,0,0,0.78) 324px,
+        rgba(0,0,0,0.86) 340px, rgba(0,0,0,0.91) 356px,
+        rgba(0,0,0,0.95) 372px, rgba(0,0,0,0.98) 384px,
+        #000 400px, #000 100%);
+    }
+    @media (max-width: 420px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 39px,
+          rgba(0,0,0,0.06) 73px, rgba(0,0,0,0.13) 104px,
+          rgba(0,0,0,0.22) 130px, rgba(0,0,0,0.33) 151px,
+          rgba(0,0,0,0.45) 169px, rgba(0,0,0,0.58) 185px,
+          rgba(0,0,0,0.68) 198px, rgba(0,0,0,0.78) 211px,
+          rgba(0,0,0,0.86) 221px, rgba(0,0,0,0.91) 231px,
+          rgba(0,0,0,0.95) 242px, rgba(0,0,0,0.98) 250px,
+          #000 260px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 39px,
+          rgba(0,0,0,0.06) 73px, rgba(0,0,0,0.13) 104px,
+          rgba(0,0,0,0.22) 130px, rgba(0,0,0,0.33) 151px,
+          rgba(0,0,0,0.45) 169px, rgba(0,0,0,0.58) 185px,
+          rgba(0,0,0,0.68) 198px, rgba(0,0,0,0.78) 211px,
+          rgba(0,0,0,0.86) 221px, rgba(0,0,0,0.91) 231px,
+          rgba(0,0,0,0.95) 242px, rgba(0,0,0,0.98) 250px,
+          #000 260px, #000 100%);
+      }
+    }
+    @media (min-width: 1024px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 69px,
+          rgba(0,0,0,0.06) 129px, rgba(0,0,0,0.13) 184px,
+          rgba(0,0,0,0.22) 230px, rgba(0,0,0,0.33) 267px,
+          rgba(0,0,0,0.45) 299px, rgba(0,0,0,0.58) 327px,
+          rgba(0,0,0,0.68) 350px, rgba(0,0,0,0.78) 373px,
+          rgba(0,0,0,0.86) 391px, rgba(0,0,0,0.91) 409px,
+          rgba(0,0,0,0.95) 428px, rgba(0,0,0,0.98) 442px,
+          #000 460px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 69px,
+          rgba(0,0,0,0.06) 129px, rgba(0,0,0,0.13) 184px,
+          rgba(0,0,0,0.22) 230px, rgba(0,0,0,0.33) 267px,
+          rgba(0,0,0,0.45) 299px, rgba(0,0,0,0.58) 327px,
+          rgba(0,0,0,0.68) 350px, rgba(0,0,0,0.78) 373px,
+          rgba(0,0,0,0.86) 391px, rgba(0,0,0,0.91) 409px,
+          rgba(0,0,0,0.95) 428px, rgba(0,0,0,0.98) 442px,
+          #000 460px, #000 100%);
+      }
+    }
+    @media (min-width: 1440px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 75px,
+          rgba(0,0,0,0.06) 140px, rgba(0,0,0,0.13) 200px,
+          rgba(0,0,0,0.22) 250px, rgba(0,0,0,0.33) 290px,
+          rgba(0,0,0,0.45) 325px, rgba(0,0,0,0.58) 355px,
+          rgba(0,0,0,0.68) 380px, rgba(0,0,0,0.78) 405px,
+          rgba(0,0,0,0.86) 425px, rgba(0,0,0,0.91) 445px,
+          rgba(0,0,0,0.95) 465px, rgba(0,0,0,0.98) 480px,
+          #000 500px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 75px,
+          rgba(0,0,0,0.06) 140px, rgba(0,0,0,0.13) 200px,
+          rgba(0,0,0,0.22) 250px, rgba(0,0,0,0.33) 290px,
+          rgba(0,0,0,0.45) 325px, rgba(0,0,0,0.58) 355px,
+          rgba(0,0,0,0.68) 380px, rgba(0,0,0,0.78) 405px,
+          rgba(0,0,0,0.86) 425px, rgba(0,0,0,0.91) 445px,
+          rgba(0,0,0,0.95) 465px, rgba(0,0,0,0.98) 480px,
+          #000 500px, #000 100%);
+      }
+    }
+  </style>
+</head>
+<body class="profile-page">
+
+  <div class="backdrop-container">
+    <div id="backdrop" class="backdrop-wrapper backdrop-fade-in"
+         data-backdrop="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/2.webp"
+         data-backdrop2x="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/2.webp"
+         data-backdrop-mobile="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/2.webp"
+         data-offset="21">
+      <div class="backdropimage js-backdrop-image"></div>
+      <div class="backdropmask js-backdrop-fade"></div>
+    </div>
+
+    <a href="/about/" class="floating-tvbox" aria-label="TV Box">
+      <svg class="tvbox-icon" aria-hidden="true" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+        <text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+      </svg>
+    </a>
+
+    <a href="/home/" class="floating-home -beside-tvbox" aria-label="Home">
+      <svg class="home-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 3.1l8.5 7.6c.32.29.5.7.5 1.13V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.17c0-.43.18-.84.5-1.13L12 3.1z"></path>
+      </svg>
+    </a>
+
+    <input type="checkbox" id="auth-menu-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signin-toggle" class="auth-checkbox">
+    <input type="checkbox" id="signup-toggle" class="auth-checkbox">
+
+    <label for="auth-menu-toggle" class="floating-auth -right" aria-label="Account">
+      <svg class="auth-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </label>
+
+    <label for="auth-menu-toggle" class="auth-backdrop" aria-hidden="true"></label>
+
+    <div class="auth-dropdown">
+      <label for="signin-toggle" class="auth-dropdown-btn">Sign In</label>
+      <label for="signup-toggle" class="auth-dropdown-btn">Sign Up</label>
+    </div>
+
+    <div class="auth-modal-wrap signin-modal-wrap">
+      <label for="signin-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <div class="auth-modal-wrap signup-modal-wrap">
+      <label for="signup-toggle" class="auth-modal-backdrop" aria-hidden="true"></label>
+      <div class="auth-modal-box"></div>
+    </div>
+
+    <form class="group floating-search" id="home-search-form" action="/search/" method="get">
+      <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21.53 20.47l-3.66-3.66C19.19 15.37 20 13.28 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.28 0 4.37-.81 6.04-2.13l3.66 3.66c.14.14.33.21.53.21s.39-.07.53-.21c.29-.29.29-.77 0-1.06zM11 18c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
+      </svg>
+      <input id="home-search-input" name="q" placeholder="search" type="search" class="input" autocomplete="off">
+      <button type="submit" hidden>Search</button>
+    </form>
+  </div>
+
+  <div class="page-content">
+  <header class="profile-header">
+<div class="profile-left">
+      <div class="profile-summary js-profile-summary">
+        <div class="profile-avatar">
+          <img id="avatar-trigger" src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/p.webp" alt="Saif" class="avatar-img" role="button" tabindex="0" aria-label="View full profile picture" fetchpriority="high" decoding="async">
+        </div>
+        <div id="badge-morph" class="badge-morph" aria-hidden="true">
+          <img id="badge-morph-avatar" class="badge-morph-img -visible" src="" alt="">
+          <img id="badge-morph-badge" class="badge-morph-img" src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/badge.webp" alt="">
+        </div>
+        <div class="profile-name-and-actions">
+          <h1 id="name-trigger" class="person-display-name js-display-name">Saif<button type="button" id="badge-circle-trigger" class="badge-circle-trigger" aria-label="Saif — tap to reveal badge">
+              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="m 8 0 c -3.3125 0 -6 2.6875 -6 6 c 0.007812 0.710938 0.136719 1.414062 0.386719 2.078125 l -0.015625 -0.003906 c 0.636718 1.988281 3.78125 5.082031 5.625 6.929687 h 0.003906 v -0.003906 c 1.507812 -1.507812 3.878906 -3.925781 5.046875 -5.753906 c 0.261719 -0.414063 0.46875 -0.808594 0.585937 -1.171875 l -0.019531 0.003906 c 0.25 -0.664063 0.382813 -1.367187 0.386719 -2.078125 c 0 -3.3125 -2.683594 -6 -6 -6 z m 0 3.691406 c 1.273438 0 2.308594 1.035156 2.308594 2.308594 s -1.035156 2.308594 -2.308594 2.308594 c -1.273438 -0.003906 -2.304688 -1.035156 -2.304688 -2.308594 c -0.003906 -1.273438 1.03125 -2.304688 2.304688 -2.308594 z m 0 0" fill="#0b121e"/>
+              </svg>
+            </button></h1>
+
+      </div>
+    </div>
+    <div class="bio js-profile-bio" id="profile-bio"></div>
+  </div>
+
+    <div class="profile-stats js-profile-stats">
+      <h4 class="profile-statistic statistic">
+        <a href="/u/saif/watched/">
+          <span class="value numbers" id="shows-count">–</span>
+          <span class="definition title-all-caps -small">Shows</span>
+        </a>
+      </h4>
+      <span class="profile-stats-divider" aria-hidden="true">|</span>
+      <h4 class="profile-statistic statistic">
+        <a href="/u/saif/journal/">
+          <span class="value numbers" id="journal-year-count">–</span>
+          <span class="definition title-all-caps -small">This year</span>
+        </a>
+      </h4>
+    </div>
+  </header>
+
+  <div id="avatar-lightbox" class="avatar-lightbox">
+    <img id="avatar-lightbox-img" src="" alt="Saif — full profile picture" class="avatar-lightbox-img">
+  </div>
+
+  <div class="profile-grid">
+
+  <section class="profile-favorites">
+    <h2 class="section-heading">Favorite Shows</h2>
+    <div class="poster-grid favorites-grid">
+      <div class="card">
+        <a href="/show/?imdb=tt5071412">
+          <img src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/fav1.webp" alt="Ozark" width="150" height="225" decoding="async">
+        </a>
+      </div>
+      <div class="card">
+        <a href="/show/?imdb=tt2149175">
+          <img src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/fav2.webp" alt="The Americans" width="150" height="225" decoding="async">
+        </a>
+      </div>
+            <div class="card">
+        <a href="/show/?imdb=tt0434706">
+          <img src="https://image.tmdb.org/t/p/w440_and_h660_face/c7YgL8hQoQvh5gSlTy0otMWlO24.jpg" alt="Monster" width="150" height="225" decoding="async">
+        </a>
+      </div>
+      <div class="card">
+        <a href="/show/?imdb=tt0944947">
+          <img src="https://cdn.jsdelivr.net/gh/osaiif/filmtalk-profile@main/fav5.webp" alt="Game Of Thrones" width="150" height="225" decoding="async">
+        </a>
+      </div>
+    </div>
+
+    <a href="/u/saif/stats/" class="stats-box">
+      <span class="year numbers">2026</span>
+      <span class="label">STATS</span>
+    </a>
+
+    <div class="last-watched" id="last-watched-section" hidden>
+      <span class="last-watched-label" id="last-watched-label">Last Watch</span>
+      <div class="last-watched-line" aria-hidden="true"></div>
+      <div class="card last-watched-poster">
+        <div class="last-watched-media" id="last-watched-media">
+          <a href="#" id="last-watched-link" class="last-watched-poster-link">
+            <img id="last-watched-img" src="" alt="" width="150" height="225" decoding="async" class="last-watched-poster-img">
+          </a>
+          <div class="last-watched-trailer" id="last-watched-trailer" aria-hidden="true"></div>
+        </div>
+        <p class="rating" id="last-watched-rating"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-stats-embed" id="section-embed-stats">
+    <h2 class="section-heading"><a href="/u/saif/stats/" class="section-heading-link">2026 Stats</a></h2>
+
+    <div id="embed-stats-status" class="stats-status"></div>
+
+    <div id="embed-stats-content" hidden>
+      <div class="stats-hero-row">
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-hours">–</span>
+          <span class="definition">Hours</span>
+        </div>
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-episodes">–</span>
+          <span class="definition">Episodes</span>
+        </div>
+        <div class="stats-hero-card">
+          <span class="value numbers" id="embed-stat-seasons">–</span>
+          <span class="definition">Seasons</span>
+        </div>
+      </div>
+
+      <div class="stats-donut-panel">
+        <div id="embed-platform-donut-mount"></div>
+        <ul class="stats-legend" id="embed-platform-legend"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-ratings-journal">
+    <div class="dashboard-row">
+      <div class="dash-card">
+        <h2 class="section-heading"><a href="/u/saif/ratings/" class="section-heading-link">Ratings</a></h2>
+        <div class="ratings-panel">
+          <div class="ratings-chart">
+            <div class="ratings-bars" id="ratings-bars">
+              <a class="rbar" href="/u/saif/rating/?stars=0.5" data-rating="0.5"><span class="rbar-edge-label">1/2</span></a>
+              <a class="rbar" href="/u/saif/rating/?stars=1" data-rating="1"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=1.5" data-rating="1.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=2" data-rating="2"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=2.5" data-rating="2.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=3" data-rating="3"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=3.5" data-rating="3.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=4" data-rating="4"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=4.5" data-rating="4.5"></a>
+              <a class="rbar" href="/u/saif/rating/?stars=5" data-rating="5"><span class="rbar-edge-label">5</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h2 class="section-heading"><a href="/u/saif/journal/" class="section-heading-link">Journal</a></h2>
+        <div class="journal-container">
+          <div class="journal-content">
+            <a class="calendar-badge" href="/u/saif/journal/?year=2026" aria-label="View 2026 journal" style="text-decoration:none;color:inherit;">
+              <div class="rings">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="year-text" id="journal-year-text">–</span>
+            </a>
+            <ul class="entry-list" id="journal-entry-list"></ul>
+          </div>
+          <div class="journal-year-divider" aria-hidden="true"></div>
+          <div class="journal-content" style="margin-top:16px;">
+            <a class="calendar-badge" href="/u/saif/journal/?year=2025" aria-label="View 2025 journal" style="text-decoration:none;color:inherit;">
+              <div class="rings">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="year-text" id="journal-year-text-2025">2025</span>
+            </a>
+            <ul class="entry-list" id="journal-entry-list-2025"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-dnf">
+    <h2 class="section-heading"><a href="/u/saif/dnf/" class="section-heading-link">Did Not Finish</a></h2>
+    <div class="poster-grid favorites-grid" id="index-dnf-grid">
+    </div>
+  </section>
+
+  <section class="profile-watchlist">
+    <h2 class="section-heading"><a href="/u/saif/watchlist/" class="section-heading-link">Watchlist</a></h2>
+    <div class="poster-grid favorites-grid" id="index-watchlist-grid">
+    </div>
+  </section>
+
+  </div>
+
+  </div>
+
+<footer class="site-footer">
+<div class="footer-container">
+<p style="display: inline-flex; align-items: center; gap: 0.35rem;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="13" height="13" style="flex-shrink: 0;">
+<circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="7" />
+<text x="50" y="50" font-family="Arial, sans-serif" font-size="76" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="currentColor">t</text>
+</svg><a href="/about/"><strong>tvbox.</strong></a> Data from <a href="https://www.themoviedb.org/">TMDB</a> |
+
+<button type="button" class="footer-email-btn" data-email="gsaif@proton.me" aria-label="Copy email address">
+<svg class="footer-email-icon" style="width: 1.01rem; height: 1.01rem;" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 7L10.1649 12.7154C10.8261 13.1783 11.1567 13.4097 11.5163 13.4993C11.8339 13.5785 12.1661 13.5785 12.4837 13.4993C12.8433 13.4097 13.1739 13.1783 13.8351 12.7154L22 7M6.8 20H17.2C18.8802 20 19.7202 20 20.362 19.673C20.9265 19.3854 21.3854 18.9265 21.673 18.362C22 17.7202 22 16.8802 22 15.2V8.8C22 7.11984 22 6.27976 21.673 5.63803C21.3854 5.07354 20.9265 4.6146 20.362 4.32698C19.7202 4 18.8802 4 17.2 4H6.8C5.11984 4 4.27976 4 3.63803 4.32698C3.07354 4.6146 2.6146 5.07354 2.32698 5.63803C2 6.27976 2 7.11984 2 8.8V15.2C2 16.8802 2 17.7202 2.32698 18.362C2.6146 18.9265 3.07354 19.3854 3.63803 19.673C4.27976 20 5.11984 20 6.8 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="footer-email-tooltip" role="status" aria-live="polite">Copied!</span>
+</button>
+</p>
+</div>
+</footer>
+<script>
+(function () {
+var btn = document.querySelector('.footer-email-btn');
+if (!btn) return;
+
+function fallbackCopy(text) {
+var ta = document.createElement('textarea');
+ta.value = text;
+ta.style.position = 'fixed';
+ta.style.opacity = '0';
+document.body.appendChild(ta);
+ta.focus();
+ta.select();
+try { document.execCommand('copy'); } catch (e) {}
+document.body.removeChild(ta);
+}
+
+function showCopied() {
+btn.classList.remove('-copied');
+void btn.offsetWidth;
+btn.classList.add('-copied');
+clearTimeout(btn._copiedTimeout);
+btn._copiedTimeout = setTimeout(function () {
+btn.classList.remove('-copied');
+}, 1400);
+}
+
+btn.addEventListener('click', function () {
+var email = btn.getAttribute('data-email');
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(email).then(showCopied).catch(function () {
+fallbackCopy(email);
+showCopied();
+});
+} else {
+fallbackCopy(email);
+showCopied();
+}
+});
+})();
+</script>
+
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="spinner">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+
+  <script src="/shows.js?v=1"></script>
+  <script src="/stats.js?v=1"></script>
+  <script src="/bio.js?v=1"></script>
+  <script>
+    document.getElementById('shows-count').textContent =
+      SHOWS.filter(function (s) { return !s.list || s.list === 'watched'; }).length;
+  </script>
+
+  <script>
+    (function () {
+      var bioEl = document.getElementById('profile-bio');
+      if (bioEl && typeof window.PROFILE_BIO === 'string') {
+        bioEl.textContent = window.PROFILE_BIO;
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function renderMiniGrid(gridId, listKey) {
+        var grid = document.getElementById(gridId);
+        if (!grid) return;
+        var shows = SHOWS.filter(function (s) { return s.list === listKey; }).slice(0, 4);
+
+        grid.innerHTML = shows.map(function (s) {
+          var titleAttr = escapeHtml(s.title);
+          return (
+            '<div class="card">' +
+              '<a href="/show/?imdb=' + s.imdb + '">' +
+                '<img src="' + s.src + '" alt="' + titleAttr + '" width="150" height="225" decoding="async" loading="lazy">' +
+              '</a>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      renderMiniGrid('index-dnf-grid', 'dnf');
+      renderMiniGrid('index-watchlist-grid', 'watchlist');
+    })();
+  </script>
+
+  <script>
+    // Paste your free TMDB API key (v3 auth) here to turn on the "Last Watch" trailer.
+    // Get one at https://www.themoviedb.org/settings/api — leave blank to just show the poster.
+    window.TMDB_API_KEY = "6cb6e1dc603bc65ffb6198489d5bc5b7";
+  </script>
+
+  <script>
+    (function () {
+      function starGlyph(v) {
+        var full = Math.floor(v);
+        var half = (v - full) >= 0.5;
+        return '\u2605'.repeat(full) + (half ? '\u00BD' : '');
+      }
+
+      var section = document.getElementById('last-watched-section');
+      var linkEl = document.getElementById('last-watched-link');
+      var imgEl = document.getElementById('last-watched-img');
+      var ratingEl = document.getElementById('last-watched-rating');
+      if (!section || !linkEl || !imgEl) return;
+
+      var journaled = SHOWS.filter(function (s) { return !!s.journalYear; });
+      if (!journaled.length) return;
+
+      var currentYear = new Date().getFullYear();
+      var thisYear = journaled.filter(function (s) { return s.journalYear === currentYear; });
+      var pool = thisYear.length ? thisYear : journaled;
+
+      var lastWatched = pool.reduce(function (latest, s) {
+        return (!latest || s.journalOrder > latest.journalOrder) ? s : latest;
+      }, null);
+
+      if (!lastWatched) return;
+
+      linkEl.href = '/show/?imdb=' + lastWatched.imdb;
+      imgEl.src = lastWatched.src;
+      imgEl.alt = lastWatched.title || '';
+
+      if (ratingEl && lastWatched.rating != null) {
+        ratingEl.innerHTML = '<a href="/u/saif/rating/?stars=' + lastWatched.rating + '" class="rating-link">' + starGlyph(lastWatched.rating) + '</a>';
+      }
+
+      section.hidden = false;
+
+      // --- Trailer: fetched from TMDB, swapped in exactly 3.5s after the page opens ---
+      var TMDB_API_KEY = window.TMDB_API_KEY || '';
+      var mediaEl = document.getElementById('last-watched-media');
+      var trailerEl = document.getElementById('last-watched-trailer');
+      var reverted = true; // becomes false once a trailer actually starts playing
+      var autoRevertTimer = null;
+
+      function loadYouTubeAPI(callback) {
+        if (window.YT && window.YT.Player) { callback(); return; }
+        var existing = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+          if (existing) existing();
+          callback();
+        };
+        if (!document.getElementById('youtube-iframe-api')) {
+          var tag = document.createElement('script');
+          tag.id = 'youtube-iframe-api';
+          tag.src = 'https://www.youtube.com/iframe_api';
+          document.head.appendChild(tag);
+        }
+      }
+
+      function revertToPoster() {
+        if (reverted) return;
+        reverted = true;
+        if (autoRevertTimer) { clearTimeout(autoRevertTimer); autoRevertTimer = null; }
+        // Hide the iframe immediately (no transition) so YouTube's own end-of-video
+        // "more videos" screen never has a chance to flash before we fade to the poster.
+        trailerEl.style.transition = 'none';
+        trailerEl.style.opacity = '0';
+        mediaEl.classList.remove('-trailer-active');
+        section.classList.remove('-trailer-active');
+        var labelEl = document.getElementById('last-watched-label');
+        if (labelEl) labelEl.textContent = 'Last Watch';
+        // wait a beat before actually removing the player and resetting the inline styles
+        setTimeout(function () {
+          trailerEl.innerHTML = '';
+          trailerEl.style.transition = '';
+          trailerEl.style.opacity = '';
+        }, 900);
+      }
+
+      function playTrailer(key) {
+        if (!mediaEl || !trailerEl || !key) return;
+        reverted = false;
+        var hasStartedRevertTimer = false;
+        var iframe = document.createElement('iframe');
+        iframe.id = 'last-watched-trailer-iframe';
+        iframe.src = 'https://www.youtube.com/embed/' + key +
+          '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&playsinline=1' +
+          '&disablekb=1&iv_load_policy=3&cc_load_policy=0&fs=0&enablejsapi=1&origin=' + window.location.origin;
+        iframe.title = 'Trailer';
+        // No "picture-in-picture" here on purpose: granting that permission is what lets
+        // mobile browsers auto-pop the video into a little floating window on their own.
+        iframe.allow = 'autoplay; encrypted-media';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.frameBorder = '0';
+        iframe.tabIndex = -1;
+        trailerEl.appendChild(iframe);
+
+        // Click-to-toggle play/pause overlay (no link, no navigating to YouTube).
+        var toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'last-watched-trailer-toggle';
+        toggleBtn.setAttribute('aria-label', 'Play or pause trailer');
+        toggleBtn.innerHTML =
+          '<span class="icon">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' +
+          '</span>';
+        trailerEl.appendChild(toggleBtn);
+
+        // "Tap to unmute" pill - shown on both mobile and desktop while muted.
+        var unmuteHint = document.createElement('button');
+        unmuteHint.type = 'button';
+        unmuteHint.className = 'last-watched-trailer-unmute';
+        unmuteHint.setAttribute('aria-label', 'Tap to unmute trailer');
+        unmuteHint.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.8L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>' +
+          '<span>Tap to unmute</span>';
+        trailerEl.appendChild(unmuteHint);
+
+        var player = null;
+        var wantsUnmute = false;
+
+        function applyUnmuteIfWanted() {
+          if (!wantsUnmute || !player || typeof player.unMute !== 'function') return;
+          try { player.unMute(); player.setVolume(100); } catch (err) {}
+        }
+
+        function requestUnmute() {
+          wantsUnmute = true;
+          unmuteHint.classList.remove('-visible');
+          applyUnmuteIfWanted();
+        }
+
+        unmuteHint.classList.add('-visible');
+
+        unmuteHint.addEventListener('click', function (e) {
+          e.stopPropagation();
+          requestUnmute();
+        });
+
+        // "Open in YouTube" pill - same row as the unmute pill, right-aligned.
+        var youtubeLink = document.createElement('a');
+        youtubeLink.className = 'last-watched-trailer-youtube';
+        youtubeLink.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(key);
+        youtubeLink.target = '_blank';
+        youtubeLink.rel = 'noopener noreferrer';
+        youtubeLink.setAttribute('aria-label', 'Open trailer in YouTube');
+        youtubeLink.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>' +
+          '<span>Open in YouTube</span>';
+        youtubeLink.addEventListener('click', function (e) { e.stopPropagation(); });
+        trailerEl.appendChild(youtubeLink);
+
+        toggleBtn.addEventListener('click', function () {
+          if (!player || typeof player.getPlayerState !== 'function') return;
+          var state;
+          try { state = player.getPlayerState(); } catch (err) { return; }
+          if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+          } else {
+            player.playVideo();
+          }
+        });
+
+        // next frame so the aspect-ratio/opacity/width transitions actually animate
+        requestAnimationFrame(function () {
+          mediaEl.classList.add('-trailer-active');
+          section.classList.add('-trailer-active');
+          var labelEl = document.getElementById('last-watched-label');
+          if (labelEl && lastWatched.title) {
+            var titleLink = document.createElement('a');
+            titleLink.className = 'last-watched-title-link';
+            titleLink.href = '/show/?imdb=' + encodeURIComponent(lastWatched.imdb);
+            titleLink.textContent = lastWatched.title;
+            labelEl.textContent = 'Last Watch: ';
+            labelEl.appendChild(titleLink);
+          }
+        });
+
+        // watch for the trailer actually ending, then fade back to the poster
+        loadYouTubeAPI(function () {
+          if (!document.getElementById('last-watched-trailer-iframe')) return;
+          player = new YT.Player('last-watched-trailer-iframe', {
+            events: {
+              onReady: applyUnmuteIfWanted,
+              onStateChange: function (e) {
+                if (e.data === YT.PlayerState.ENDED) revertToPoster();
+                else if (e.data === YT.PlayerState.PLAYING) {
+                  toggleBtn.classList.remove('-paused');
+                  // Hard cap: revert to the poster 12s after the trailer actually starts
+                  // playing (not from when we first tried to load it).
+                  if (!hasStartedRevertTimer) {
+                    hasStartedRevertTimer = true;
+                    autoRevertTimer = setTimeout(revertToPoster, 12000);
+                  }
+                }
+                else if (e.data === YT.PlayerState.PAUSED) toggleBtn.classList.add('-paused');
+              }
+            }
+          });
+          applyUnmuteIfWanted();
+        });
+      }
+
+      function fetchTrailerKey(imdbId) {
+        return fetch('https://api.themoviedb.org/3/find/' + imdbId + '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id')
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var hit = (data.tv_results && data.tv_results[0])
+              ? { id: data.tv_results[0].id, type: 'tv' }
+              : (data.movie_results && data.movie_results[0])
+                ? { id: data.movie_results[0].id, type: 'movie' }
+                : null;
+            if (!hit) return null;
+            return fetch('https://api.themoviedb.org/3/' + hit.type + '/' + hit.id + '/videos?api_key=' + TMDB_API_KEY)
+              .then(function (r) { return r.json(); })
+              .then(function (vdata) {
+                var vids = (vdata.results || []).filter(function (v) { return v.site === 'YouTube'; });
+                var pick = vids.find(function (v) { return v.type === 'Trailer' && v.official; })
+                  || vids.find(function (v) { return v.type === 'Trailer'; })
+                  || vids.find(function (v) { return v.type === 'Teaser'; })
+                  || vids[0];
+                return pick ? pick.key : null;
+              });
+          });
+      }
+
+      if (TMDB_API_KEY && lastWatched.imdb) {
+        var startDelayTimer = new Promise(function (resolve) { setTimeout(resolve, 3500); });
+        Promise.all([fetchTrailerKey(lastWatched.imdb), startDelayTimer])
+          .then(function (results) { playTrailer(results[0]); })
+          .catch(function () { /* no trailer found - poster just stays put */ });
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      var journaled = SHOWS.filter(function (s) { return !!s.journalYear; })
+        .sort(function (a, b) { return b.journalOrder - a.journalOrder; });
+
+      var yearCountEl = document.getElementById('journal-year-count');
+      var yearTextEl = document.getElementById('journal-year-text');
+      var listEl = document.getElementById('journal-entry-list');
+      if (!journaled.length || !yearCountEl || !yearTextEl || !listEl) return;
+
+      var latestYear = journaled[0].journalYear;
+
+      yearCountEl.textContent = journaled.filter(function (s) { return s.journalYear === latestYear; }).length;
+      yearTextEl.textContent = latestYear;
+
+      var journaledLatestYear = journaled.filter(function (s) { return s.journalYear === latestYear; });
+
+      listEl.innerHTML = journaledLatestYear.slice(0, 2).map(function (s) {
+        return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
+      }).join('');
+
+      var listEl2025 = document.getElementById('journal-entry-list-2025');
+      if (listEl2025) {
+        var journaled2025 = journaled.filter(function (s) { return s.journalYear === 2025; });
+        listEl2025.innerHTML = journaled2025.length
+          ? journaled2025.slice(0, 2).map(function (s) {
+              return '<li><a href="/show/?imdb=' + s.imdb + '" class="entry-title">' + escapeHtml(s.title) + '</a></li>';
+            }).join('')
+          : '<li class="entry-title" style="opacity:0.5;">Nothing logged yet</li>';
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var RATING_STEPS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+      var counts = {};
+      RATING_STEPS.forEach(function (r) { counts[r] = 0; });
+
+      SHOWS.forEach(function (s) {
+        if (s.rating && counts.hasOwnProperty(s.rating)) {
+          counts[s.rating]++;
+        }
+      });
+
+      var maxCount = Math.max.apply(null, RATING_STEPS.map(function (r) { return counts[r]; }));
+
+      var bars = document.querySelectorAll('#ratings-bars .rbar');
+      Array.prototype.forEach.call(bars, function (bar) {
+        var r = parseFloat(bar.dataset.rating);
+        var count = counts[r] || 0;
+        var pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+
+        bar.style.height = pct + '%';
+        bar.title = r + '★ · ' + count;
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      if (!window.matchMedia('(min-width: 1024px)').matches) return;
+      if (!window.STATS_YEARS || !window.TVStats) return;
+
+      var SPINNER_HTML =
+        '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+      var PALETTE = ['#5b8ecb', '#c97b7b', '#c9a06b', '#6bb3a0', '#9b8bc4', '#6bafc9', '#c98bab', '#93b378', '#c9b26b'];
+      var OTHER_COLOR = '#3a4a63';
+
+      function colorFor(item, i) {
+        return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function fmtPct(v) {
+        return (Math.round(v * 10) / 10).toString();
+      }
+
+      function buildDonut(list, centerValue, centerLabel) {
+        var size = 168, cx = 84, cy = 84, r = 64, sw = 22;
+        var circumference = 2 * Math.PI * r;
+        var total = list.reduce(function (s, i) { return s + i.value; }, 0) || 1;
+        var offset = 0;
+
+        var segments = list.map(function (item, i) {
+          var frac = item.value / total;
+          var len = Math.max(frac * circumference, list.length > 1 ? 1.5 : circumference);
+          var gap = list.length > 1 ? 2 : 0;
+          var dasharray = Math.max(len - gap, 0) + ' ' + (circumference - len + gap);
+          var dashoffset = -offset;
+          offset += len;
+          return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
+            'stroke="' + colorFor(item, i) + '" stroke-width="' + sw + '" ' +
+            'stroke-dasharray="' + dasharray + '" stroke-dashoffset="' + dashoffset + '" ' +
+            'stroke-linecap="round" transform="rotate(-90 ' + cx + ' ' + cy + ')" />';
+        }).join('');
+
+        return (
+          '<svg viewBox="0 0 ' + size + ' ' + size + '" class="stats-donut" role="img" aria-label="Platform distribution">' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="' + sw + '"/>' +
+            segments +
+            '<text x="' + cx + '" y="' + (cy - 3) + '" text-anchor="middle" class="stats-donut-center-value numbers">' + escapeHtml(centerValue) + '</text>' +
+            '<text x="' + cx + '" y="' + (cy + 15) + '" text-anchor="middle" class="stats-donut-center-label">' + escapeHtml(centerLabel) + '</text>' +
+          '</svg>'
+        );
+      }
+
+      var statusEl = document.getElementById('embed-stats-status');
+      var content = document.getElementById('embed-stats-content');
+      var heroHours = document.getElementById('embed-stat-hours');
+      var heroEpisodes = document.getElementById('embed-stat-episodes');
+      var heroSeasons = document.getElementById('embed-stat-seasons');
+      var platformMount = document.getElementById('embed-platform-donut-mount');
+      var platformLegend = document.getElementById('embed-platform-legend');
+
+      if (!statusEl || !content) return;
+
+      statusEl.hidden = false;
+      statusEl.innerHTML = SPINNER_HTML;
+
+      var showList = STATS_YEARS[2026] || [];
+      var ids = showList.map(function (s) { return s.imdb; });
+
+      TVStats.fetchAll(ids).then(function (records) {
+        var summary = TVStats.aggregate(showList, records);
+
+        statusEl.hidden = true;
+        statusEl.innerHTML = '';
+
+        if (!summary.showCount) {
+          statusEl.hidden = false;
+          statusEl.innerHTML = '<p class="stats-empty">No shows logged yet.</p>';
+          return;
+        }
+
+        content.hidden = false;
+        heroHours.textContent = fmtPct(summary.hours);
+        heroEpisodes.textContent = Math.round(summary.episodes);
+        heroSeasons.textContent = Math.round(summary.seasons);
+
+        var platformList = TVStats.toRanked(summary.platforms, 5);
+        platformMount.innerHTML = buildDonut(platformList, fmtPct(summary.hours), 'HOURS');
+        platformLegend.innerHTML = platformList.map(function (item, i) {
+          var pct = summary.hours ? fmtPct((item.value / summary.hours) * 100) : '0';
+          return (
+            '<li class="stats-legend-item">' +
+              '<span class="stats-legend-dot" style="background:' + colorFor(item, i) + '"></span>' +
+              '<span class="stats-legend-name">' + escapeHtml(item.name) + '</span>' +
+              '<span class="stats-legend-value"><span class="numbers">' + pct + '%</span></span>' +
+            '</li>'
+          );
+        }).join('');
+      }).catch(function () {
+        statusEl.hidden = false;
+        statusEl.classList.add('-error');
+        statusEl.textContent = 'Something went wrong pulling stats.';
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var form = document.getElementById('home-search-form');
+      var input = document.getElementById('home-search-input');
+      var overlay = document.getElementById('page-loading-overlay');
+
+      function goToResults() {
+        var value = input.value.trim();
+        if (!value) return;
+        overlay.classList.add('-visible');
+        window.location.href = '/search/?q=' + encodeURIComponent(value);
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        goToResults();
+      });
+
+      input.addEventListener('search', function () {
+        goToResults();
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          goToResults();
+        }
+      });
+
+      window.addEventListener('pageshow', function () {
+        overlay.classList.remove('-visible');
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var trigger = document.getElementById('avatar-trigger');
+      var lightbox = document.getElementById('avatar-lightbox');
+      var lightboxImg = document.getElementById('avatar-lightbox-img');
+
+      function openLightbox() {
+        lightboxImg.src = trigger.src;
+        lightbox.classList.add('-visible');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove('-visible');
+        document.body.style.overflow = '';
+      }
+
+      trigger.addEventListener('click', openLightbox);
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox();
+        }
+      });
+
+      lightbox.addEventListener('click', closeLightbox);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeLightbox();
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var wrapper = document.getElementById('backdrop');
+      if (!wrapper) return;
+      var image = wrapper.querySelector('.js-backdrop-image');
+
+      var isRetina = window.devicePixelRatio > 1;
+      var isMobile = window.matchMedia('(max-width: 600px)').matches;
+
+      var url = wrapper.dataset.backdrop;
+      if (isMobile && wrapper.dataset.backdropMobile) {
+        url = wrapper.dataset.backdropMobile;
+      } else if (isRetina && wrapper.dataset.backdrop2x) {
+        url = wrapper.dataset.backdrop2x;
+      }
+      if (!url || url.indexOf('PASTE_') === 0) return;
+
+      var offset = wrapper.dataset.offset;
+      if (offset) {
+        image.style.backgroundPosition = 'center ' + offset + '%';
+      }
+
+      var preload = new Image();
+      preload.onload = function () {
+        image.style.backgroundImage = 'url("' + url + '")';
+        image.classList.add('is-loaded');
+      };
+      preload.src = url;
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var nameTrigger = document.getElementById('name-trigger');
+      var circleTrigger = document.getElementById('badge-circle-trigger');
+      var avatarImg = document.getElementById('avatar-trigger');
+      var summary = document.querySelector('.profile-summary');
+      var morph = document.getElementById('badge-morph');
+      var morphAvatarImg = document.getElementById('badge-morph-avatar');
+      var morphBadgeImg = document.getElementById('badge-morph-badge');
+      var morphLabel = document.getElementById('badge-morph-label');
+      if (!nameTrigger || !circleTrigger || !avatarImg || !summary || !morph) return;
+
+      var isAnimating = false;
+
+      var POP_EASE = 'cubic-bezier(0.22, 1.2, 0.36, 1)';
+      var IN_EASE = 'cubic-bezier(0.45, 0, 0.55, 1)';
+      var MORPH_PROPS = ['width', 'height', 'left', 'top', 'border-radius', 'border-width'];
+
+      function setMorphTransition(duration, easing) {
+        morph.style.transition = MORPH_PROPS.map(function (p) {
+          return p + ' ' + duration + 'ms ' + easing;
+        }).join(', ');
+      }
+
+      function playBadgeAnimation() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        var summaryRect = summary.getBoundingClientRect();
+        var avatarRect = avatarImg.getBoundingClientRect();
+
+        var startLeft = avatarRect.left - summaryRect.left;
+        var startTop = avatarRect.top - summaryRect.top;
+        var startW = avatarRect.width;
+        var startH = avatarRect.height;
+        var centerY = startTop + startH / 2;
+        var dot = Math.max(10, startW * 0.16);
+        var dotLeft = startLeft + startW / 2 - dot / 2;
+        var dotTop = centerY - dot / 2;
+
+        morphAvatarImg.src = avatarImg.currentSrc || avatarImg.src;
+
+        morph.style.transition = 'none';
+        morph.style.left = startLeft + 'px';
+        morph.style.top = startTop + 'px';
+        morph.style.width = startW + 'px';
+        morph.style.height = startH + 'px';
+        morph.style.borderRadius = '50%';
+        morph.style.borderWidth = '4px';
+        morphAvatarImg.classList.add('-visible');
+        morphBadgeImg.classList.remove('-visible');
+        morph.classList.add('-active');
+        avatarImg.style.opacity = '0';
+        void morph.offsetWidth;
+
+        var t = 0;
+
+        requestAnimationFrame(function () {
+          setMorphTransition(200, IN_EASE);
+          morph.style.width = dot + 'px';
+          morph.style.height = dot + 'px';
+          morph.style.left = dotLeft + 'px';
+          morph.style.top = dotTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '2px';
+        });
+        t += 200;
+
+        setTimeout(function () {
+          nameTrigger.style.transition = 'opacity 0.25s ease';
+          nameTrigger.style.opacity = '0';
+
+          morphBadgeImg.classList.add('-visible');
+          morphAvatarImg.classList.remove('-visible');
+
+          var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+          var badgeScale = isDesktop ? 2 : 1;
+          var badgeW, badgeH;
+          if (isDesktop) {
+            badgeH = startH;
+            var naturalAspect = (morphBadgeImg.naturalWidth && morphBadgeImg.naturalHeight)
+              ? (morphBadgeImg.naturalWidth / morphBadgeImg.naturalHeight)
+              : 3;
+            badgeW = badgeH * naturalAspect;
+          } else {
+            badgeW = Math.min(summaryRect.width * 0.8, 300) * badgeScale;
+            badgeH = badgeW / 3;
+          }
+          var badgeLeft = (summaryRect.width - badgeW) / 2;
+          var badgeTop = centerY - badgeH / 2;
+          var radius = Math.max(10, Math.round(badgeH * 0.16));
+
+          setMorphTransition(360, POP_EASE);
+          morph.style.width = badgeW + 'px';
+          morph.style.height = badgeH + 'px';
+          morph.style.left = badgeLeft + 'px';
+          morph.style.top = badgeTop + 'px';
+          morph.style.borderRadius = radius + 'px';
+          morph.style.borderWidth = '0px';
+
+          if (morphLabel) {
+            morphLabel.style.setProperty('--badge-left', badgeLeft + 'px');
+            morphLabel.style.setProperty('--badge-top', badgeTop + 'px');
+            morphLabel.style.setProperty('--badge-w', badgeW + 'px');
+            morphLabel.style.setProperty('--badge-h', badgeH + 'px');
+            morphLabel.style.setProperty('--badge-center-y', centerY + 'px');
+            morphLabel.classList.add('-visible');
+          }
+        }, t);
+        t += 360;
+
+        var HOLD = 950;
+        t += HOLD;
+
+        setTimeout(function () {
+          morphAvatarImg.classList.add('-visible');
+          morphBadgeImg.classList.remove('-visible');
+          if (morphLabel) morphLabel.classList.remove('-visible');
+
+          setMorphTransition(200, IN_EASE);
+          morph.style.width = dot + 'px';
+          morph.style.height = dot + 'px';
+          morph.style.left = dotLeft + 'px';
+          morph.style.top = dotTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '2px';
+
+          nameTrigger.style.opacity = '1';
+        }, t);
+        t += 200;
+
+        setTimeout(function () {
+          setMorphTransition(340, POP_EASE);
+          morph.style.width = startW + 'px';
+          morph.style.height = startH + 'px';
+          morph.style.left = startLeft + 'px';
+          morph.style.top = startTop + 'px';
+          morph.style.borderRadius = '50%';
+          morph.style.borderWidth = '4px';
+        }, t);
+        t += 340;
+
+        setTimeout(function () {
+          avatarImg.style.opacity = '1';
+          morph.classList.remove('-active');
+          isAnimating = false;
+          circleTrigger.blur();
+        }, t + 40);
+      }
+
+      circleTrigger.addEventListener('click', playBadgeAnimation);
+      circleTrigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          playBadgeAnimation();
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted && document.activeElement) {
+        document.activeElement.blur();
+      }
+    });
+  </script>
+<script src="/auth.js?v=1"></script>
+</body>
+</html>
