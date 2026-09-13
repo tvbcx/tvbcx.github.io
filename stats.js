@@ -3,7 +3,7 @@ var STATS_YEARS = (function () {
   SHOWS.filter(function (s) { return !!s.journalYear; })
     .sort(function (a, b) { return a.journalOrder - b.journalOrder; })
     .forEach(function (s) {
-      (byYear[s.journalYear] = byYear[s.journalYear] || []).push({ title: s.title, imdb: s.imdb });
+      (byYear[s.journalYear] = byYear[s.journalYear] || []).push({ title: s.title, imdb: s.imdb, seasons: s.seasons });
     });
   return byYear;
 })();
@@ -15,7 +15,7 @@ var STATS_YEARS = (function () {
   var TMDB_BASE = 'https://api.themoviedb.org/3';
   var TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w154';
   var CACHE_PREFIX = 'tvbox:stats:';
-  var CACHE_VERSION = 2;
+  var CACHE_VERSION = 3;
   var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
   var DEFAULT_RUNTIME_MIN = 45;
@@ -36,7 +36,8 @@ var STATS_YEARS = (function () {
     lastYear: null,
     status: null,
     poster: null,
-    name: null
+    name: null,
+    rawSeasons: []
   });
 
   function readCache(imdbId) {
@@ -83,10 +84,17 @@ var STATS_YEARS = (function () {
     var languages = (show.spoken_languages || []).map(function (l) { return l.english_name || l.name; });
     if (!languages.length && show.original_language) languages = [show.original_language.toUpperCase()];
 
+    var rawSeasons = (show.seasons || [])
+      .filter(function (s) { return s && typeof s.season_number === 'number' && s.season_number > 0; })
+      .map(function (s) {
+        return { number: s.season_number, episodes: s.episode_count || 0, airDate: s.air_date || null };
+      });
+
     return {
       episodes: episodes,
       seasons: seasons,
       minutes: episodes * avgRuntime,
+      rawSeasons: rawSeasons,
       genres: genres.length ? genres : ['Unspecified'],
       networks: networks.length ? networks : ['Independent / Other'],
       creators: creators.length ? creators : ['Unattributed'],
@@ -149,6 +157,38 @@ var STATS_YEARS = (function () {
     return Promise.all(workers).then(function () { return results; });
   }
 
+  // Scopes a full-show record down to only the season(s) actually watched,
+  // for stats purposes. Journal/display data elsewhere is untouched — this
+  // only reshapes episodes/minutes/seasons/firstYear/lastYear used in aggregate().
+  function applyWatchedSeasons(record, watchedSeasons) {
+    if (!watchedSeasons || !watchedSeasons.length) return record;
+    if (!record.rawSeasons || !record.rawSeasons.length) return record;
+
+    var wanted = watchedSeasons.map(function (n) { return Number(n); });
+    var matched = record.rawSeasons.filter(function (s) { return wanted.indexOf(s.number) !== -1; });
+    if (!matched.length) return record;
+
+    var episodes = matched.reduce(function (sum, s) { return sum + (s.episodes || 0); }, 0);
+    var avgRuntime = record.episodes > 0 ? (record.minutes / record.episodes) : DEFAULT_RUNTIME_MIN;
+
+    var years = matched
+      .map(function (s) { return yearFromDate(s.airDate); })
+      .filter(function (y) { return y !== null; });
+
+    var scoped = {};
+    for (var key in record) {
+      if (Object.prototype.hasOwnProperty.call(record, key)) scoped[key] = record[key];
+    }
+    scoped.episodes = episodes;
+    scoped.seasons = matched.length;
+    scoped.minutes = episodes * avgRuntime;
+    if (years.length) {
+      scoped.firstYear = Math.min.apply(null, years);
+      scoped.lastYear = Math.max.apply(null, years);
+    }
+    return scoped;
+  }
+
   function aggregate(showList, records) {
     var summary = {
       hours: 0,
@@ -167,7 +207,8 @@ var STATS_YEARS = (function () {
     };
 
     showList.forEach(function (entry) {
-      var r = records[entry.imdb] || EMPTY_RECORD;
+      var full = records[entry.imdb] || EMPTY_RECORD;
+      var r = applyWatchedSeasons(full, entry.seasons);
       var hours = r.minutes / 60;
 
       summary.hours += hours;
