@@ -807,14 +807,6 @@ showCopied();
         iframe.tabIndex = -1;
         trailerEl.appendChild(iframe);
 
-        var watchLink = document.createElement('a');
-        watchLink.href = 'https://www.youtube.com/watch?v=' + key;
-        watchLink.target = '_blank';
-        watchLink.rel = 'noopener noreferrer';
-        watchLink.className = 'last-watched-trailer-link';
-        watchLink.setAttribute('aria-label', 'Watch trailer on YouTube');
-        trailerEl.appendChild(watchLink);
-
         // next frame so the aspect-ratio/opacity/width transitions actually animate
         requestAnimationFrame(function () {
           mediaEl.classList.add('-trailer-active');
@@ -833,9 +825,6 @@ showCopied();
           if (!document.getElementById('last-watched-trailer-iframe')) return;
           var player = new YT.Player('last-watched-trailer-iframe', {
             events: {
-              onReady: function (e) {
-                try { e.target.unMute(); e.target.setVolume(100); } catch (err) {}
-              },
               onStateChange: function (e) {
                 if (e.data === YT.PlayerState.ENDED) revertToPoster();
               }
