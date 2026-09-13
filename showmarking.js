@@ -5,7 +5,6 @@ const AUTH_PROMPT_MESSAGE = 'Sign in or Sign up to continue';
 const MARKAS_OPTIONS = [
   { id: 'dnf', label: 'Did Not Finish' },
   { id: 'watched', label: 'Watched' },
-  { id: 'addlist', label: 'Add to List' },
 ];
 
 const STAR_COUNT = 5;
