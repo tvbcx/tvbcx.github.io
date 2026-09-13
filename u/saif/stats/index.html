@@ -118,27 +118,27 @@
     .stx-hero-value { font-weight: 700; letter-spacing: -0.02em; }
 
     .stx-trend { display: flex; flex-direction: column; gap: 2px; }
-    .stx-trend-chart { position: relative; height: 96px; margin-bottom: 6px; }
+    .stx-trend-chart { position: relative; height: 96px; margin-bottom: 8px; }
     .stx-trend-svg { display: block; width: 100%; height: 100%; overflow: visible; }
-    .stx-trend-line { stroke: #4d8eff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--line-len, 1); stroke-dashoffset: var(--line-len, 1); transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1); }
+    .stx-trend-line { stroke: #6b7994; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--line-len, 1); stroke-dashoffset: var(--line-len, 1); transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1); }
     .stx-trend-chart.-visible .stx-trend-line { stroke-dashoffset: 0; }
     .stx-trend-area { opacity: 0; transition: opacity 0.9s ease 0.35s; }
     .stx-trend-chart.-visible .stx-trend-area { opacity: 1; }
-    .stx-trend-dot { fill: #0b121e; stroke: #4d8eff; stroke-width: 1.75; opacity: 0; transition: opacity 0.4s ease 0.2s; }
+    .stx-trend-dot { fill: #0b121e; stroke: #6b7994; stroke-width: 1.5; opacity: 0; transition: opacity 0.4s ease 0.2s; }
     .stx-trend-chart.-visible .stx-trend-dot { opacity: 1; }
-    .stx-trend-dot.-current { fill: #4d8eff; }
+    .stx-trend-dot.-current { fill: #8490a4; stroke: #8490a4; }
 
     .stx-trend-cols { display: flex; align-items: flex-start; gap: 14px; padding: 0 2px; }
-    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-    .stx-trend-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 9px; border-radius: 999px; font-family: var(--font-numbers); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; background-color: rgba(255,255,255,0.03); color: #8490a4; white-space: nowrap; }
+    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
+    .stx-trend-badge { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-numbers); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; color: #8490a4; white-space: nowrap; }
     .stx-trend-badge .arrow { font-size: 8px; line-height: 1; }
-    .stx-trend-badge.-up { color: #6bb3a0; background-color: rgba(107,179,160,0.1); }
-    .stx-trend-badge.-down { color: #c97b7b; background-color: rgba(201,123,123,0.1); }
+    .stx-trend-badge.-up { color: #7c9e93; }
+    .stx-trend-badge.-down { color: #a97e7e; }
     .stx-trend-badge.-flat { color: #8490a4; }
-    .stx-trend-badge.-empty { color: #505a6b; background: none; }
+    .stx-trend-badge.-empty { color: #505a6b; }
     .stx-trend-value { font-size: 13.5px; color: #eaeef5; font-weight: 600; }
     .stx-trend-year { font-size: 11.5px; color: #8490a4; }
-    .stx-trend-year.-current { color: #4d8eff; font-weight: 700; }
+    .stx-trend-year.-current { color: #b3c2db; font-weight: 700; }
 
     @media (min-width: 1024px) {
       .stx-trend-chart { height: 128px; }
@@ -851,8 +851,8 @@ showCopied();
           var svg =
             '<svg class="stx-trend-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
               '<defs><linearGradient id="stxTrendFill" x1="0" y1="0" x2="0" y2="1">' +
-                '<stop offset="0%" stop-color="#4d8eff" stop-opacity="0.3"></stop>' +
-                '<stop offset="100%" stop-color="#4d8eff" stop-opacity="0"></stop>' +
+                '<stop offset="0%" stop-color="#6b7994" stop-opacity="0.14"></stop>' +
+                '<stop offset="100%" stop-color="#6b7994" stop-opacity="0"></stop>' +
               '</linearGradient></defs>' +
               '<path class="stx-trend-area" d="' + areaPath + '" fill="url(#stxTrendFill)"></path>' +
               '<path class="stx-trend-line" d="' + linePath + '" fill="none"></path>' +
