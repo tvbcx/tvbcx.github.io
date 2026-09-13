@@ -23,7 +23,7 @@
     .stx-top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
     .stx-top-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .stx-title { margin: 0; font-size: 1.5rem; line-height: 1.15; color: #fff; display: flex; align-items: baseline; gap: 9px; }
-    .stx-title .numbers { color: #5b8ecb; font-weight: 500; }
+    .stx-title .numbers { color: #fff; font-weight: 500; }
     .stx-title-label { color: #eaeef5; }
     .stx-meta { margin: 0; font-size: 12.5px; color: #8490a4; min-height: 1.4em; }
     .stx-meta strong { color: #b3c2db; font-weight: 600; }
@@ -33,10 +33,10 @@
     .year-pills::-webkit-scrollbar { display: none; }
     .year-pill { flex: 0 0 auto; padding: 6px 15px; border: 1px solid #1e2a3e; border-radius: 8px; background-color: rgba(255,255,255,0.02); color: #8490a4; font-family: var(--font-numbers); font-size: 13px; letter-spacing: 0.02em; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease; }
     .year-pill:hover { border-color: #30405a; color: #b3c2db; }
-    .year-pill.-active { background-color: #4d8eff; border-color: #4d8eff; color: #071019; font-weight: 700; }
+    .year-pill.-active { background-color: #fff; border-color: #fff; color: #0b121e; font-weight: 700; }
 
     .stx-status { display: flex; align-items: center; justify-content: center; gap: 10px; color: #8490a4; font-size: 13px; padding: 60px 0; }
-    .stx-status.-error { color: #29a6ff; }
+    .stx-status.-error { color: #fff; }
     .stx-status[hidden] { display: none; }
     .stx-empty { color: rgba(234,238,245,0.5); font-size: 13px; padding: 8px 0; }
 
@@ -54,7 +54,7 @@
 
     .stx-hero-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
     .stx-hero-ring-track { fill: none; stroke: rgba(208,222,235,0.14); stroke-width: 6; }
-    .stx-hero-ring-fill { fill: none; stroke: var(--stat-color, #4E81B3); stroke-width: 6; stroke-linecap: round;
+    .stx-hero-ring-fill { fill: none; stroke: var(--stat-color, #fff); stroke-width: 6; stroke-linecap: round;
       stroke-dasharray: 327; stroke-dashoffset: 327;
       transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1) 0.05s; }
     .stx-hero-item.-visible .stx-hero-ring-fill { stroke-dashoffset: var(--ring-offset, 90); }
@@ -71,12 +71,12 @@
 
     .stx-panel { position: relative; background-color: #0b121e; border: 1px solid #1e2a3e; border-radius: 14px; padding: 18px; min-width: 0; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease; overflow: hidden; }
     .stx-panel.-visible { opacity: 1; transform: translateY(0); }
-    .stx-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--panel-accent, #4d8eff); }
+    .stx-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--panel-accent, rgba(255,255,255,0.5)); }
 
     .stx-panel-head { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e2a3e; }
     .stx-panel-title { margin: 0; font-size: 12.2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(234,238,245,0.55); }
     .stx-panel-note { flex: none; font-size: 12px; color: #8490a4; text-align: right; }
-    .stx-panel-note strong { color: var(--panel-tint, #4d8eff); font-weight: 700; }
+    .stx-panel-note strong { color: var(--panel-tint, #fff); font-weight: 700; }
 
     .stx-dist-bar { display: flex; width: 100%; height: 10px; border-radius: 999px; overflow: hidden; background-color: rgba(255,255,255,0.04); margin-bottom: 18px; }
     .stx-dist-seg { height: 100%; flex-grow: 0; flex-shrink: 0; flex-basis: 0%; box-sizing: border-box; border-right: 1px solid #0b121e; transition: flex-basis 0.8s cubic-bezier(0.22,1,0.36,1); }
@@ -93,10 +93,10 @@
     .stx-bar-top { display: flex; align-items: baseline; gap: 8px; }
     .stx-bar-rank { flex: none; width: 15px; font-family: var(--font-numbers); font-size: 10px; color: #505a6b; }
     .stx-bar-label { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #b3c2db; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .stx-bar-value { flex: none; font-size: 12px; color: #4d8eff; font-variant-numeric: tabular-nums; }
+    .stx-bar-value { flex: none; font-size: 12px; color: #fff; font-variant-numeric: tabular-nums; }
     .stx-bar-value .sub { color: #8490a4; margin-left: 3px; }
     .stx-bar-track { height: 6px; border-radius: 999px; background-color: rgba(255,255,255,0.04); overflow: hidden; margin-left: 23px; }
-    .stx-bar-fill { height: 100%; width: 0%; border-radius: 999px; background-color: #4d8eff; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .stx-bar-fill { height: 100%; width: 0%; border-radius: 999px; background-color: rgba(255,255,255,0.85); transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
 
     .stx-highlight-list { display: flex; flex-direction: column; }
     .stx-highlight { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #1e2a3e; }
@@ -107,43 +107,41 @@
     .stx-highlight-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     .stx-highlight-label { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: #8490a4; font-weight: 600; }
     .stx-highlight-title { font-size: 13.5px; color: #eaeef5; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .stx-highlight-value { flex: none; font-size: 15px; color: var(--panel-tint, #4d8eff); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.15; }
+    .stx-highlight-value { flex: none; font-size: 15px; color: var(--panel-tint, #fff); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.15; }
     .stx-highlight-value .unit { display: block; font-size: 9px; color: #8490a4; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 2px; font-family: var(--font-text); }
 
     .stx-chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
     .stx-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid #1e2a3e; border-radius: 999px; background-color: rgba(255,255,255,0.02); font-size: 12px; color: #a2acbe; }
-    .stx-chip .pct { font-variant-numeric: tabular-nums; color: var(--panel-tint, #4d8eff); font-weight: 600; }
+    .stx-chip .pct { font-variant-numeric: tabular-nums; color: var(--panel-tint, #fff); font-weight: 600; }
 
     .stx-page .numbers { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
     .stx-hero-value { font-weight: 700; letter-spacing: -0.02em; }
 
-    .stx-trend { display: flex; flex-direction: column; gap: 2px; }
-    .stx-trend-chart { position: relative; height: 96px; margin-bottom: 8px; }
-    .stx-trend-svg { display: block; width: 100%; height: 100%; overflow: visible; }
-    .stx-trend-line { stroke: #6b7994; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--line-len, 1); stroke-dashoffset: var(--line-len, 1); transition: stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1); }
-    .stx-trend-chart.-visible .stx-trend-line { stroke-dashoffset: 0; }
-    .stx-trend-area { opacity: 0; transition: opacity 0.9s ease 0.35s; }
-    .stx-trend-chart.-visible .stx-trend-area { opacity: 1; }
-    .stx-trend-dot { fill: #0b121e; stroke: #6b7994; stroke-width: 1.5; opacity: 0; transition: opacity 0.4s ease 0.2s; }
-    .stx-trend-chart.-visible .stx-trend-dot { opacity: 1; }
-    .stx-trend-dot.-current { fill: #8490a4; stroke: #8490a4; }
+    .stx-record { display: flex; flex-direction: column; gap: 4px; }
+    .stx-record-bars { display: flex; align-items: flex-end; gap: 10px; height: 108px; padding: 0 2px; border-bottom: 1px solid #1e2a3e; }
+    .stx-record-col { flex: 1; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+    .stx-record-track { width: 100%; max-width: 34px; height: 100%; display: flex; align-items: flex-end; }
+    .stx-record-fill { width: 100%; height: 0%; border-radius: 3px 3px 0 0; background: rgba(255,255,255,0.16); transition: height 0.85s cubic-bezier(0.22,1,0.36,1), background 0.3s ease; }
+    .stx-record-col.-current .stx-record-fill { background: #ffffff; }
+    .stx-record-col:hover .stx-record-fill { background: rgba(255,255,255,0.4); }
+    .stx-record-col.-current:hover .stx-record-fill { background: #ffffff; }
 
-    .stx-trend-cols { display: flex; align-items: flex-start; gap: 14px; padding: 0 2px; }
-    .stx-trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
-    .stx-trend-badge { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-numbers); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; color: #8490a4; white-space: nowrap; }
-    .stx-trend-badge .arrow { font-size: 8px; line-height: 1; }
-    .stx-trend-badge.-up { color: #7c9e93; }
-    .stx-trend-badge.-down { color: #a97e7e; }
-    .stx-trend-badge.-flat { color: #8490a4; }
-    .stx-trend-badge.-empty { color: #505a6b; }
-    .stx-trend-value { font-size: 13.5px; color: #eaeef5; font-weight: 600; }
-    .stx-trend-year { font-size: 11.5px; color: #8490a4; }
-    .stx-trend-year.-current { color: #b3c2db; font-weight: 700; }
+    .stx-record-cols { display: flex; align-items: flex-start; gap: 10px; padding: 10px 2px 0; }
+    .stx-record-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+    .stx-record-value { font-size: 12.5px; color: #eaeef5; font-weight: 600; letter-spacing: -0.01em; }
+    .stx-record-year { font-size: 11px; color: #8490a4; }
+    .stx-record-year.-current { color: #fff; font-weight: 700; }
+    .stx-record-delta { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-numbers); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; color: #8490a4; white-space: nowrap; }
+    .stx-record-delta .arrow { font-size: 8px; line-height: 1; opacity: 0.7; }
+    .stx-record-delta.-up { color: #d7dde8; }
+    .stx-record-delta.-down { color: #6f7a8d; }
+    .stx-record-delta.-flat { color: #8490a4; }
+    .stx-record-delta.-empty { color: #505a6b; }
 
     @media (min-width: 1024px) {
-      .stx-trend-chart { height: 128px; }
-      .stx-trend-value { font-size: 15px; }
-      .stx-trend-badge { font-size: 11.5px; }
+      .stx-record-bars { height: 138px; }
+      .stx-record-value { font-size: 14px; }
+      .stx-record-delta { font-size: 11px; }
     }
 
     @media (min-width: 640px) {
@@ -173,7 +171,7 @@
     @media (hover: hover) and (pointer: fine) {
       .stx-bar-row:hover .stx-bar-label { color: #eaeef5; }
       .stx-bar-row:hover .stx-bar-track { background-color: rgba(255,255,255,0.07); }
-      .stx-highlight:hover .stx-highlight-title { color: #4d8eff; }
+      .stx-highlight:hover .stx-highlight-title { color: #fff; }
     }
   </style>
 </head>
@@ -247,7 +245,7 @@
       <div id="stats-content" hidden>
 
         <section class="stx-hero" id="section-hero">
-          <div class="stx-hero-item" style="--stat-color:#5b8ecb; --ring-offset:59;">
+          <div class="stx-hero-item" style="--ring-offset:59;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
@@ -259,7 +257,7 @@
             </div>
             <span class="stx-hero-label">Hours Watched</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#9b8bc4; --ring-offset:98;">
+          <div class="stx-hero-item" style="--ring-offset:98;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
@@ -271,7 +269,7 @@
             </div>
             <span class="stx-hero-label">Episodes</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#c9a06b; --ring-offset:147;">
+          <div class="stx-hero-item" style="--ring-offset:147;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
@@ -283,7 +281,7 @@
             </div>
             <span class="stx-hero-label">Seasons</span>
           </div>
-          <div class="stx-hero-item" style="--stat-color:#6bb3a0; --ring-offset:114;">
+          <div class="stx-hero-item" style="--ring-offset:114;">
             <div class="stx-hero-circle">
               <svg class="stx-hero-ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="stx-hero-ring-track" cx="60" cy="60" r="52"></circle>
@@ -299,15 +297,15 @@
 
         <div class="stx-grid">
 
-          <section class="stx-panel stx-span-12" id="section-trend" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
+          <section class="stx-panel stx-span-12" id="section-record">
             <div class="stx-panel-head">
-              <h2 class="stx-panel-title">Watching Trend</h2>
-              <span class="stx-panel-note" id="trend-insight"></span>
+              <h2 class="stx-panel-title">Watch Record</h2>
+              <span class="stx-panel-note" id="record-insight"></span>
             </div>
-            <div id="trend-chart-mount"></div>
+            <div id="record-chart-mount"></div>
           </section>
 
-          <section class="stx-panel stx-span-7" id="section-platforms" style="--panel-accent: #5b8ecb; --panel-tint: #5b8ecb;">
+          <section class="stx-panel stx-span-7" id="section-platforms">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Platforms</h2>
               <span class="stx-panel-note" id="platform-insight"></span>
@@ -316,14 +314,14 @@
             <ul class="stx-dist-legend" id="platform-legend"></ul>
           </section>
 
-          <section class="stx-panel stx-span-5" id="section-highlights" style="--panel-accent: #c9a06b; --panel-tint: #c9a06b;">
+          <section class="stx-panel stx-span-5" id="section-highlights">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Highlights</h2>
             </div>
             <div class="stx-highlight-list" id="highlight-list"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-genres" style="--panel-accent: #9b8bc4; --panel-tint: #9b8bc4;">
+          <section class="stx-panel stx-span-6" id="section-genres">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Genres</h2>
               <span class="stx-panel-note" id="genre-insight"></span>
@@ -331,7 +329,7 @@
             <div class="stx-bar-list" id="genre-bars"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-creators" style="--panel-accent: #6bb3a0; --panel-tint: #6bb3a0;">
+          <section class="stx-panel stx-span-6" id="section-creators">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Creators</h2>
               <span class="stx-panel-note" id="creator-insight"></span>
@@ -339,14 +337,14 @@
             <div class="stx-bar-list" id="creator-bars"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-countries" style="--panel-accent: #93b378; --panel-tint: #93b378;">
+          <section class="stx-panel stx-span-6" id="section-countries">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Countries</h2>
             </div>
             <div class="stx-chip-list" id="country-chips"></div>
           </section>
 
-          <section class="stx-panel stx-span-6" id="section-languages" style="--panel-accent: #c9b26b; --panel-tint: #c9b26b;">
+          <section class="stx-panel stx-span-6" id="section-languages">
             <div class="stx-panel-head">
               <h2 class="stx-panel-title">Languages</h2>
             </div>
@@ -464,8 +462,8 @@ showCopied();
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
 
-      var PALETTE = ['#5b8ecb', '#c97b7b', '#c9a06b', '#6bb3a0', '#9b8bc4', '#6bafc9', '#c98bab', '#93b378', '#c9b26b'];
-      var OTHER_COLOR = '#3a4a63';
+      var PALETTE = ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.76)', 'rgba(255,255,255,0.62)', 'rgba(255,255,255,0.50)', 'rgba(255,255,255,0.40)', 'rgba(255,255,255,0.32)', 'rgba(255,255,255,0.26)', 'rgba(255,255,255,0.21)', 'rgba(255,255,255,0.17)'];
+      var OTHER_COLOR = 'rgba(255,255,255,0.12)';
 
       function colorFor(item, i) {
         return item.name === 'Other' ? OTHER_COLOR : PALETTE[i % PALETTE.length];
@@ -796,9 +794,9 @@ showCopied();
         });
       }
 
-      function loadTrend() {
-        var mount = document.getElementById('trend-chart-mount');
-        var insight = document.getElementById('trend-insight');
+      function loadRecord() {
+        var mount = document.getElementById('record-chart-mount');
+        var insight = document.getElementById('record-insight');
         if (!mount) return;
 
         var allIds = [];
@@ -817,52 +815,28 @@ showCopied();
           });
 
           if (points.length < 2) {
-            mount.innerHTML = '<p class="stx-empty">Not enough years logged yet to show a trend.</p>';
+            mount.innerHTML = '<p class="stx-empty">Not enough years logged yet to show a record.</p>';
             return;
           }
 
-          var W = 600, H = 110, padX = 3, padTop = 12, padBottom = 12;
-          var n = points.length;
           var maxHours = Math.max.apply(null, points.map(function (p) { return p.hours; })) || 1;
-          var range = maxHours || 1;
 
-          function xFor(i) {
-            return n === 1 ? W / 2 : padX + (i / (n - 1)) * (W - padX * 2);
-          }
-          function yFor(hours) {
-            var t = hours / range;
-            return H - padBottom - t * (H - padTop - padBottom);
-          }
-
-          var coords = points.map(function (p, i) { return { x: xFor(i), y: yFor(p.hours) }; });
-
-          var linePath = coords.map(function (c, i) {
-            return (i === 0 ? 'M' : 'L') + c.x.toFixed(1) + ' ' + c.y.toFixed(1);
-          }).join(' ');
-          var lastX = coords[coords.length - 1].x.toFixed(1);
-          var firstX = coords[0].x.toFixed(1);
-          var areaPath = linePath + ' L' + lastX + ' ' + H + ' L' + firstX + ' ' + H + ' Z';
-
-          var dotsSvg = coords.map(function (c, i) {
-            var isCurrent = i === coords.length - 1;
-            return '<circle class="stx-trend-dot' + (isCurrent ? ' -current' : '') + '" cx="' + c.x.toFixed(1) + '" cy="' + c.y.toFixed(1) + '" r="' + (isCurrent ? 4 : 3) + '"></circle>';
+          var barsHtml = points.map(function (p, i) {
+            var isCurrent = String(p.year) === String(YEARS[0]);
+            var pct = maxHours ? (p.hours / maxHours) * 100 : 0;
+            return (
+              '<div class="stx-record-col' + (isCurrent ? ' -current' : '') + '">' +
+                '<div class="stx-record-track">' +
+                  '<div class="stx-record-fill" data-target="' + pct + '"></div>' +
+                '</div>' +
+              '</div>'
+            );
           }).join('');
 
-          var svg =
-            '<svg class="stx-trend-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
-              '<defs><linearGradient id="stxTrendFill" x1="0" y1="0" x2="0" y2="1">' +
-                '<stop offset="0%" stop-color="#6b7994" stop-opacity="0.14"></stop>' +
-                '<stop offset="100%" stop-color="#6b7994" stop-opacity="0"></stop>' +
-              '</linearGradient></defs>' +
-              '<path class="stx-trend-area" d="' + areaPath + '" fill="url(#stxTrendFill)"></path>' +
-              '<path class="stx-trend-line" d="' + linePath + '" fill="none"></path>' +
-              dotsSvg +
-            '</svg>';
-
-          var colsHtml = points.map(function (p, i) {
-            var badgeHtml;
+          var metaHtml = points.map(function (p, i) {
+            var deltaHtml;
             if (i === 0) {
-              badgeHtml = '<span class="stx-trend-badge -empty">–</span>';
+              deltaHtml = '<span class="stx-record-delta -empty">–</span>';
             } else {
               var prev = points[i - 1].hours;
               if (prev > 0) {
@@ -870,38 +844,35 @@ showCopied();
                 var dir = change > 1 ? '-up' : (change < -1 ? '-down' : '-flat');
                 var arrow = change > 1 ? '&#9650;' : (change < -1 ? '&#9660;' : '');
                 var sign = change > 0 ? '+' : '';
-                badgeHtml = '<span class="stx-trend-badge ' + dir + '">' + (arrow ? '<span class="arrow">' + arrow + '</span>' : '') + sign + fmt1(change) + '%</span>';
+                deltaHtml = '<span class="stx-record-delta ' + dir + '">' + (arrow ? '<span class="arrow">' + arrow + '</span>' : '') + sign + fmt1(change) + '%</span>';
               } else if (p.hours > 0) {
-                badgeHtml = '<span class="stx-trend-badge -up"><span class="arrow">&#9650;</span>New</span>';
+                deltaHtml = '<span class="stx-record-delta -up"><span class="arrow">&#9650;</span>New</span>';
               } else {
-                badgeHtml = '<span class="stx-trend-badge -empty">–</span>';
+                deltaHtml = '<span class="stx-record-delta -empty">–</span>';
               }
             }
             var isCurrent = String(p.year) === String(YEARS[0]);
             return (
-              '<div class="stx-trend-col">' +
-                badgeHtml +
-                '<span class="stx-trend-value numbers">' + fmt1(p.hours) + 'h</span>' +
-                '<span class="stx-trend-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
+              '<div class="stx-record-meta">' +
+                '<span class="stx-record-value numbers">' + fmt1(p.hours) + 'h</span>' +
+                '<span class="stx-record-year numbers' + (isCurrent ? ' -current' : '') + '">' + p.year + '</span>' +
+                deltaHtml +
               '</div>'
             );
           }).join('');
 
           mount.innerHTML =
-            '<div class="stx-trend">' +
-              '<div class="stx-trend-chart" id="stx-trend-chart">' + svg + '</div>' +
-              '<div class="stx-trend-cols">' + colsHtml + '</div>' +
+            '<div class="stx-record">' +
+              '<div class="stx-record-bars" id="stx-record-bars">' + barsHtml + '</div>' +
+              '<div class="stx-record-cols">' + metaHtml + '</div>' +
             '</div>';
 
           requestAnimationFrame(function () {
-            var lineEl = mount.querySelector('.stx-trend-line');
-            if (lineEl) {
-              var len = lineEl.getTotalLength();
-              lineEl.style.setProperty('--line-len', len);
-            }
+            var fills = mount.querySelectorAll('.stx-record-fill');
             requestAnimationFrame(function () {
-              var chartEl = document.getElementById('stx-trend-chart');
-              if (chartEl) chartEl.classList.add('-visible');
+              fills.forEach(function (el, i) {
+                setTimeout(function () { el.style.height = el.dataset.target + '%'; }, i * 45);
+              });
             });
           });
 
@@ -915,7 +886,7 @@ showCopied();
             }
           }
         }).catch(function () {
-          mount.innerHTML = '<p class="stx-empty">Could not load the trend right now.</p>';
+          mount.innerHTML = '<p class="stx-empty">Could not load the record right now.</p>';
         });
       }
 
@@ -931,7 +902,7 @@ showCopied();
         pillsMount.appendChild(pill);
       });
 
-      loadTrend();
+      loadRecord();
 
       if (DEFAULT_YEAR) {
         renderYear(DEFAULT_YEAR);
