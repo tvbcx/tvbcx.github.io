@@ -772,6 +772,7 @@ showCopied();
       var trailerEl = document.getElementById('last-watched-trailer');
       var reverted = true;
       var autoRevertTimer = null;
+      var trailerResizeHandler = null;
 
       function loadYouTubeAPI(callback) {
         if (window.YT && window.YT.Player) { callback(); return; }
@@ -792,6 +793,7 @@ showCopied();
         if (reverted) return;
         reverted = true;
         if (autoRevertTimer) { clearTimeout(autoRevertTimer); autoRevertTimer = null; }
+        if (trailerResizeHandler) { window.removeEventListener('resize', trailerResizeHandler); trailerResizeHandler = null; }
         trailerEl.style.transition = 'none';
         trailerEl.style.opacity = '0';
         mediaEl.classList.remove('-trailer-active');
@@ -809,6 +811,9 @@ showCopied();
         if (!mediaEl || !trailerEl || !key) return;
         reverted = false;
         var hasStartedRevertTimer = false;
+        var PLAYER_W = 1280;
+        var PLAYER_H = 720;
+
         var iframe = document.createElement('iframe');
         iframe.id = 'last-watched-trailer-iframe';
         iframe.src = 'https://www.youtube.com/embed/' + key +
@@ -819,7 +824,32 @@ showCopied();
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.frameBorder = '0';
         iframe.tabIndex = -1;
+        // Render the player at a large fixed size, then scale the whole
+        // thing down with CSS to fit the actual (often small/mobile) box.
+        // YouTube sizes its title/logo/end-card overlays relative to the
+        // player's own pixel size (small players get bigger touch-friendly
+        // overlays), so rendering "large" and shrinking visually makes all
+        // of that chrome shrink proportionally along with the video.
+        iframe.width = PLAYER_W;
+        iframe.height = PLAYER_H;
+        iframe.style.position = 'absolute';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
+        iframe.style.width = PLAYER_W + 'px';
+        iframe.style.height = PLAYER_H + 'px';
+        iframe.style.transformOrigin = '0 0';
         trailerEl.appendChild(iframe);
+
+        function scaleTrailerIframe() {
+          if (!mediaEl) return;
+          var w = mediaEl.getBoundingClientRect().width;
+          if (!w) return;
+          iframe.style.transform = 'scale(' + (w / PLAYER_W) + ')';
+        }
+
+        scaleTrailerIframe();
+        trailerResizeHandler = scaleTrailerIframe;
+        window.addEventListener('resize', trailerResizeHandler);
 
         var toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
@@ -884,7 +914,7 @@ showCopied();
           }
         });
 
-        requestAnimationFrame(function () {
+        function revealTrailer() {
           mediaEl.classList.add('-trailer-active');
           section.classList.add('-trailer-active');
           var labelEl = document.getElementById('last-watched-label');
@@ -896,7 +926,7 @@ showCopied();
             labelEl.textContent = 'Last Watch: ';
             labelEl.appendChild(titleLink);
           }
-        });
+        }
 
         loadYouTubeAPI(function () {
           if (!document.getElementById('last-watched-trailer-iframe')) return;
@@ -909,6 +939,7 @@ showCopied();
                   toggleBtn.classList.remove('-paused');
                   if (!hasStartedRevertTimer) {
                     hasStartedRevertTimer = true;
+                    requestAnimationFrame(revealTrailer);
                     autoRevertTimer = setTimeout(revertToPoster, 17000);
                   }
                 }
@@ -944,7 +975,7 @@ showCopied();
       }
 
       if (TMDB_API_KEY && lastWatched.imdb) {
-        var startDelayTimer = new Promise(function (resolve) { setTimeout(resolve, 3500); });
+        var startDelayTimer = new Promise(function (resolve) { setTimeout(resolve, 4000); });
         Promise.all([fetchTrailerKey(lastWatched.imdb), startDelayTimer])
           .then(function (results) { playTrailer(results[0]); })
           .catch(function () {});
