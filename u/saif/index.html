@@ -898,8 +898,7 @@ showCopied();
         youtubeLink.rel = 'noopener noreferrer';
         youtubeLink.setAttribute('aria-label', 'Open trailer in YouTube');
         youtubeLink.innerHTML =
-          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>' +
-          '<span>Open in YouTube</span>';
+          '<span>Open on YouTube</span>';
         youtubeLink.addEventListener('click', function (e) { e.stopPropagation(); });
         trailerEl.appendChild(youtubeLink);
 
