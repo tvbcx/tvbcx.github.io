@@ -181,6 +181,7 @@ showCopied();
 
       var heroSlides = [];
       var heroShows = [];
+      var heroDots = [];
       var heroIndex = 0;
       var heroTimer = null;
       var HERO_INTERVAL = 6500;
@@ -197,6 +198,23 @@ showCopied();
           heroSlides.push(slide);
         });
 
+        if (heroShows.length > 1) {
+          var dotsWrap = document.createElement('div');
+          dotsWrap.className = 'hero-dots';
+          heroShows.forEach(function (show, i) {
+            var dot = document.createElement('button');
+            dot.type = 'button';
+            dot.className = 'hero-dot';
+            dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+            dot.addEventListener('click', function () {
+              goToHero(i, true);
+            });
+            dotsWrap.appendChild(dot);
+            heroDots.push(dot);
+          });
+          heroEl.appendChild(dotsWrap);
+        }
+
         heroSkeleton.style.display = 'none';
         goToHero(0);
         startHeroTimer();
@@ -208,6 +226,7 @@ showCopied();
       function goToHero(i, userTriggered) {
         heroIndex = i;
         heroSlides.forEach(function (s, idx) { s.classList.toggle('-active', idx === i); });
+        heroDots.forEach(function (d, idx) { d.classList.toggle('-active', idx === i); });
 
         heroContent.classList.remove('-visible');
 
@@ -227,7 +246,7 @@ showCopied();
           heroCta.href = '/show/?id=' + show.id;
 
           heroContent.classList.add('-visible');
-        }, userTriggered ? 0 : 0);
+        }, 300);
 
         if (userTriggered) {
           stopHeroTimer();
