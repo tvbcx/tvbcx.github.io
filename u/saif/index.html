@@ -773,6 +773,7 @@ showCopied();
       var reverted = true;
       var autoRevertTimer = null;
       var trailerResizeHandler = null;
+      var trailerResizeObserver = null;
 
       function loadYouTubeAPI(callback) {
         if (window.YT && window.YT.Player) { callback(); return; }
@@ -794,6 +795,7 @@ showCopied();
         reverted = true;
         if (autoRevertTimer) { clearTimeout(autoRevertTimer); autoRevertTimer = null; }
         if (trailerResizeHandler) { window.removeEventListener('resize', trailerResizeHandler); trailerResizeHandler = null; }
+        if (trailerResizeObserver) { trailerResizeObserver.disconnect(); trailerResizeObserver = null; }
         trailerEl.style.transition = 'none';
         trailerEl.style.opacity = '0';
         mediaEl.classList.remove('-trailer-active');
@@ -850,6 +852,16 @@ showCopied();
         scaleTrailerIframe();
         trailerResizeHandler = scaleTrailerIframe;
         window.addEventListener('resize', trailerResizeHandler);
+
+        // The box animates from its small poster width up to full width via
+        // a CSS transition, and a plain 'resize' listener never fires for
+        // that. Use ResizeObserver to keep the iframe's scale in sync with
+        // the box's actual size throughout that animation (this is what was
+        // making the desktop trailer look shrunk into a corner).
+        if (window.ResizeObserver) {
+          trailerResizeObserver = new ResizeObserver(scaleTrailerIframe);
+          trailerResizeObserver.observe(mediaEl);
+        }
 
         var toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
