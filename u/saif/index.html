@@ -691,7 +691,7 @@ showCopied();
     (function () {
       var bioEl = document.getElementById('profile-bio');
       if (bioEl && typeof window.PROFILE_BIO === 'string') {
-        bioEl.textContent = window.PROFILE_BIO;
+        bioEl.innerHTML = window.PROFILE_BIO;
       }
     })();
   </script>
