@@ -7,7 +7,7 @@ var SHOWS = [
   { title: "Chernobyl",                          imdb: "tt7366338",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/193/482599.jpg",        rating: 4.5  , journalYear: 2024, journalOrder: 18 },
   { title: "The Bear",                           imdb: "tt14452776", src: "https://static.tvmaze.com/uploads/images/medium_untouched/592/1480192.jpg",      rating: 4    , journalYear: 2023, journalOrder: 13 },
   { title: "The Queen's Gambit",                 imdb: "tt10048342", src: "https://static.tvmaze.com/uploads/images/medium_portrait/510/1275203.jpg",       rating: 4    , journalYear: 2022, journalOrder: 8 },
-  { title: "Game of Thrones",                    imdb: "tt0944947",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/498/1245274.jpg",       rating: 5    },
+  { title: "Game of Thrones",                    imdb: "tt0944947",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/498/1245274.jpg",       rating: null    },
   { title: "Mr. Robot",                          imdb: "tt4158110",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/211/528026.jpg",        rating: 4.5 },
   { title: "When They See Us",                   imdb: "tt7137906",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/oPv3nNtkuc6EPEql5lgdOuQNHuG.jpg",        rating: 4    },
   { title: "Ozark",                              imdb: "tt5071412",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/398/996611.jpg",        rating: null },
