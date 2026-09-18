@@ -25,6 +25,7 @@
 
   var SPINNER_HTML =
     '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+  var LOADING_HTML = '<div class="loading-shimmer">' + SPINNER_HTML + '</div>';
 
   function clearResults() {
     resultsContainer.innerHTML = '';
@@ -114,7 +115,7 @@ document.title = query.trim()
       return;
     }
 
-    setStatus(SPINNER_HTML);
+    setStatus(LOADING_HTML);
 
     if (activeController) activeController.abort();
     var controller = new AbortController();
