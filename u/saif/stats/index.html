@@ -414,8 +414,10 @@ showCopied();
 })();
 </script>
   <div id="page-loading-overlay" class="page-loading-overlay">
-    <div class="spinner">
-      <div></div><div></div><div></div><div></div><div></div><div></div>
+    <div class="loading-shimmer -fullscreen">
+      <div class="spinner -inline">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
     </div>
   </div>
 
@@ -460,6 +462,7 @@ showCopied();
     (function () {
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+      var LOADING_HTML = '<div class="loading-shimmer">' + SPINNER_HTML + '</div>';
 
       var PALETTE = ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.76)', 'rgba(255,255,255,0.62)', 'rgba(255,255,255,0.50)', 'rgba(255,255,255,0.40)', 'rgba(255,255,255,0.32)', 'rgba(255,255,255,0.26)', 'rgba(255,255,255,0.21)', 'rgba(255,255,255,0.17)'];
       var OTHER_COLOR = 'rgba(255,255,255,0.12)';
@@ -678,7 +681,7 @@ showCopied();
         content.hidden = true;
         statusEl.hidden = false;
         statusEl.classList.remove('-error');
-        statusEl.innerHTML = SPINNER_HTML + '<span>Crunching the numbers…</span>';
+        statusEl.innerHTML = LOADING_HTML;
       }
 
       function showError(message) {
