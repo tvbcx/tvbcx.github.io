@@ -136,3 +136,11 @@
   .profile-stats { margin: 16px 0 16px; }
   .profile-favorites .section-heading { font-size: 11px; }
 }
+
+
+/* --- Desktop-only tweaks: bigger footer text, top header bar with image starting below it (about page) --- */
+@media (min-width:1024px){.site-footer{font-size:14px}}
+@media (min-width:1024px){
+  body.about-page .site-header{background-color:#141a25}
+  body.about-page .about-media img{top:76px}
+}
