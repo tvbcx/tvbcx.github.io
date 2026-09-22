@@ -783,6 +783,26 @@ showCopied();
         yearLabels.forEach(function (label) {
           label.classList.toggle('-current', label.dataset.year === String(year));
         });
+
+        var fills = recordMount.querySelectorAll('.stx-record-fill');
+        if (!fills.length) return;
+
+        // Drop every bar back to 0 first, then force the browser to register
+        // that reset before animating back up, so the bars visibly rebuild
+        // from the bottom on every year switch (not just on first load).
+        fills.forEach(function (el) {
+          el.style.height = '0%';
+        });
+
+        void recordMount.offsetHeight;
+
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            fills.forEach(function (el, i) {
+              setTimeout(function () { el.style.height = el.dataset.target + '%'; }, i * 45);
+            });
+          });
+        });
       }
 
       function setActivePill(year) {
