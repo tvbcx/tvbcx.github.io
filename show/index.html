@@ -7,7 +7,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>...</title>
-  <link rel="stylesheet" href="/styles.css?v=3">
+  <link rel="stylesheet" href="/styles.css?v=4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
@@ -160,7 +160,13 @@
         <div class="show-actions">
           <input type="checkbox" id="markas-toggle" class="auth-checkbox">
 
-          <button type="button" id="watchlist-btn" class="watchlist-btn">Add to Watchlist</button>
+          <div class="watchlist-cluster" id="watchlist-cluster">
+            <button type="button" id="trailer-btn" class="trailer-btn" tabindex="-1" aria-hidden="true" aria-label="Watch trailer on YouTube">
+              <svg class="trailer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+              <span>Watch Trailer</span>
+            </button>
+            <button type="button" id="watchlist-btn" class="watchlist-btn">Add to Watchlist</button>
+          </div>
 
           <label for="markas-toggle" id="markas-btn-label" class="markas-btn">Mark As</label>
 
@@ -332,6 +338,62 @@ showCopied();
       var hero = document.getElementById('show-hero');
       var backdropImage = document.querySelector('.js-show-backdrop-image');
 
+      var trailerCluster = document.getElementById('watchlist-cluster');
+      var trailerBtn = document.getElementById('trailer-btn');
+      var trailerTimers = [];
+
+      function pickTrailerUrl(show) {
+        var results = (show.videos && show.videos.results) || [];
+        var onYouTube = results.filter(function (v) { return v.site === 'YouTube'; });
+
+        function first(pred) {
+          var matches = onYouTube.filter(pred);
+          return matches.length ? matches[0] : null;
+        }
+
+        var best =
+          first(function (v) { return v.type === 'Trailer' && v.official && v.iso_639_1 === 'en'; }) ||
+          first(function (v) { return v.type === 'Trailer' && v.official; }) ||
+          first(function (v) { return v.type === 'Trailer' && v.iso_639_1 === 'en'; }) ||
+          first(function (v) { return v.type === 'Trailer'; }) ||
+          first(function (v) { return v.type === 'Teaser' && v.official; }) ||
+          first(function (v) { return v.type === 'Teaser'; });
+
+        return best ? ('https://www.youtube.com/watch?v=' + best.key) : null;
+      }
+
+      function clearTrailerTimers() {
+        for (var i = 0; i < trailerTimers.length; i++) clearTimeout(trailerTimers[i]);
+        trailerTimers = [];
+      }
+
+      function setupTrailerReveal(show) {
+        clearTrailerTimers();
+        trailerCluster.classList.remove('-split');
+        trailerBtn.setAttribute('tabindex', '-1');
+        trailerBtn.setAttribute('aria-hidden', 'true');
+        trailerBtn.onclick = null;
+
+        var url = pickTrailerUrl(show);
+        if (!url) return;
+
+        trailerBtn.onclick = function () {
+          window.open(url, '_blank', 'noopener');
+        };
+
+        trailerTimers.push(setTimeout(function () {
+          trailerCluster.classList.add('-split');
+          trailerBtn.setAttribute('tabindex', '0');
+          trailerBtn.setAttribute('aria-hidden', 'false');
+
+          trailerTimers.push(setTimeout(function () {
+            trailerCluster.classList.remove('-split');
+            trailerBtn.setAttribute('tabindex', '-1');
+            trailerBtn.setAttribute('aria-hidden', 'true');
+          }, 2500));
+        }, 1200));
+      }
+
       var SPINNER_HTML =
         '<div class="spinner -inline"><div></div><div></div><div></div><div></div><div></div><div></div></div>';
 
@@ -368,7 +430,7 @@ showCopied();
       function loadShow(id) {
         setStatus(SPINNER_HTML);
 
-        fetch(TMDB_BASE + '/tv/' + encodeURIComponent(id) + '?api_key=' + TMDB_API_KEY + '&append_to_response=external_ids')
+        fetch(TMDB_BASE + '/tv/' + encodeURIComponent(id) + '?api_key=' + TMDB_API_KEY + '&append_to_response=external_ids,videos')
           .then(function (res) {
             if (!res.ok) throw new Error('TMDB request failed (' + res.status + ')');
             return res.json();
@@ -453,6 +515,8 @@ showCopied();
               show.overview || 'No description available.';
 
             hero.hidden = false;
+
+            setupTrailerReveal(show);
       }
     })();
   </script>
