@@ -161,7 +161,7 @@ showCopied();
 </script>
 </div>
 <div id="page-loading-overlay" class="page-loading-overlay">
-<div class="spinner">
+<div class="spinner -inline">
 <div></div><div></div><div></div><div></div><div></div><div></div>
 </div>
 </div>
@@ -197,6 +197,32 @@ goToResults();
 window.addEventListener('pageshow', function () {
 overlay.classList.remove('-visible');
 });
+})();
+</script>
+<script>
+(function () {
+if (!document.body.classList.contains('about-page')) return;
+var startY = 0;
+var tracking = false;
+
+document.addEventListener('touchstart', function (e) {
+if (e.touches.length !== 1) return;
+startY = e.touches[0].clientY;
+tracking = (document.scrollingElement || document.documentElement).scrollTop <= 0;
+}, { passive: true });
+
+document.addEventListener('touchmove', function (e) {
+if (!tracking || e.touches.length !== 1) return;
+var deltaY = e.touches[0].clientY - startY;
+var scrollTop = (document.scrollingElement || document.documentElement).scrollTop;
+if (scrollTop <= 0 && deltaY > 0) {
+e.preventDefault();
+}
+}, { passive: false });
+
+document.addEventListener('touchend', function () {
+tracking = false;
+}, { passive: true });
 })();
 </script>
 <script src="/auth.js?v=1"></script>
