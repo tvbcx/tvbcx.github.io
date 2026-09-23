@@ -3,7 +3,8 @@ const SIGNIN_HTML = `
     <input type="text" class="auth-input" id="signin-username" name="username" placeholder="Username" autocomplete="username">
     <input type="password" class="auth-input" id="signin-password" name="password" placeholder="Password" autocomplete="current-password">
     <div class="auth-form-divider"></div>
-    <button type="submit" class="auth-submit-btn" id="signin-submit">Sign In</button>
+    <button type="submit" class="auth-submit-btn -primary" id="signin-submit">Sign In</button>
+    <button type="button" class="auth-submit-btn -ghost" id="goto-signup">Sign Up</button>
   </form>
 `;
 
@@ -22,6 +23,13 @@ const SIGNIN_LOADING_MS = 1650;
 const AUTH_TOAST_VISIBLE_MS = 2200;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Remove Sign Up button from dropdown — handled inside the sign-in modal instead
+  document.querySelectorAll('.auth-dropdown .auth-dropdown-btn').forEach(btn => {
+    if (btn.htmlFor === 'signup-toggle' || (btn.getAttribute && btn.getAttribute('for') === 'signup-toggle')) {
+      btn.remove();
+    }
+  });
+
   const signinBox = document.querySelector('.signin-modal-wrap .auth-modal-box');
   const signupBox = document.querySelector('.signup-modal-wrap .auth-modal-box');
 
@@ -69,6 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(SIGNIN_ERROR_MESSAGE);
       }, SIGNIN_LOADING_MS);
     });
+
+    const gotoSignup = document.getElementById('goto-signup');
+    if (gotoSignup) {
+      gotoSignup.addEventListener('click', () => {
+        if (signinToggle) signinToggle.checked = false;
+        if (signupToggle) signupToggle.checked = true;
+      });
+    }
   }
 
   renderSigninForm();
