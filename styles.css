@@ -241,4 +241,7 @@
     padding-right:22px;
     margin-right:14px;
   }
-}
+}.auth-submit-btn.-primary{background-color:#ffffff;color:#0b121e;border-color:#ffffff}
+@media (hover:hover) and (pointer:fine){.auth-submit-btn.-primary:hover{background-color:#e4e7ee;border-color:#e4e7ee;transform:translateY(-1px)}}
+.auth-submit-btn.-ghost{background-color:transparent;color:rgba(234,238,245,0.55);border-color:rgba(255,255,255,0.1)}
+@media (hover:hover) and (pointer:fine){.auth-submit-btn.-ghost:hover{background-color:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:rgba(234,238,245,0.85)}}
