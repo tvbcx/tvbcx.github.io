@@ -245,3 +245,149 @@
 @media (hover:hover) and (pointer:fine){.auth-submit-btn.-primary:hover{background-color:#e4e7ee;border-color:#e4e7ee;transform:translateY(-1px)}}
 .auth-submit-btn.-ghost{background-color:transparent;color:rgba(234,238,245,0.55);border-color:rgba(255,255,255,0.1)}
 @media (hover:hover) and (pointer:fine){.auth-submit-btn.-ghost:hover{background-color:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:rgba(234,238,245,0.85)}}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Surface Pro 7 portrait / mid-range tablets  (900 – 1023 px)
+   Bridges the gap: profile layout fires at 900 px but header,
+   avatar, carousel, and show page stay at mobile sizes until 1024 px.
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 900px) and (max-width: 1023px) {
+
+  /* ── Site header: intermediate between mobile and 1024px desktop ── */
+  .site-header {
+    height: 64px;
+    padding: 0 24px;
+  }
+  .header-container .group {
+    max-width: 200px;
+  }
+  .input {
+    height: 34px;
+    line-height: 34px;
+    font-size: 13px;
+  }
+  .header-home {
+    width: 34px;
+    height: 34px;
+  }
+  .header-home svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ── Page content: a touch more side padding ── */
+  .page-content {
+    padding: 0 24px 24px;
+  }
+
+  /* ── Hero carousel: intermediate height ── */
+  .hero-carousel {
+    height: 540px;
+    margin-bottom: -88px;
+  }
+  .hero-content {
+    bottom: 116px;
+  }
+
+  /* ── Poster carousel cards: intermediate size ── */
+  .carousel-card,
+  .carousel-poster,
+  .carousel-card img,
+  .carousel-poster-fallback,
+  .carousel-card-body {
+    width: 140px;
+  }
+  .carousel-card {
+    flex-basis: 140px;
+  }
+  .carousel-poster,
+  .carousel-card img,
+  .carousel-poster-fallback {
+    height: 210px;
+  }
+  .carousel-card img {
+    min-width: 140px;
+    max-width: 140px;
+  }
+  .carousel-track {
+    gap: 14px;
+  }
+
+  /* ── Profile: intermediate avatar size ── */
+  .avatar-img {
+    width: 120px;
+    height: 120px;
+    border-width: 4px;
+  }
+  .person-display-name {
+    font-size: 2.1rem;
+  }
+  .profile-summary {
+    padding-top: 36px;
+    gap: 22px;
+  }
+
+  /* ── Profile bio: adjusted for 120px avatar ── */
+  .profile-header .bio {
+    top: 88px;
+    left: 142px;
+    max-width: 390px;
+    font-size: 15px;
+  }
+
+  /* ── Profile stats: intermediate padding and value size ── */
+  .profile-header .profile-stats {
+    padding-top: 36px;
+  }
+  .profile-header .profile-statistic .value {
+    font-size: 1.38rem;
+  }
+
+  /* ── Poster grids: intermediate card size ── */
+  #ratings-grid,
+  #dnf-grid,
+  #journal-grid,
+  #rating-grid,
+  #watched-grid,
+  #watchlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── Section headings: slightly more breathing room ── */
+  .section-heading,
+  .section-heading-row {
+    margin-bottom: 18px;
+  }
+
+  /* ── Backdrop: profile page ── */
+  body.profile-page .backdrop-container {
+    height: 560px;
+    margin-bottom: -370px;
+  }
+
+  /* ── Show page: intermediate sizes ── */
+  .show-banner-container {
+    height: 310px;
+  }
+  .show-hero {
+    gap: 30px;
+    margin-top: -105px;
+  }
+  .show-poster {
+    width: 195px;
+  }
+  .show-title {
+    font-size: 2.2rem;
+  }
+  .show-overview {
+    font-size: 14px;
+    max-width: 660px;
+  }
+
+  /* ── Footer text: intermediate size ── */
+  .site-footer {
+    font-size: 13px;
+  }
+}
