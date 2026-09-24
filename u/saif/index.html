@@ -283,6 +283,136 @@
       }
     }
 
+    /* ── Surface Pro 7 portrait / mid-range viewports (900 – 1023 px) ── */
+    @media (min-width: 900px) and (max-width: 1023px) {
+
+      /* Two-column float layout for the profile grid */
+      .profile-grid {
+        display: block;
+      }
+      .profile-grid::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .profile-favorites,
+      .profile-dnf,
+      .profile-watchlist {
+        float: left;
+        clear: left;
+        width: calc(100% - 320px);
+        box-sizing: border-box;
+        padding-right: 16px;
+      }
+      .profile-stats-embed,
+      .profile-ratings-journal {
+        float: right;
+        clear: right;
+        width: 300px;
+        display: block;
+      }
+      /* Hide the inline stats-box link (replaced by the embed) */
+      .profile-favorites .stats-box {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+      .profile-favorites,
+      .profile-dnf {
+        margin-top: 0 !important;
+        margin-bottom: 20px !important;
+      }
+      .profile-watchlist {
+        margin-top: 0 !important;
+        margin-bottom: 20px !important;
+      }
+      .profile-stats-embed {
+        margin-bottom: 20px !important;
+      }
+      /* Stack ratings + journal vertically inside the right column */
+      .profile-ratings-journal .dashboard-row {
+        display: block;
+      }
+      .profile-ratings-journal .dash-card:first-child {
+        margin-bottom: 20px;
+      }
+
+      /* Section headings inside right column */
+      .profile-favorites .section-heading,
+      .profile-stats-embed .section-heading {
+        color: #fff;
+        border-bottom-color: #000;
+        padding-bottom: 6px;
+      }
+
+      /* Stats embed – sized for the 300 px right column */
+      .profile-stats-embed .stats-hero-card {
+        padding: 14px 5px 12px;
+      }
+      .profile-stats-embed .stats-hero-card .value {
+        font-size: 1.35rem;
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: initial;
+        color: #fff;
+      }
+      .profile-stats-embed .stats-hero-card::before {
+        display: none;
+      }
+      .profile-stats-embed .stats-hero-row {
+        gap: 7px;
+        margin-bottom: 16px;
+      }
+      .profile-stats-embed .stats-donut-panel {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+      }
+      .profile-stats-embed .stats-donut {
+        width: 96px;
+        height: 96px;
+      }
+      .profile-stats-embed .stats-legend {
+        width: auto;
+      }
+      .profile-stats-embed .stats-legend-item {
+        font-size: 11.5px;
+        gap: 6px;
+      }
+      .profile-stats-embed .stats-legend-name {
+        max-width: 100px;
+      }
+    }
+
+    /* Film-grain mask tuned for 64 px header / 560 px backdrop */
+    @media (min-width: 900px) and (max-width: 1023px) {
+      body::before {
+        -webkit-mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 64px,
+          rgba(0,0,0,0.06) 120px, rgba(0,0,0,0.13) 172px,
+          rgba(0,0,0,0.22) 215px, rgba(0,0,0,0.33) 250px,
+          rgba(0,0,0,0.45) 280px, rgba(0,0,0,0.58) 306px,
+          rgba(0,0,0,0.68) 327px, rgba(0,0,0,0.78) 349px,
+          rgba(0,0,0,0.86) 366px, rgba(0,0,0,0.91) 383px,
+          rgba(0,0,0,0.95) 400px, rgba(0,0,0,0.98) 413px,
+          #000 430px, #000 100%);
+        mask-image: linear-gradient(to bottom,
+          transparent 0px, transparent 64px,
+          rgba(0,0,0,0.06) 120px, rgba(0,0,0,0.13) 172px,
+          rgba(0,0,0,0.22) 215px, rgba(0,0,0,0.33) 250px,
+          rgba(0,0,0,0.45) 280px, rgba(0,0,0,0.58) 306px,
+          rgba(0,0,0,0.68) 327px, rgba(0,0,0,0.78) 349px,
+          rgba(0,0,0,0.86) 366px, rgba(0,0,0,0.91) 383px,
+          rgba(0,0,0,0.95) 400px, rgba(0,0,0,0.98) 413px,
+          #000 430px, #000 100%);
+      }
+    }
+
     body::before {
       -webkit-mask-image: linear-gradient(to bottom,
         transparent 0px, transparent 60px,
