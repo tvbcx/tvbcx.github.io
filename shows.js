@@ -1,20 +1,18 @@
 var SHOWS = [
-  { title: "The Americans",                      imdb: "tt2149175",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/w1UBlxEXhbKe8sp0fxFZh7MqTce.jpg",           rating: null },
-  { title: "Money Heist",                        imdb: "tt13696452", src: "https://image.tmdb.org/t/p/w440_and_h660_face/dmnwJGVergOFWCiLbPsQTyyzePw.jpg",       rating: 3.5 },
+  { title: "The Americans",                      imdb: "tt2149175",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/w1UBlxEXhbKe8sp0fxFZh7MqTce.jpg",  rating: null },
+  { title: "Money Heist",                        imdb: "tt13696452", src: "https://image.tmdb.org/t/p/w440_and_h660_face/dmnwJGVergOFWCiLbPsQTyyzePw.jpg",  rating: 3.5 },
   { title: "Dark",                               imdb: "tt5753856",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/201/502948.jpg",       rating: 3.5  },
   { title: "Prison Break",                       imdb: "tt0455275",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/48/122451.jpg",        rating: 4    },
-  { title: "Squid Game",                         imdb: "tt10919420", src: "https://static.tvmaze.com/uploads/images/medium_portrait/576/1440521.jpg",       rating: 4    , journalYear: 2023, journalOrder: 11 },
+  { title: "Baseball",                           imdb: "tt0108700", src: "https://static.tvmaze.com/uploads/images/medium_untouched/80/202106.jpg",         rating: null },
   { title: "Chernobyl",                          imdb: "tt7366338",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/193/482599.jpg",        rating: 4.5  , journalYear: 2024, journalOrder: 18 },
   { title: "The Bear",                           imdb: "tt14452776", src: "https://static.tvmaze.com/uploads/images/medium_untouched/592/1480192.jpg",      rating: 4    , journalYear: 2023, journalOrder: 13 },
   { title: "The Queen's Gambit",                 imdb: "tt10048342", src: "https://static.tvmaze.com/uploads/images/medium_portrait/510/1275203.jpg",       rating: 4    , journalYear: 2022, journalOrder: 8 },
   { title: "Game of Thrones",                    imdb: "tt0944947",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/498/1245274.jpg",       rating: null    },
   { title: "Mr. Robot",                          imdb: "tt4158110",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/211/528026.jpg",        rating: 4.5 },
   { title: "When They See Us",                   imdb: "tt7137906",  src: "https://image.tmdb.org/t/p/w440_and_h660_face/oPv3nNtkuc6EPEql5lgdOuQNHuG.jpg",        rating: 4    },
-  { title: "Ozark",                              imdb: "tt5071412",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/398/996611.jpg",        rating: null },
+  { title: "Ozark",                             imdb: "tt5071412",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/398/996611.jpg",        rating: null },
   { title: "Dexter",                             imdb: "tt0773262",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/39/99906.jpg",         rating: 4    },
   { title: "Lupin",                              imdb: "tt2531336",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/286/715734.jpg",       rating: 3    , journalYear: 2022, journalOrder: 1 },
-  { title: "The Punisher",                       imdb: "tt5675620",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/500/1250736.jpg",       rating: 3.5  , journalYear: 2022, journalOrder: 5 },
-  { title: "The Vampire Diaries",                imdb: "tt1405406",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/271/677698.jpg",        rating: 4 },
   { title: "Severance",                          imdb: "tt11280740", src: "https://static.tvmaze.com/uploads/images/medium_untouched/547/1369575.jpg",      rating: 4    , journalYear: 2024, journalOrder: 16 },
   { title: "Mindhunter",                         imdb: "tt5290382",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253490.jpg",       rating: 4    },
   { title: "Band of Brothers",                   imdb: "tt0185906",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/80/201679.jpg",        rating: 5    , journalYear: 2022, journalOrder: 3 },
@@ -49,7 +47,6 @@ var SHOWS = [
   { title: "Through the Darkness",               imdb: "tt15007172", src: "https://static.tvmaze.com/uploads/images/medium_portrait/389/972574.jpg",        rating: 3.5  , journalYear: 2026, journalOrder: 30 },
   { title: "Silo",                               imdb: "tt14688458",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg",       rating: 4  , journalYear: 2026, journalOrder: 31, seasons: [3] },
 
-  // DNF
   { title: "Succession",                         imdb: "tt7660850",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/453/1134275.jpg",       rating: null, list: "dnf" },
   { title: "West World",                            imdb: "tt0475784",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/445/1113927.jpg",       rating: null, list: "dnf" },
   { title: "Teen Wolf",                          imdb: "tt1567432",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/30/75365.jpg",         rating: null, list: "dnf" },
@@ -59,7 +56,6 @@ var SHOWS = [
   { title: "Vikings: Valhalla",                            imdb: "tt11311302",  src: "https://static.tvmaze.com/uploads/images/medium_portrait/523/1308457.jpg",       rating: null, list: "dnf" },
   { title: "11.22.63",                            imdb: "tt2879552",  src: "https://static.tvmaze.com/uploads/images/medium_untouched/63/157660.jpg",       rating: null, list: "dnf" },
 
-  // WL
   { title: "Pluribus",                           imdb: "tt22202452", src: "https://static.tvmaze.com/uploads/images/medium_portrait/592/1481086.jpg",       rating: null, list: "watchlist" },
   { title: "The Pitt",                           imdb: "tt31938062", src: "https://static.tvmaze.com/uploads/images/medium_portrait/606/1516776.jpg",       rating: null, list: "watchlist" },
   { title: "The Comeback: 2004 Boston Red Sox",  imdb: "tt31186041", src: "https://static.tvmaze.com/uploads/images/medium_untouched/540/1351183.jpg",      rating: null, list: "watchlist" },
