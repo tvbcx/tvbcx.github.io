@@ -369,6 +369,11 @@
           #000 500px, #000 100%);
       }
     }
+
+    /* Removed the fixed full-screen grain overlay (body::before) that showed as a dark shadow at the bottom while scrolling */
+    body.profile-page::before {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="profile-page">
