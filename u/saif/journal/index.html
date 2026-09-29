@@ -53,7 +53,14 @@
       padding: 20px 0;
     }
 
-    #journal-grid { grid-template-columns: repeat(4, 1fr); }
+    #journal-grid {
+      grid-template-columns: repeat(4, 1fr);
+      overflow-anchor: none;
+      min-height: 70vh;
+      min-height: 70svh;
+    }
+    #journal-grid .card { animation: card-in 0.25s ease both; }
+    @keyframes card-in { from { opacity: 0; } to { opacity: 1; } }
 
     .site-header {
       position: relative;
@@ -267,10 +274,14 @@ showCopied();
         }).join('');
       }
 
+      var currentYear = null;
+
       function setActiveYear(year) {
+        if (String(year) === currentYear) return;
+        currentYear = String(year);
         var pills = pillsMount.querySelectorAll('.year-pill');
         pills.forEach(function (pill) {
-          pill.classList.toggle('-active', pill.dataset.year === String(year));
+          pill.classList.toggle('-active', pill.dataset.year === currentYear);
         });
         renderGrid(year);
       }
