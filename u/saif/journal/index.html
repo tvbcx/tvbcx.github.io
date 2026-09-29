@@ -14,6 +14,17 @@
   <link rel="preload" as="script" href="/shows.js?v=1">
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Stack+Sans+Headline:wght@400&display=swap" rel="stylesheet">
   <style>
+    /* Fix: reserve scrollbar space so the layout never shifts sideways when the page height changes */
+    html {
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
+    }
+
+    .year-pills {
+      scrollbar-width: none;
+    }
+    .year-pills::-webkit-scrollbar { display: none; }
+
     .year-pills {
       display: flex;
       flex-wrap: nowrap;
