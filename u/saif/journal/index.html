@@ -65,13 +65,15 @@
     }
 
     #journal-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-content: start;
+      align-items: start;
       overflow-anchor: none;
       min-height: 70vh;
       min-height: 70svh;
     }
-    #journal-grid .card { animation: card-in 0.25s ease both; }
-    @keyframes card-in { from { opacity: 0; } to { opacity: 1; } }
+    #journal-grid .card { min-width: 0; }
+    #journal-grid .journal-empty { grid-column: 1 / -1; }
 
     .site-header {
       position: relative;
@@ -265,24 +267,46 @@ showCopied();
       var grid = document.getElementById('journal-grid');
 
       var EAGER_ROW_SIZE = 4;
+      var cache = {};
 
-      function renderGrid(year) {
+      function buildYear(year) {
         var shows = JOURNAL[year] || [];
         if (!shows.length) {
-          grid.innerHTML = '<p class="journal-empty">No shows logged for ' + year + ' yet.</p>';
-          return;
+          var empty = document.createElement('p');
+          empty.className = 'journal-empty';
+          empty.textContent = 'No shows logged for ' + year + ' yet.';
+          return [empty];
         }
-        grid.innerHTML = shows.map(function (show, i) {
-          var titleAttr = show.title.replace(/"/g, '&quot;');
-          var loadingAttr = i < EAGER_ROW_SIZE ? 'eager' : 'lazy';
-          return (
-            '<div class="card" data-title="' + titleAttr + '" data-imdb="' + show.imdb + '">' +
-              '<a href="/show/?imdb=' + show.imdb + '">' +
-                '<img src="' + show.src + '" alt="' + titleAttr + '" width="150" height="225" loading="' + loadingAttr + '" decoding="async">' +
-              '</a>' +
-            '</div>'
-          );
-        }).join('');
+        return shows.map(function (show, i) {
+          var card = document.createElement('div');
+          card.className = 'card';
+          card.setAttribute('data-title', show.title);
+          card.setAttribute('data-imdb', show.imdb);
+
+          var a = document.createElement('a');
+          a.href = '/show/?imdb=' + show.imdb;
+
+          var img = document.createElement('img');
+          img.alt = show.title;
+          img.width = 150;
+          img.height = 225;
+          img.decoding = 'async';
+          img.loading = i < EAGER_ROW_SIZE ? 'eager' : 'lazy';
+          img.src = show.src;
+
+          a.appendChild(img);
+          card.appendChild(a);
+          return card;
+        });
+      }
+
+      function renderGrid(year) {
+        if (!cache[year]) cache[year] = buildYear(year);
+        var nodes = cache[year];
+        var frag = document.createDocumentFragment();
+        nodes.forEach(function (n) { frag.appendChild(n); });
+        while (grid.firstChild) grid.removeChild(grid.firstChild);
+        grid.appendChild(frag);
       }
 
       var currentYear = null;
