@@ -277,6 +277,57 @@ showCopied();
 })();
 </script>
 
+  <script>
+  (function () {
+    var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    var container = document.getElementById('results-container');
+
+    function blank(img) {
+      if (img.getAttribute('data-blanked')) return;
+      img.setAttribute('data-blanked', '1');
+      img.onerror = null;
+      img.removeAttribute('srcset');
+      img.alt = '';
+      img.removeAttribute('title');
+      img.src = BLANK_IMG;
+    }
+
+    function check(img) {
+      if (img.getAttribute('data-blanked')) return;
+      var src = img.getAttribute('src') || '';
+      if (!src || /placeholder|no[-_]?image|no[-_]?poster/i.test(src) || /\/null$|\/undefined$/i.test(src)) {
+        blank(img);
+        return;
+      }
+      if (img.complete && img.naturalWidth === 0) blank(img);
+    }
+
+    function scan(root) {
+      if (root.nodeType !== 1) return;
+      if (root.tagName === 'IMG') { check(root); return; }
+      var imgs = root.querySelectorAll('img');
+      for (var i = 0; i < imgs.length; i++) check(imgs[i]);
+    }
+
+    window.addEventListener('error', function (e) {
+      var t = e.target;
+      if (t && t.tagName === 'IMG' && container && container.contains(t)) {
+        e.stopImmediatePropagation();
+        blank(t);
+      }
+    }, true);
+
+    if (container && window.MutationObserver) {
+      new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var m = mutations[i];
+          if (m.type === 'attributes') { check(m.target); continue; }
+          for (var j = 0; j < m.addedNodes.length; j++) scan(m.addedNodes[j]);
+        }
+      }).observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+    }
+  })();
+  </script>
   <script src="/search.js?v=2"></script>
 <script src="/auth.js?v=1"></script>
 </body>
