@@ -196,7 +196,7 @@
               </div>
               <div class="wd-header-text">
                 <span class="wd-title">Log your watch</span>
-                <span class="wd-subtitle" id="wd-show-name">this show</span>
+                <span class="wd-subtitle"><span class="wd-show-name" id="wd-show-name">this show</span><span class="wd-show-year" id="wd-show-year"></span></span>
               </div>
               <label for="watchdate-toggle" class="wd-close" aria-label="Close">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -215,12 +215,6 @@
                 <span class="wd-stub-label">Finished</span>
                 <span class="wd-stub-value" id="wd-value-end">—</span>
               </button>
-            </div>
-
-            <div class="wd-tear" aria-hidden="true">
-              <span class="wd-tear-line"></span>
-              <span class="wd-tear-icon">✂</span>
-              <span class="wd-tear-line"></span>
             </div>
 
             <div class="wd-calendar" id="wd-calendar"></div>
@@ -362,6 +356,36 @@ showCopied();
         return best ? ('https://www.youtube.com/watch?v=' + best.key) : null;
       }
 
+      function openTrailer(webUrl) {
+        var match = /[?&]v=([^&]+)/.exec(webUrl);
+        var key = match ? match[1] : null;
+        var ua = navigator.userAgent || '';
+        var isAndroid = /Android/i.test(ua);
+        var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (key && isAndroid) {
+          window.location.href = 'intent://www.youtube.com/watch?v=' + key +
+            '#Intent;scheme=https;package=com.google.android.youtube;' +
+            'S.browser_fallback_url=' + encodeURIComponent(webUrl) + ';end';
+          return;
+        }
+
+        if (key && isIOS) {
+          var leftPage = false;
+          var onVisibility = function () { if (document.hidden) leftPage = true; };
+          document.addEventListener('visibilitychange', onVisibility);
+          window.location.href = 'youtube://www.youtube.com/watch?v=' + key;
+          setTimeout(function () {
+            document.removeEventListener('visibilitychange', onVisibility);
+            if (!leftPage && !document.hidden) window.location.href = webUrl;
+          }, 1500);
+          return;
+        }
+
+        window.open(webUrl, '_blank', 'noopener');
+      }
+
       function clearTrailerTimers() {
         for (var i = 0; i < trailerTimers.length; i++) clearTimeout(trailerTimers[i]);
         trailerTimers = [];
@@ -378,7 +402,7 @@ showCopied();
         if (!url) return;
 
         trailerBtn.onclick = function () {
-          window.open(url, '_blank', 'noopener');
+          openTrailer(url);
         };
 
         trailerTimers.push(setTimeout(function () {
