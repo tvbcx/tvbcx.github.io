@@ -165,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const watchdateToggle = document.getElementById('watchdate-toggle');
   const wdPopover       = document.getElementById('watchdate-popover');
   const wdShowNameEl    = document.getElementById('wd-show-name');
+  const wdShowYearEl    = document.getElementById('wd-show-year');
   const wdCalendarEl    = document.getElementById('wd-calendar');
   const wdHintEl        = document.getElementById('wd-hint');
   const wdDurationEl    = document.getElementById('wd-duration');
@@ -284,9 +285,24 @@ document.addEventListener('DOMContentLoaded', () => {
     wdCalendarEl.innerHTML = html;
   }
 
-  function wdNavigate(dir) {
+  function wdCanNavigate(dir) {
+    const min = wdMinDate();
+    const max = wdMaxDate();
+    const viewYM = new Date(wdView.getFullYear(), wdView.getMonth(), 1);
+    if (dir < 0) {
+      return new Date(viewYM.getFullYear(), viewYM.getMonth(), 0) >= min;
+    }
+    return new Date(viewYM.getFullYear(), viewYM.getMonth() + 1, 1) <= max;
+  }
+
+  function wdNavigate(dir, animate) {
     wdView = new Date(wdView.getFullYear(), wdView.getMonth() + dir, 1);
     renderWdCalendar();
+    if (animate) {
+      wdCalendarEl.classList.remove('-slide-next', '-slide-prev');
+      void wdCalendarEl.offsetWidth;
+      wdCalendarEl.classList.add(dir > 0 ? '-slide-next' : '-slide-prev');
+    }
   }
 
   function updateWdStubs() {
@@ -342,6 +358,38 @@ document.addEventListener('DOMContentLoaded', () => {
       openWdJump();
     }
   });
+
+  const WD_SWIPE_MIN_PX = 50;
+  let wdSwipeX = null;
+  let wdSwipeY = null;
+
+  wdCalendarEl.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) {
+      wdSwipeX = null;
+      wdSwipeY = null;
+      return;
+    }
+    wdSwipeX = e.touches[0].clientX;
+    wdSwipeY = e.touches[0].clientY;
+  }, { passive: true });
+
+  wdCalendarEl.addEventListener('touchend', (e) => {
+    if (wdSwipeX === null) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - wdSwipeX;
+    const dy = touch.clientY - wdSwipeY;
+    wdSwipeX = null;
+    wdSwipeY = null;
+    if (Math.abs(dx) < WD_SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const dir = dx > 0 ? -1 : 1;
+    if (!wdCanNavigate(dir)) return;
+    wdNavigate(dir, true);
+  }, { passive: true });
+
+  wdCalendarEl.addEventListener('touchcancel', () => {
+    wdSwipeX = null;
+    wdSwipeY = null;
+  }, { passive: true });
 
   if (wdFieldStart) {
     wdFieldStart.addEventListener('click', () => {
@@ -431,6 +479,11 @@ document.addEventListener('DOMContentLoaded', () => {
         (titleEl && titleEl.textContent) ||
         (window.tvboxShowMeta && window.tvboxShowMeta.name) ||
         'this show';
+    }
+    if (wdShowYearEl) {
+      const meta = window.tvboxShowMeta;
+      const yearMatch = meta && meta.firstAirDate ? /^\d{4}/.exec(meta.firstAirDate) : null;
+      wdShowYearEl.textContent = yearMatch ? ' - ' + yearMatch[0] : '';
     }
     wdView = wdRange.start
       ? new Date(wdRange.start.getFullYear(), wdRange.start.getMonth(), 1)
