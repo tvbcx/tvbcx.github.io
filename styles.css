@@ -34,7 +34,9 @@
 .wd-clapper svg{width:15px;height:15px;fill:currentColor}
 .wd-header-text{min-width:0;flex:1}
 .wd-title{display:block;font-family:var(--font-text);font-size:13.5px;font-weight:700;color:#eaeef5;line-height:1.2}
-.wd-subtitle{display:block;margin-top:1px;font-size:11px;color:#8490a4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+.wd-subtitle{display:flex;margin-top:1px;font-size:11px;color:#8490a4;white-space:nowrap;overflow:hidden;max-width:170px}
+.wd-show-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wd-show-year{display:none;flex:none;white-space:pre}
 .wd-close{display:flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;border-radius:50%;color:#8490a4;cursor:pointer;transition:background-color 0.15s ease,color 0.15s ease}
 .wd-close svg{width:11px;height:11px}
 @media (hover:hover) and (pointer:fine){.wd-close:hover{background-color:rgba(255,255,255,0.08);color:#eaeef5}}
@@ -52,11 +54,12 @@
 .wd-duration{flex:none;font-family:var(--font-numbers);font-size:9.5px;font-weight:700;color:#0b121e;background:#ffffff;padding:3px 7px;border-radius:999px;white-space:nowrap}
 .wd-duration[hidden]{display:none}
 
-.wd-tear{display:flex;align-items:center;gap:8px;padding:0 2px;color:#3a4863}
-.wd-tear-line{flex:1;height:0;border-top:1.5px dashed #24304a}
-.wd-tear-icon{flex:none;font-size:11px;transform:rotate(90deg);opacity:0.7}
-
-.wd-calendar{}
+.wd-calendar{touch-action:pan-y}
+.wd-calendar.-slide-next{animation:wd-slide-next 0.22s ease-out}
+.wd-calendar.-slide-prev{animation:wd-slide-prev 0.22s ease-out}
+@keyframes wd-slide-next{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes wd-slide-prev{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.wd-calendar.-slide-next,.wd-calendar.-slide-prev{animation:none}}
 .wd-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .wd-cal-nav{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;color:#b3c2db;cursor:pointer;transition:background-color 0.15s ease,color 0.15s ease}
 .wd-cal-nav svg{width:12px;height:12px;display:block}
@@ -107,17 +110,30 @@
 @media (max-width:380px){
   .watchdate-popover{width:calc(100vw - 24px);padding:14px;gap:10px}}
 
+@media (max-width:1023px){
+  .wd-header-text{text-align:center}
+  .wd-subtitle{justify-content:center;max-width:none}
+  .wd-show-year{display:block}
+  .wd-stub.-end{text-align:left;align-items:flex-start}}
+
 @media (min-width:1024px){
-  .watchdate-popover{width:420px;padding:24px;gap:16px;border-radius:22px}
+  .watchdate-popover{width:780px;max-width:calc(100vw - 48px);padding:28px;column-gap:28px;row-gap:16px;border-radius:22px}
+  #watchdate-toggle:checked ~ .watchdate-popover{display:grid;grid-template-columns:320px minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto auto;align-items:start}
+  .watchdate-popover > .wd-header{grid-column:1;grid-row:1}
+  .watchdate-popover > .wd-hint{grid-column:1;grid-row:2;text-align:left}
+  .watchdate-popover > .wd-stub-row{grid-column:1;grid-row:3}
+  .watchdate-popover > .wd-actions{grid-column:1;grid-row:5}
+  .watchdate-popover > .wd-skip-btn{grid-column:1;grid-row:6}
+  .watchdate-popover > .wd-calendar{grid-column:2;grid-row:1 / 7;align-self:stretch;padding-left:28px;border-left:1px solid #1e2a3e}
   .wd-clapper{width:32px;height:32px;border-radius:10px}
   .wd-clapper svg{width:18px;height:18px}
   .wd-title{font-size:15px}
-  .wd-subtitle{font-size:12.5px;max-width:250px}
+  .wd-subtitle{font-size:12.5px;max-width:100%}
   .wd-close{width:26px;height:26px}
   .wd-hint{font-size:12.5px}
-  .wd-stub-row{padding:12px 14px;border-radius:14px}
+  .wd-stub-row{padding:12px 10px;border-radius:14px}
   .wd-stub-label{font-size:10px}
-  .wd-stub-value{font-size:15px}
+  .wd-stub-value{font-size:13.5px}
   .wd-duration{font-size:10.5px;padding:4px 9px}
   .wd-cal-nav{width:30px;height:30px}
   .wd-cal-nav svg{width:14px;height:14px}
