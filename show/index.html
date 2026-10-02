@@ -18,6 +18,9 @@
       background-color: #32425b;
       display: block;
     }
+    .show-hero.-no-actions .show-actions {
+      display: none !important;
+    }
     #watchlist-btn {
       background-color: #ffffff;
       border-color: #ffffff;
@@ -501,9 +504,20 @@ showCopied();
               preload.src = backdropUrl;
             }
 
+            var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
             var posterImg = document.getElementById('show-poster-img');
-            posterImg.src = show.poster_path ? POSTER_BASE + show.poster_path : 'poster-placeholder.jpg';
-            posterImg.alt = show.name || '';
+            posterImg.onerror = function () {
+              posterImg.onerror = null;
+              posterImg.alt = '';
+              posterImg.src = BLANK_IMG;
+            };
+            if (show.poster_path) {
+              posterImg.alt = show.name || '';
+              posterImg.src = POSTER_BASE + show.poster_path;
+            } else {
+              posterImg.alt = '';
+              posterImg.src = BLANK_IMG;
+            }
 
             document.getElementById('show-title').textContent = show.name || 'Untitled';
             document.title = (show.name || 'Untitled') + ' ǀ tvbox';
@@ -535,8 +549,10 @@ showCopied();
             document.getElementById('show-episodes-value').textContent =
               show.number_of_episodes != null ? show.number_of_episodes : '–';
 
-            document.getElementById('show-overview').textContent =
-              show.overview || 'No description available.';
+            document.getElementById('show-overview').textContent = show.overview || '';
+
+            var hasNothing = !show.overview && !show.number_of_seasons && !show.number_of_episodes;
+            hero.classList.toggle('-no-actions', hasNothing);
 
             hero.hidden = false;
 
