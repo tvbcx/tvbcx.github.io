@@ -305,3 +305,8 @@ body.profile-page .backdropmask{background:linear-gradient(to bottom,rgba(11,18,
   .ep-title{font-size:14px}
   .ep-meta{font-size:12.5px}
 }
+.auth-modal-backdrop{background-color:rgba(0,0,0,0.55);animation:auth-fade-in 0.18s ease both}
+.auth-modal-box{background-color:rgba(8,12,20,0.92);animation:auth-fade-in 0.18s ease both}
+.auth-dropdown{background-color:rgba(8,12,20,0.9)}
+@keyframes auth-fade-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.auth-modal-backdrop,.auth-modal-box{animation:none}}
