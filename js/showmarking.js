@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const SEASON_POSTER_BASE = 'https://image.tmdb.org/t/p/w185';
   let seasonsData  = [];
   const seasonLogs = {};
+  const SEASON_STILL_BASE = 'https://image.tmdb.org/t/p/w300';
+  const openSeasons   = {};
+  const episodesCache = {};
   let activeSeason = null;
   let applyStarsRating = null;
   function findSeason(n) {
@@ -658,8 +661,114 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       html += '<span class="season-upcoming">Upcoming</span>';
     }
+    if (season.episodes > 0) {
+      const isOpen = !!openSeasons[season.number];
+      html += '<button type="button" class="season-toggle" data-season-toggle="' + season.number +
+        '" aria-expanded="' + (isOpen ? 'true' : 'false') +
+        '" aria-controls="season-eps-' + season.number +
+        '" aria-label="' + (isOpen ? 'Hide' : 'Show') + ' episodes of ' + escapeText(name) + '">' +
+        '<svg class="season-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg></button>';
+    }
     html += '</article>';
     return html;
+  }
+  function seasonItemHtml(season) {
+    const isOpen = !!openSeasons[season.number];
+    let html = '<div class="season-item' + (isOpen ? ' -open' : '') + '" data-season-item="' + season.number + '">';
+    html += seasonRowHtml(season);
+    if (season.episodes > 0) {
+      html += '<div class="season-eps" id="season-eps-' + season.number + '"' + (isOpen ? '' : ' hidden') + '></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+  function formatRuntime(mins) {
+    const m = Math.round(Number(mins));
+    if (!isFinite(m) || m <= 0) return '';
+    if (m < 60) return m + 'm';
+    const r = m % 60;
+    return Math.floor(m / 60) + 'h' + (r ? ' ' + r + 'm' : '');
+  }
+  function episodeItemHtml(ep) {
+    const num   = ep.episode_number != null ? ep.episode_number : '';
+    const title = ep.name || (num !== '' ? 'Episode ' + num : 'Untitled');
+    let html = '<li class="ep-item">';
+    html += '<div class="ep-thumb' + (ep.still_path ? ' -has-img' : '') + '">';
+    if (ep.still_path) {
+      html += '<img src="' + SEASON_STILL_BASE + escapeText(ep.still_path) +
+        '" alt="" loading="lazy" decoding="async">';
+    }
+    html += '</div><div class="ep-body"><div class="ep-head">';
+    if (num !== '') html += '<span class="ep-num numbers">' + escapeText(num) + '</span>';
+    html += '<h4 class="ep-title">' + escapeText(title) + '</h4></div>';
+    const bits = [];
+    const d = ep.air_date ? fromISODate(String(ep.air_date).slice(0, 10)) : null;
+    if (d) bits.push('<span class="numbers">' + formatDate(d) + '</span>');
+    const rt = formatRuntime(ep.runtime);
+    if (rt) bits.push('<span class="numbers">' + rt + '</span>');
+    if (ep.vote_average > 0 && ep.vote_count > 0) {
+      bits.push('<span class="numbers">\u2605 ' + Number(ep.vote_average).toFixed(1) + '</span>');
+    }
+    if (bits.length) {
+      html += '<div class="ep-meta">' + bits.join('<span class="ep-meta-dot">\u00b7</span>') + '</div>';
+    }
+    if (ep.overview) html += '<p class="ep-desc">' + escapeText(ep.overview) + '</p>';
+    html += '</div></li>';
+    return html;
+  }
+  function episodesHtml(list) {
+    if (!list.length) return '<div class="ep-status">No episode details available yet.</div>';
+    return '<ul class="ep-list">' + list.map(episodeItemHtml).join('') + '</ul>';
+  }
+  function loadEpisodes(n, panel) {
+    if (!panel) return;
+    if (episodesCache[n]) {
+      panel.innerHTML = episodesHtml(episodesCache[n]);
+      return;
+    }
+    if (panel.getAttribute('data-loading') === '1') return;
+    const meta = window.tvboxShowMeta;
+    const get  = window.tvboxTmdbGet;
+    const failHtml = '<div class="ep-status -error">Couldn\u2019t load episodes.' +
+      '<button type="button" class="ep-retry" data-season-retry="' + n + '">Retry</button></div>';
+    if (typeof get !== 'function' || !meta || meta.id == null) {
+      panel.innerHTML = failHtml;
+      return;
+    }
+    panel.setAttribute('data-loading', '1');
+    panel.innerHTML = '<div class="ep-status">Loading episodes\u2026</div>';
+    get('/tv/' + encodeURIComponent(meta.id) + '/season/' + encodeURIComponent(n))
+      .then((data) => {
+        episodesCache[n] = data && Array.isArray(data.episodes) ? data.episodes : [];
+        panel.innerHTML = episodesHtml(episodesCache[n]);
+      })
+      .catch(() => {
+        panel.innerHTML = failHtml;
+      })
+      .then(() => {
+        panel.removeAttribute('data-loading');
+      });
+  }
+  function toggleSeasonEpisodes(n) {
+    if (!seasonListEl) return;
+    const item = seasonListEl.querySelector('[data-season-item="' + n + '"]');
+    const panel = item ? item.querySelector('.season-eps') : null;
+    if (!item || !panel) return;
+    const open = !openSeasons[n];
+    openSeasons[n] = open;
+    item.classList.toggle('-open', open);
+    panel.hidden = !open;
+    const btn = item.querySelector('.season-toggle');
+    const season = findSeason(n);
+    if (btn) {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (season) {
+        btn.setAttribute('aria-label', (open ? 'Hide' : 'Show') + ' episodes of ' + seasonDisplayName(season));
+      }
+    }
+    if (open) loadEpisodes(n, panel);
   }
   function renderSeasons() {
     if (!seasonSectionEl || !seasonListEl) return;
@@ -675,7 +784,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     seasonsData = list;
-    seasonListEl.innerHTML = list.map(seasonRowHtml).join('');
+    Object.keys(openSeasons).forEach((k) => { delete openSeasons[k]; });
+    seasonListEl.innerHTML = list.map(seasonItemHtml).join('');
     seasonSectionEl.hidden = false;
   }
   function setSeasonLog(n, entry) {
@@ -719,6 +829,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (seasonListEl) {
     seasonListEl.addEventListener('click', (e) => {
+      const toggleBtn = e.target.closest('.season-toggle');
+      if (toggleBtn) {
+        toggleSeasonEpisodes(parseInt(toggleBtn.getAttribute('data-season-toggle'), 10));
+        return;
+      }
+      const retryBtn = e.target.closest('.ep-retry');
+      if (retryBtn) {
+        loadEpisodes(
+          parseInt(retryBtn.getAttribute('data-season-retry'), 10),
+          retryBtn.closest('.season-eps')
+        );
+        return;
+      }
       const btn = e.target.closest('.season-log-btn');
       if (!btn) return;
       openSeasonMarkAs(parseInt(btn.getAttribute('data-season'), 10));
@@ -727,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const img = e.target;
       if (!img || img.tagName !== 'IMG') return;
       img.style.display = 'none';
-      const box = img.closest('.season-poster');
+      const box = img.closest('.season-poster, .ep-thumb');
       if (box) box.classList.remove('-has-img');
     }, true);
   }
