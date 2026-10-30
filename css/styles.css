@@ -156,6 +156,9 @@
 .trailer-btn[hidden]{
   display:none;
 }
+.show-actions .trailer-btn{
+  order:1;
+}
 @media (hover:hover) and (pointer:fine){
   .trailer-btn:hover{
     background-color:rgba(77,142,255,0.2);
@@ -279,7 +282,7 @@ body.profile-page .backdropmask{background:linear-gradient(to bottom,rgba(11,18,
 .ep-title{margin:0;min-width:0;font-size:13px;font-weight:600;line-height:1.3;color:#ffffff;overflow:hidden;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1}
 .ep-meta{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;color:#8490a4;font-size:11.5px}
 .ep-meta-dot{color:#30405a}
-.ep-desc{margin:0;color:#a2acbe;font-size:12px;line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.ep-rating{color:#ffffff;font-weight:600}
 .ep-status{padding:14px;text-align:center;color:#8490a4;font-size:12.5px}
 .ep-retry{font-family:var(--font-text);font-size:12px;font-weight:600;color:#b3c2db;background:transparent;border:1px solid #30405a;border-radius:8px;padding:4px 10px;margin-left:10px;cursor:pointer}
 @media (hover:hover) and (pointer:fine){.ep-retry:hover{color:#ffffff;border-color:#ffffff}}
@@ -301,5 +304,4 @@ body.profile-page .backdropmask{background:linear-gradient(to bottom,rgba(11,18,
   .ep-num{font-size:13px}
   .ep-title{font-size:14px}
   .ep-meta{font-size:12.5px}
-  .ep-desc{font-size:13px;-webkit-line-clamp:3}
 }
