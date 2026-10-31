@@ -310,3 +310,7 @@ body.profile-page .backdropmask{background:linear-gradient(to bottom,rgba(11,18,
 .auth-dropdown{background-color:rgba(8,12,20,0.9)}
 @keyframes auth-fade-in{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.auth-modal-backdrop,.auth-modal-box{animation:none}}
+a.ep-item{color:inherit;text-decoration:none}
+a.ep-item .ep-title{transition:color 0.15s ease}
+@media (hover:hover) and (pointer:fine){a.ep-item:hover{background-color:rgba(255,255,255,0.03)}a.ep-item:hover .ep-title{color:#29a6ff}}
+a.ep-item:focus-visible{outline:none;background-color:rgba(255,255,255,0.05)}
