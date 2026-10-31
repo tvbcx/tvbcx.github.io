@@ -501,7 +501,7 @@
         setImage(document.getElementById('ep-still'), ep.still_path ? STILL_BASE + ep.still_path : '', epName);
         var back = document.getElementById('ep-back');
         back.href = showUrl(tvId);
-        back.textContent = '\u2190 ' + (showName || 'Back to show');
+        back.textContent = showName || 'Back to show';
         document.getElementById('ep-title').textContent = epName;
         document.title = epName + (showName ? ' \u00b7 ' + showName : '') + ' \u01c0 tvbox';
         var parts = [];
