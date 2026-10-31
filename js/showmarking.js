@@ -691,10 +691,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const r = m % 60;
     return Math.floor(m / 60) + 'h' + (r ? ' ' + r + 'm' : '');
   }
-  function episodeItemHtml(ep) {
+  function episodeItemHtml(ep, seasonNumber) {
     const num   = ep.episode_number != null ? ep.episode_number : '';
+    const meta  = window.tvboxShowMeta;
+    const href  = (num !== '' && meta && meta.id != null)
+      ? '/assets/episode/?tv=' + encodeURIComponent(meta.id) + '&season=' + encodeURIComponent(seasonNumber) +
+        '&ep=' + encodeURIComponent(num)
+      : '';
     const title = ep.name || (num !== '' ? 'Episode ' + num : 'Untitled');
-    let html = '<li class="ep-item">';
+    let html = href ? '<a class="ep-item" href="' + href + '">' : '<div class="ep-item">';
     html += '<div class="ep-thumb' + (ep.still_path ? ' -has-img' : '') + '">';
     if (ep.still_path) {
       html += '<img src="' + SEASON_STILL_BASE + escapeText(ep.still_path) +
@@ -714,17 +719,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bits.length) {
       html += '<div class="ep-meta">' + bits.join('<span class="ep-meta-dot">\u00b7</span>') + '</div>';
     }
-    html += '</div></li>';
+    html += '</div>' + (href ? '</a>' : '</div>');
     return html;
   }
-  function episodesHtml(list) {
+  function episodesHtml(list, seasonNumber) {
     if (!list.length) return '<div class="ep-status">No episode details available yet.</div>';
-    return '<ul class="ep-list">' + list.map(episodeItemHtml).join('') + '</ul>';
+    return '<div class="ep-list">' + list.map((ep) => episodeItemHtml(ep, seasonNumber)).join('') + '</div>';
   }
   function loadEpisodes(n, panel) {
     if (!panel) return;
     if (episodesCache[n]) {
-      panel.innerHTML = episodesHtml(episodesCache[n]);
+      panel.innerHTML = episodesHtml(episodesCache[n], n);
       return;
     }
     if (panel.getAttribute('data-loading') === '1') return;
@@ -741,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
     get('/tv/' + encodeURIComponent(meta.id) + '/season/' + encodeURIComponent(n))
       .then((data) => {
         episodesCache[n] = data && Array.isArray(data.episodes) ? data.episodes : [];
-        panel.innerHTML = episodesHtml(episodesCache[n]);
+        panel.innerHTML = episodesHtml(episodesCache[n], n);
       })
       .catch(() => {
         panel.innerHTML = failHtml;
@@ -859,6 +864,9 @@ document.addEventListener('DOMContentLoaded', () => {
     Object.keys(map || {}).forEach((k) => setSeasonLog(parseInt(k, 10), map[k]));
   };
   seasonsApi.getLog  = (n) => (seasonLogs[n] ? Object.assign({}, seasonLogs[n]) : null);
+  document.addEventListener('tvbox:show-loaded', () => {
+    try { sessionStorage.setItem('tvbox-show-path', window.location.pathname); } catch (e) {}
+  });
   document.addEventListener('tvbox:show-loaded', renderSeasons);
   if (window.tvboxShowMeta) renderSeasons();
   window.addEventListener('scroll', () => {
