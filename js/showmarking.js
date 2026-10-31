@@ -615,7 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const name  = seasonDisplayName(season);
     const year  = season.airDate && /^\d{4}/.test(season.airDate) ? season.airDate.slice(0, 4) : null;
     const hasImg = !!season.poster;
-    let html = '<article class="season-row" data-season-row="' + season.number + '">';
+    let html = '<article class="season-row' + (season.episodes > 0 ? ' -expandable' : '') +
+      '" data-season-row="' + season.number + '">';
     html += '<div class="season-poster' + (hasImg ? ' -has-img' : '') + '">';
     html += '<span class="season-poster-num numbers">' + season.number + '</span>';
     if (hasImg) {
@@ -695,7 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const num   = ep.episode_number != null ? ep.episode_number : '';
     const meta  = window.tvboxShowMeta;
     const href  = (num !== '' && meta && meta.id != null)
-      ? '/assets/episode/?tv=' + encodeURIComponent(meta.id) + '&season=' + encodeURIComponent(seasonNumber) +
+      ? '/ep/?tv=' + encodeURIComponent(meta.id) + '&season=' + encodeURIComponent(seasonNumber) +
         '&ep=' + encodeURIComponent(num)
       : '';
     const title = ep.name || (num !== '' ? 'Episode ' + num : 'Untitled');
@@ -847,8 +848,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       const btn = e.target.closest('.season-log-btn');
-      if (!btn) return;
-      openSeasonMarkAs(parseInt(btn.getAttribute('data-season'), 10));
+      if (btn) {
+        openSeasonMarkAs(parseInt(btn.getAttribute('data-season'), 10));
+        return;
+      }
+      const row = e.target.closest('.season-row.-expandable');
+      if (row) {
+        toggleSeasonEpisodes(parseInt(row.getAttribute('data-season-row'), 10));
+      }
     });
     seasonListEl.addEventListener('error', (e) => {
       const img = e.target;
