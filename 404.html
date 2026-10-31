@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>tvbox - not found</title>
+  <script>
+  (function () {
+    var m = location.pathname.match(/^\/p\/([^\/]+)\/?$/);
+    if (m) location.replace('/p/?s=' + m[1] + location.hash);
+  })();
+  </script>
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png">
 </head>
 <body style="background:#000;color:#fff;font-family:sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;margin:0">

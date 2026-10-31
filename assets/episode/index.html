@@ -431,9 +431,15 @@
           addGroup(d, mergePeople(depts[d], function (c) { return c.job; }));
         });
       }
+      function personHref(p) {
+        var s = String(p.name || '');
+        if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        var base = s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        return '/p/' + (base ? base + '-' + p.id : String(p.id));
+      }
       function personCardHtml(p) {
         var photoUrl = p.photo ? PROFILE_BASE + p.photo : '';
-        return '<a class="person-card" href="/assets/person/?id=' + encodeURIComponent(p.id) + '">' +
+        return '<a class="person-card" href="' + escapeHtml(personHref(p)) + '">' +
           '<span class="person-photo' + (photoUrl ? ' -has-img' : '') + '">' +
           '<span class="person-initial">' + escapeHtml(firstLetter(p.name)) + '</span>' +
           (photoUrl ? '<img src="' + escapeHtml(photoUrl) + '" alt="" loading="lazy" decoding="async">' : '') +
