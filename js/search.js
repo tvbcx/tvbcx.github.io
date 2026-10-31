@@ -77,37 +77,6 @@
     href: '/u/saif/',
     photo: 'https://raw.githubusercontent.com/osaiif/r/main/r.webp'
   };
-  var ROLE_LABELS = {
-    Acting: 'Actor',
-    Directing: 'Director',
-    Writing: 'Writer',
-    Production: 'Producer',
-    Editing: 'Editor',
-    Creator: 'Creator',
-    Camera: 'Cinematographer',
-    Sound: 'Composer'
-  };
-  var PEOPLE_LIMIT = 6;
-  function slugify(name) {
-    var s = String(name || '');
-    if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  }
-  function personPath(name, id) {
-    var base = slugify(name);
-    return '/p/' + (base ? base + '-' + id : String(id));
-  }
-  function normalize(str) {
-    var s = String(str || '');
-    if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  }
-  function nameMatches(name, query) {
-    var tokens = normalize(query).split(' ').filter(Boolean);
-    if (!tokens.length) return false;
-    var hay = normalize(name);
-    return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
-  }
   function matchesSaif(query) {
     var t = String(query || '').trim().toLowerCase().replace(/^@/, '');
     return t.length >= 3 && ('saif'.indexOf(t) === 0 || t === 'osaif');
@@ -200,31 +169,6 @@
         });
     });
   }
-  function buildPersonCard(person) {
-    var item = document.createElement('a');
-    item.className = 'result-item person-item';
-    item.href = personPath(person.name, person.id);
-    var photo = person.profile_path ? IMG_BASE + person.profile_path : '';
-    var role = ROLE_LABELS[person.known_for_department] || person.known_for_department || '';
-    var known = (person.known_for || [])
-      .map(function (k) { return k.name || k.title; })
-      .filter(Boolean)
-      .slice(0, 3)
-      .join(', ');
-    item.innerHTML =
-      '<span class="person-photo">' +
-        '<span class="person-initial">' + escapeHtml(firstLetter(person.name)) + '</span>' +
-        (photo ? '<img src="' + escapeHtml(photo) + '" alt="" loading="lazy" decoding="async">' : '') +
-      '</span>' +
-      '<div class="details">' +
-        '<div class="header">' +
-          '<h2 class="title">' + escapeHtml(person.name) + '</h2>' +
-          '<div class="meta">' + (role ? '<span class="year">' + escapeHtml(role) + '</span>' : '') + '</div>' +
-        '</div>' +
-        (known ? '<p class="overview">Known for ' + escapeHtml(known) + '</p>' : '') +
-      '</div>';
-    return item;
-  }
   function buildSaifCard() {
     var item = document.createElement('a');
     item.className = 'result-item person-item';
@@ -249,42 +193,24 @@
     label.textContent = text;
     return label;
   }
-  function renderResults(query, shows, people) {
+  function renderResults(query, shows) {
     var showSaif = matchesSaif(query);
     clearResults();
-    if (!showSaif && !people.length && !shows.length) {
+    if (!showSaif && !shows.length) {
       setStatus('');
       resultsContainer.innerHTML = '<p class="no-results">No results found for “' + escapeHtml(query) + '”.</p>';
       return;
     }
     setStatus('');
-    var personFirst = false;
-    if (people.length && nameMatches(people[0].name, query)) {
-      if (!shows.length || !nameMatches(shows[0].name, query) ||
-          (people[0].popularity || 0) > (shows[0].popularity || 0)) {
-        personFirst = true;
-      }
-    }
-    var peopleCount = people.length + (showSaif ? 1 : 0);
-    var multiple = peopleCount > 0 && shows.length > 0;
+    var multiple = showSaif && shows.length > 0;
     var fragment = document.createDocumentFragment();
-    function addPeople() {
-      if (!peopleCount) return;
-      if (multiple) fragment.appendChild(buildGroupLabel('People'));
-      if (showSaif) fragment.appendChild(buildSaifCard());
-      people.forEach(function (p) { fragment.appendChild(buildPersonCard(p)); });
+    if (showSaif) {
+      if (multiple) fragment.appendChild(buildGroupLabel('Profile'));
+      fragment.appendChild(buildSaifCard());
     }
-    function addShows() {
-      if (!shows.length) return;
+    if (shows.length) {
       if (multiple) fragment.appendChild(buildGroupLabel('Shows'));
       shows.forEach(function (show) { fragment.appendChild(buildCard(show)); });
-    }
-    if (personFirst || showSaif) {
-      addPeople();
-      addShows();
-    } else {
-      addShows();
-      addPeople();
     }
     resultsContainer.appendChild(fragment);
     if (shows.length) fetchCreators(shows);
@@ -303,26 +229,21 @@
     if (activeController) activeController.abort();
     var controller = new AbortController();
     activeController = controller;
-    var q = encodeURIComponent(query.trim());
-    var showsReq = tmdbFetch('/search/tv', 'query=' + q + '&include_adult=false&page=1', controller.signal);
-    var peopleReq = tmdbFetch('/search/person', 'query=' + q + '&include_adult=false&page=1', controller.signal)
-      .catch(function (err) {
-        if (err && err.name === 'AbortError') throw err;
-        return null;
-      });
-    Promise.all([showsReq, peopleReq])
-      .then(function (res) {
+    tmdbFetch('/search/tv', 'query=' + encodeURIComponent(query.trim()) + '&include_adult=false&page=1', controller.signal)
+      .then(function (data) {
         if (requestId !== currentRequestId) return;
-        var shows = (res[0].results || []).filter(function (r) { return r.name; });
-        var people = ((res[1] && res[1].results) || [])
-          .filter(function (r) { return r.name && nameMatches(r.name, query); })
-          .slice(0, PEOPLE_LIMIT);
-        renderResults(query.trim(), shows, people);
+        var shows = (data.results || []).filter(function (r) { return r.name; });
+        renderResults(query.trim(), shows);
       })
       .catch(function (err) {
         if (err.name === 'AbortError') return;
         if (requestId !== currentRequestId) return;
         clearResults();
+        if (matchesSaif(query)) {
+          setStatus('');
+          resultsContainer.appendChild(buildSaifCard());
+          return;
+        }
         setStatus('Something went wrong: ' + err.message, true);
       });
   }
